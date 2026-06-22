@@ -26,8 +26,26 @@
   <nav class="navbar">
     <div class="nav-logo">AzWord</div>
     <div class="nav-user">
-      <span id="user-name">...</span>
-      <button class="btn-sm" onclick="logout()">Chiqish</button>
+
+      <div class="profile-avatar" id="profile-avatar">
+        <span id="avatar-text">A</span>
+      </div>
+
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-head">
+          <div class="profile-avatar-lg">
+            <span id="avatar-text-lg">A</span>
+          </div>
+
+          <h4 id="user-name">...</h4>
+          <p id="user-email">...</p>
+        </div>
+
+        <button class="profile-btn-item" onclick="logout()">
+          🚪 Chiqish
+        </button>
+      </div>
+
     </div>
   </nav>
 
@@ -93,6 +111,11 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = 'index.html';
       currentUser = user;
+      document.getElementById('user-email').textContent = user.email;
+      const letter = (user.displayName || user.email).charAt(0).toUpperCase();
+      document.getElementById('avatar-text').textContent = letter;
+      document.getElementById('avatar-text-lg').textContent = letter;
+
       document.getElementById('user-name').textContent = user.displayName || user.email;
       document.getElementById('greeting-name').textContent = user.displayName?.split(' ')[0] || 'Foydalanuvchi';
 
@@ -218,7 +241,21 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    document.getElementById('folder-name').addEventListener('keydown', (e) => {
+    
+    const avatar = document.getElementById('profile-avatar');
+    const dropdown = document.getElementById('profile-dropdown');
+
+    avatar?.addEventListener('click', () => {
+      dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-user')) {
+        dropdown.classList.remove('open');
+      }
+    });
+
+document.getElementById('folder-name').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') window.createFolder();
     });
   </script>
