@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Bo'lim</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .folder-page { max-width: 900px; margin: 0 auto; padding: 36px 24px; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      margin-bottom: 28px;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-main); }
+
+    .folder-page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .folder-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .folder-title .fi { font-size: 2.2rem; }
+    .folder-title h1 { font-size: 1.6rem; font-weight: 700; }
+    .folder-title .word-count { color: var(--text-muted); font-size: 0.875rem; margin-top: 3px; }
+
+    .header-actions { display: flex; gap: 10px; }
+
+    /* Word list */
+    .words-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .word-item {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .word-item:hover { border-color: var(--purple-main); }
+
+    .word-left { flex: 1; }
+    .word-en {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .word-uz {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .word-example {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    .word-num {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-weight: 600;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .word-actions { display: flex; gap: 6px; }
+
+    /* Start study btn */
+    .btn-study {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.2s;
+    }
+    .btn-study:hover { opacity: 0.88; }
+    .btn-study:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Empty */
+    .words-empty {
+      text-align: center;
+      padding: 56px 24px;
+      color: var(--text-muted);
+      border: 1.5px dashed var(--border);
+      border-radius: 14px;
+    }
+    .words-empty .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+
+    /* Modal: add word */
+    .modal h3 { margin-bottom: 20px; font-size: 1.15rem; }
+    .char-count {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-align: right;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <span id="user-name">...</span>
+      <button class="btn-sm" onclick="logout()">Chiqish</button>
+    </div>
+  </nav>
+
+  <div class="folder-page">
+
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      ← Orqaga
+    </button>
+
+    <div class="folder-page-header">
+      <div class="folder-title">
+        <div class="fi" id="folder-emoji">📁</div>
+        <div>
+          <h1 id="folder-name">...</h1>
+          <div class="word-count" id="word-count">0 ta so'z</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-add" onclick="openAddModal()">＋ So'z qo'shish</button>
+        <button class="btn-study" id="study-btn" onclick="startStudy()" disabled>▶ Mashq boshlash</button>
+      </div>
+    </div>
+
+    <!-- So'zlar ro'yxati -->
+    <div class="words-list" id="words-list">
+      <div class="words-empty">
+        <div class="emoji">📝</div>
+        <p>Hali so'z yo'q. Birinchi so'zingizni qo'shing!</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal: So'z qo'shish -->
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal">
+      <h3>Yangi so'z qo'shish</h3>
+      <div class="form-group">
+        <label>Inglizcha so'z</label>
+        <input type="text" id="word-en" placeholder="apple" />
+      </div>
+      <div class="form-group">
+        <label>O'zbekcha tarjima</label>
+        <input type="text" id="word-uz" placeholder="olma" />
+      </div>
+      <div class="form-group">
+        <label>Misol gap (inglizcha)</label>
+        <input type="text" id="word-example" placeholder="I eat an apple every day." maxlength="150" />
+        <div class="char-count" id="char-count">0 / 150</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeAddModal()">Bekor qilish</button>
+        <button class="btn-confirm" onclick="addWord()">Qo'shish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      doc, getDoc, collection, addDoc, getDocs, deleteDoc,
+      updateDoc, query, orderBy, serverTimestamp, increment
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const folderId = params.get('id');
+    let currentUser = null;
+    let words = [];
+
+    if (!folderId) window.location.href = 'dashboard.html';
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
+      document.getElementById('user-name').textContent = user.displayName || user.email;
+      await loadFolder();
+      await loadWords();
+    });
+
+    async function loadFolder() {
+      const snap = await getDoc(doc(db, 'folders', folderId));
+      if (!snap.exists()) return window.location.href = 'dashboard.html';
+      const data = snap.data();
+      document.getElementById('folder-emoji').textContent = data.emoji || '📁';
+      document.getElementById('folder-name').textContent = data.name;
+      document.title = `AzWord — ${data.name}`;
+    }
+
+    async function loadWords() {
+      const q = query(collection(db, 'folders', folderId, 'words'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      words = [];
+      snap.forEach(d => words.push({ id: d.id, ...d.data() }));
+      renderWords();
+    }
+
+    function renderWords() {
+      const container = document.getElementById('words-list');
+      const countEl = document.getElementById('word-count');
+      const studyBtn = document.getElementById('study-btn');
+
+      countEl.textContent = `${words.length} ta so'z`;
+      studyBtn.disabled = words.length === 0;
+
+      if (words.length === 0) {
+        container.innerHTML = `
+          <div class="words-empty">
+            <div class="emoji">📝</div>
+            <p>Hali so'z yo'q. Birinchi so'zingizni qo'shing!</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = '';
+      words.forEach((w, i) => {
+        const div = document.createElement('div');
+        div.className = 'word-item';
+        div.innerHTML = `
+          <div class="word-num">${i + 1}</div>
+          <div class="word-left">
+            <div class="word-en">${w.en}</div>
+            <div class="word-uz">${w.uz}</div>
+            ${w.example ? `<div class="word-example">"${w.example}"</div>` : ''}
+          </div>
+          <div class="word-actions">
+            <button class="icon-btn" onclick="deleteWord('${w.id}')" title="O'chirish">🗑</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    window.openAddModal = () => {
+      document.getElementById('add-modal').classList.add('open');
+      setTimeout(() => document.getElementById('word-en').focus(), 100);
+    };
+
+    window.closeAddModal = () => {
+      document.getElementById('add-modal').classList.remove('open');
+      document.getElementById('word-en').value = '';
+      document.getElementById('word-uz').value = '';
+      document.getElementById('word-example').value = '';
+      document.getElementById('char-count').textContent = '0 / 150';
+    };
+
+    document.getElementById('word-example').addEventListener('input', function() {
+      document.getElementById('char-count').textContent = `${this.value.length} / 150`;
+    });
+
+    window.addWord = async () => {
+      const en = document.getElementById('word-en').value.trim();
+      const uz = document.getElementById('word-uz').value.trim();
+      const example = document.getElementById('word-example').value.trim();
+
+      if (!en || !uz) return showToast("Inglizcha va o'zbekcha so'zlarni kiriting!", true);
+
+      await addDoc(collection(db, 'folders', folderId, 'words'), {
+        en, uz, example,
+        createdAt: serverTimestamp()
+      });
+
+      // folder dagi wordCount ni yangilash
+      await updateDoc(doc(db, 'folders', folderId), {
+        wordCount: increment(1)
+      });
+
+      closeAddModal();
+      showToast("So'z qo'shildi! ✅");
+      await loadWords();
+    };
+
+    window.deleteWord = async (wordId) => {
+      if (!confirm("Bu so'zni o'chirasizmi?")) return;
+      await deleteDoc(doc(db, 'folders', folderId, 'words', wordId));
+      await updateDoc(doc(db, 'folders', folderId), {
+        wordCount: increment(-1)
+      });
+      showToast("O'chirildi", true);
+      await loadWords();
+    };
+
+    window.startStudy = () => {
+      if (words.length === 0) return;
+      window.location.href = `study.html?id=${folderId}`;
+    };
+
+    window.logout = async () => {
+      await signOut(auth);
+      window.location.href = 'index.html';
+    };
+
+    // Enter bilan so'z qo'shish
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && document.getElementById('add-modal').classList.contains('open')) {
+        window.addWord();
+      }
+    });
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
