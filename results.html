@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Natija</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .results-wrap { max-width: 700px; margin: 0 auto; padding: 40px 24px; }
+
+    .results-hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .results-emoji { font-size: 4rem; margin-bottom: 16px; }
+
+    .results-hero h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .results-hero p { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* Score circle */
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 4px solid var(--purple-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 24px auto;
+      background: var(--purple-glow);
+    }
+
+    .score-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--purple-light);
+      line-height: 1;
+    }
+
+    .score-total { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Word results */
+    .section-label { margin-bottom: 14px; }
+
+    .result-item {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .result-item.perfect { border-color: rgba(52,211,153,0.4); }
+    .result-item.has-mistakes { border-color: rgba(248,113,113,0.3); }
+
+    .result-icon { font-size: 1.3rem; min-width: 28px; text-align: center; }
+
+    .result-word {
+      flex: 1;
+    }
+
+    .result-en {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .result-uz { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+
+    .result-mistakes {
+      font-size: 0.78rem;
+      color: var(--danger);
+      margin-top: 4px;
+    }
+
+    .result-ok { font-size: 0.78rem; color: var(--success); margin-top: 4px; }
+
+    /* Actions */
+    .results-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn-retry {
+      flex: 1;
+      padding: 14px;
+      background: transparent;
+      border: 1.5px solid var(--purple-main);
+      border-radius: 12px;
+      color: var(--purple-light);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .btn-retry:hover { background: var(--purple-glow); }
+
+    .btn-home {
+      flex: 1;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.2s;
+    }
+
+    .btn-home:hover { opacity: 0.88; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <button class="btn-sm" onclick="window.location.href='dashboard.html'">Dashboard</button>
+    </div>
+  </nav>
+
+  <div class="results-wrap">
+
+    <div class="results-hero">
+      <div class="results-emoji" id="result-emoji">🎉</div>
+      <h1 id="result-title">Mashq yakunlandi!</h1>
+      <p id="result-subtitle">Natijalaringiz quyida</p>
+
+      <div class="score-circle">
+        <div class="score-num" id="score-num">0/0</div>
+        <div class="score-total">mukammal so'z</div>
+      </div>
+    </div>
+
+    <!-- Word by word results -->
+    <div class="section-label">📋 Har bir so'z natijalari</div>
+    <div id="results-list"></div>
+
+    <div class="results-actions">
+      <button class="btn-retry" onclick="retry()">🔄 Qaytadan ishlash</button>
+      <button class="btn-home" onclick="window.location.href='dashboard.html'">🏠 Bosh sahifa</button>
+    </div>
+
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const folderId = params.get('id');
+
+    const resultsRaw = sessionStorage.getItem('studyResults');
+    const wordsRaw = sessionStorage.getItem('studyWords');
+
+    if (!resultsRaw || !wordsRaw) {
+      window.location.href = 'dashboard.html';
+    }
+
+    const results = JSON.parse(resultsRaw);
+    const words = JSON.parse(wordsRaw);
+
+    const STAGE_NAMES = {
+      1: 'Tanishish',
+      2: 'Variantlar',
+      3: "Bo'laklash",
+      4: 'Moslashtirish',
+      5: 'Yozish',
+      6: 'Gap tuzish'
+    };
+
+    const totalWords = words.length;
+    const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
+
+    // Score display
+    document.getElementById('score-num').textContent = `${perfectWords}/${totalWords}`;
+
+    // Emoji & title based on score
+    const pct = perfectWords / totalWords;
+    if (pct === 1) {
+      document.getElementById('result-emoji').textContent = '🏆';
+      document.getElementById('result-title').textContent = 'Mukammal natija!';
+      document.getElementById('result-subtitle').textContent = 'Barcha so\'zlarni to\'liq o\'zlashtirdingiz!';
+    } else if (pct >= 0.7) {
+      document.getElementById('result-emoji').textContent = '🎉';
+      document.getElementById('result-title').textContent = 'Zo\'r natija!';
+      document.getElementById('result-subtitle').textContent = 'Juda yaxshi, davom eting!';
+    } else if (pct >= 0.4) {
+      document.getElementById('result-emoji').textContent = '💪';
+      document.getElementById('result-title').textContent = 'Yaxshi urinish!';
+      document.getElementById('result-subtitle').textContent = 'Yana bir marta ishlasangiz yanada yaxshi bo\'ladi.';
+    } else {
+      document.getElementById('result-emoji').textContent = '📚';
+      document.getElementById('result-title').textContent = 'O\'rganishda davom eting!';
+      document.getElementById('result-subtitle').textContent = 'Qaytadan ishlash tavsiya etiladi.';
+    }
+
+    // Word results list
+    const list = document.getElementById('results-list');
+    words.forEach(word => {
+      const r = results[word.id];
+      const perfect = r.mistakes.length === 0;
+      const div = document.createElement('div');
+      div.className = `result-item ${perfect ? 'perfect' : 'has-mistakes'}`;
+      div.innerHTML = `
+        <div class="result-icon">${perfect ? '✅' : '❌'}</div>
+        <div class="result-word">
+          <div class="result-en">${word.en}</div>
+          <div class="result-uz">${word.uz}</div>
+          ${perfect
+            ? `<div class="result-ok">Barcha bosqichlar to'g'ri ✓</div>`
+            : `<div class="result-mistakes">Xato bosqichlar: ${r.mistakes.map(s => STAGE_NAMES[s]).join(', ')}</div>`
+          }
+        </div>
+      `;
+      list.appendChild(div);
+    });
+
+    window.retry = () => {
+      window.location.href = `study.html?id=${folderId}`;
+    };
+  </script>
+</body>
+</html>

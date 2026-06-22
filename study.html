@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Mashq</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .study-wrap { max-width: 680px; margin: 0 auto; padding: 36px 24px; }
+
+    /* Progress bar */
+    .study-progress {
+      margin-bottom: 28px;
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .progress-label { font-size: 0.82rem; color: var(--text-muted); }
+    .progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple-main), var(--rose));
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+
+    /* Stage badge */
+    .stage-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--purple-light);
+      margin-bottom: 20px;
+    }
+
+    /* Card */
+    .study-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .word-display {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+
+    .word-sub {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .word-example-text {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    /* Stage 1 - intro */
+    .intro-card { gap: 8px; }
+    .intro-translation {
+      font-size: 1.1rem;
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    /* Stage 2 - multiple choice */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      margin-top: 24px;
+    }
+
+    .option-btn {
+      padding: 14px 16px;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--purple-main);
+      background: var(--bg-hover);
+    }
+
+    .option-btn.correct {
+      border-color: var(--success);
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--success);
+    }
+
+    .option-btn.wrong {
+      border-color: var(--danger);
+      background: rgba(248, 113, 113, 0.12);
+      color: var(--danger);
+    }
+
+    /* Stage 3 - word pieces */
+    .pieces-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 24px;
+      width: 100%;
+    }
+
+    .piece-btn {
+      padding: 10px 18px;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 1rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .piece-btn:hover:not(.used) { border-color: var(--purple-main); }
+    .piece-btn.used { opacity: 0.3; cursor: default; }
+
+    .assembled-word {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--purple-light);
+      min-height: 50px;
+      margin-top: 16px;
+      letter-spacing: 2px;
+    }
+
+    /* Stage 4 - matching */
+    .match-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      margin-top: 16px;
+    }
+
+    .match-col { display: flex; flex-direction: column; gap: 10px; }
+
+    .match-btn {
+      padding: 12px 16px;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .match-btn:hover:not(.matched):not(.wrong-match) { border-color: var(--purple-main); }
+    .match-btn.selected { border-color: var(--purple-light); background: var(--purple-glow); color: var(--purple-light); }
+    .match-btn.matched { border-color: var(--success); background: rgba(52,211,153,0.1); color: var(--success); opacity: 0.7; cursor: default; }
+    .match-btn.wrong-match { border-color: var(--danger); background: rgba(248,113,113,0.1); }
+
+    /* Stage 5 - typing */
+    .type-input {
+      width: 100%;
+      background: var(--bg-deep);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text-main);
+      font-size: 1.2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      text-align: center;
+      outline: none;
+      margin-top: 20px;
+      transition: border-color 0.2s;
+      letter-spacing: 1px;
+    }
+
+    .type-input:focus { border-color: var(--purple-main); }
+    .type-input.correct-input { border-color: var(--success); }
+    .type-input.wrong-input { border-color: var(--danger); }
+
+    /* Stage 6 - sentence */
+    .sentence-input {
+      width: 100%;
+      background: var(--bg-deep);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: var(--text-main);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      margin-top: 20px;
+      resize: none;
+      height: 100px;
+      transition: border-color 0.2s;
+      line-height: 1.6;
+    }
+
+    .sentence-input:focus { border-color: var(--purple-main); }
+
+    .ai-feedback {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      text-align: left;
+      display: none;
+    }
+
+    .ai-feedback.good { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+    .ai-feedback.bad { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+
+    /* Feedback overlay */
+    .feedback-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 3rem;
+      font-weight: 700;
+      display: none;
+    }
+
+    .feedback-overlay.show { display: flex; }
+    .feedback-overlay.correct-ov { background: rgba(52,211,153,0.15); }
+    .feedback-overlay.wrong-ov { background: rgba(248,113,113,0.15); }
+    .feedback-overlay p { font-size: 1rem; font-weight: 600; }
+
+    /* Hint */
+    .hint-text {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 10px;
+    }
+
+    /* Nav buttons */
+    .study-nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-next {
+      flex: 1;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.2s;
+    }
+
+    .btn-next:hover { opacity: 0.88; }
+
+    .btn-skip {
+      padding: 14px 20px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .btn-skip:hover { border-color: var(--text-muted); color: var(--text-main); }
+
+    /* Loading */
+    .loading-dots {
+      display: inline-flex;
+      gap: 5px;
+      margin-left: 8px;
+    }
+
+    .loading-dots span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      animation: dot-bounce 1.2s infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    @media (max-width: 500px) {
+      .study-card { padding: 24px 18px; }
+      .word-display { font-size: 1.8rem; }
+      .options-grid { grid-template-columns: 1fr; }
+      .match-area { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <button class="btn-sm" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+    </div>
+  </nav>
+
+  <div class="study-wrap">
+
+    <!-- Progress -->
+    <div class="study-progress">
+      <div class="progress-top">
+        <span class="progress-label" id="progress-text">1 / 1</span>
+        <span class="progress-label" id="stage-text">1-bosqich</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Stage badge -->
+    <div class="stage-badge" id="stage-badge">📖 Tanishish</div>
+
+    <!-- Study card -->
+    <div class="study-card" id="study-card">
+      <div style="color:var(--text-muted)">Yuklanmoqda...</div>
+    </div>
+
+    <!-- Nav -->
+    <div class="study-nav">
+      <button class="btn-skip" id="skip-btn" onclick="skipWord()">O'tkazib yuborish</button>
+      <button class="btn-next" id="next-btn" onclick="nextAction()">Davom etish →</button>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, getDocs, query, orderBy, doc, setDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const STAGES = [
+      { id: 1, name: "Tanishish",       emoji: "📖" },
+      { id: 2, name: "Variantlar",       emoji: "🔤" },
+      { id: 3, name: "Bo'laklash",       emoji: "🧩" },
+      { id: 4, name: "Moslashtirish",    emoji: "🔗" },
+      { id: 5, name: "Yozish",           emoji: "✍️" },
+      { id: 6, name: "Gap tuzish",       emoji: "📝" },
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const folderId = params.get('id');
+    if (!folderId) window.location.href = 'dashboard.html';
+
+    let words = [];
+    let currentWordIndex = 0;
+    let currentStage = 1;
+    let results = {}; // wordId -> { mistakes: [stageNums] }
+    let currentUser = null;
+
+    // Matching state
+    let matchSelected = null;
+    let matchedPairs = 0;
+
+    // Piece state
+    let pieces = [];
+    let assembled = '';
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
+      await loadWords();
+    });
+
+    async function loadWords() {
+      const q = query(collection(db, 'folders', folderId, 'words'), orderBy('createdAt', 'asc'));
+      const snap = await getDocs(q);
+      words = [];
+      snap.forEach(d => words.push({ id: d.id, ...d.data() }));
+
+      if (words.length === 0) {
+        window.location.href = `folder.html?id=${folderId}`;
+        return;
+      }
+
+      words.forEach(w => { results[w.id] = { en: w.en, uz: w.uz, mistakes: [] }; });
+      renderStage();
+    }
+
+    function updateProgress() {
+      const totalSteps = words.length * 6;
+      const doneSteps = currentWordIndex * 6 + (currentStage - 1);
+      const pct = Math.round((doneSteps / totalSteps) * 100);
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = `${currentWordIndex + 1} / ${words.length}`;
+      document.getElementById('stage-text').textContent = `${currentStage}-bosqich`;
+      const s = STAGES[currentStage - 1];
+      document.getElementById('stage-badge').textContent = `${s.emoji} ${s.name}`;
+    }
+
+    function renderStage() {
+      updateProgress();
+      const word = words[currentWordIndex];
+      const card = document.getElementById('study-card');
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.textContent = 'Davom etish →';
+      nextBtn.disabled = false;
+
+      if (currentStage === 1) renderStage1(word, card);
+      else if (currentStage === 2) renderStage2(word, card);
+      else if (currentStage === 3) renderStage3(word, card);
+      else if (currentStage === 4) renderStage4(card);
+      else if (currentStage === 5) renderStage5(word, card);
+      else if (currentStage === 6) renderStage6(word, card);
+    }
+
+    // ── STAGE 1: Tanishtirish ──
+    function renderStage1(word, card) {
+      card.innerHTML = `
+        <div class="word-display">${word.en}</div>
+        <div class="intro-translation">${word.uz}</div>
+        ${word.example ? `<div class="word-example-text">"${word.example}"</div>` : ''}
+      `;
+      document.getElementById('next-btn').textContent = "Tushundim →";
+    }
+
+    // ── STAGE 2: Variantlar ──
+    function renderStage2(word, card) {
+      const opts = generateOptions(word, 'en', 4);
+      card.innerHTML = `
+        <div class="word-sub">Quyidagi so'zning inglizcha tarjimasini toping:</div>
+        <div class="word-display">${word.uz}</div>
+        <div class="options-grid" id="opts-grid">
+          ${opts.map(o => `<button class="option-btn" onclick="checkOption(this, '${o}', '${word.en}')">${o}</button>`).join('')}
+        </div>
+      `;
+      document.getElementById('next-btn').disabled = true;
+    }
+
+    window.checkOption = (btn, selected, correct) => {
+      document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+      if (selected === correct) {
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('wrong');
+        document.querySelectorAll('.option-btn').forEach(b => {
+          if (b.textContent === correct) b.classList.add('correct');
+        });
+        markMistake(2);
+      }
+      document.getElementById('next-btn').disabled = false;
+    };
+
+    function generateOptions(word, field, count) {
+      const correct = word[field];
+      const others = words.filter(w => w.id !== word.id).map(w => w[field]);
+      const shuffled = others.sort(() => Math.random() - 0.5).slice(0, count - 1);
+      const all = [...shuffled, correct].sort(() => Math.random() - 0.5);
+      return all;
+    }
+
+    // ── STAGE 3: Bo'laklash ──
+    function renderStage3(word, card) {
+      const en = word.en.toLowerCase();
+      // 2-3 bo'lakka ajratish
+      pieces = splitWord(en);
+      assembled = '';
+
+      card.innerHTML = `
+        <div class="word-sub">Bu so'zni to'g'ri yig'ing:</div>
+        <div class="word-display" style="font-size:1.1rem;color:var(--text-muted)">${word.uz}</div>
+        <div class="assembled-word" id="assembled-display">_</div>
+        <div class="pieces-area" id="pieces-area">
+          ${pieces.map((p, i) => `<button class="piece-btn" id="piece-${i}" onclick="addPiece(${i}, '${p}', '${en}')">${p}</button>`).join('')}
+        </div>
+      `;
+      document.getElementById('next-btn').disabled = true;
+    }
+
+    function splitWord(word) {
+      const len = word.length;
+      if (len <= 4) return [word[0], word.slice(1)];
+      if (len <= 7) {
+        const mid = Math.floor(len / 2);
+        return [word.slice(0, mid), word.slice(mid)];
+      }
+      const p1 = Math.floor(len / 3);
+      const p2 = Math.floor(len * 2 / 3);
+      return [word.slice(0, p1), word.slice(p1, p2), word.slice(p2)];
+    }
+
+    window.addPiece = (idx, piece, correct) => {
+      const btn = document.getElementById(`piece-${idx}`);
+      if (btn.classList.contains('used')) return;
+      btn.classList.add('used');
+      assembled += piece;
+      const display = document.getElementById('assembled-display');
+      display.textContent = assembled;
+
+      // Check if all pieces used
+      const allUsed = pieces.every((_, i) => document.getElementById(`piece-${i}`).classList.contains('used'));
+      if (allUsed) {
+        if (assembled === correct) {
+          display.style.color = 'var(--success)';
+        } else {
+          display.style.color = 'var(--danger)';
+          display.textContent = assembled + ' ✗';
+          markMistake(3);
+          setTimeout(() => {
+            assembled = '';
+            display.textContent = '_';
+            display.style.color = '';
+            pieces.forEach((_, i) => document.getElementById(`piece-${i}`).classList.remove('used'));
+          }, 1200);
+          return;
+        }
+        document.getElementById('next-btn').disabled = false;
+      }
+    };
+
+    // ── STAGE 4: Moslashtirish (hamma so'zlar) ──
+    function renderStage4(card) {
+      matchSelected = null;
+      matchedPairs = 0;
+
+      const sample = words.slice(0, Math.min(words.length, 6));
+      const enList = [...sample].sort(() => Math.random() - 0.5);
+      const uzList = [...sample].sort(() => Math.random() - 0.5);
+
+      card.innerHTML = `
+        <div class="word-sub" style="margin-bottom:16px">Inglizcha va o'zbekcha so'zlarni moslashtiring:</div>
+        <div class="match-area">
+          <div class="match-col" id="en-col">
+            ${enList.map(w => `<button class="match-btn" data-word="${w.en}" data-side="en" onclick="selectMatch(this)">${w.en}</button>`).join('')}
+          </div>
+          <div class="match-col" id="uz-col">
+            ${uzList.map(w => `<button class="match-btn" data-word="${w.en}" data-side="uz" onclick="selectMatch(this)">${w.uz}</button>`).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('next-btn').disabled = true;
+    }
+
+    window.selectMatch = (btn) => {
+      if (btn.classList.contains('matched')) return;
+
+      if (!matchSelected) {
+        document.querySelectorAll('.match-btn.selected').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        matchSelected = btn;
+        return;
+      }
+
+      if (matchSelected === btn) {
+        btn.classList.remove('selected');
+        matchSelected = null;
+        return;
+      }
+
+      // Check if different sides
+      if (matchSelected.dataset.side === btn.dataset.side) {
+        document.querySelectorAll('.match-btn.selected').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        matchSelected = btn;
+        return;
+      }
+
+      // Check match
+      if (matchSelected.dataset.word === btn.dataset.word) {
+        matchSelected.classList.remove('selected');
+        matchSelected.classList.add('matched');
+        btn.classList.add('matched');
+        matchSelected = null;
+        matchedPairs++;
+
+        const total = Math.min(words.length, 6);
+        if (matchedPairs === total) {
+          document.getElementById('next-btn').disabled = false;
+          showToast("Hammasi to'g'ri! 🎉");
+        }
+      } else {
+        matchSelected.classList.remove('selected');
+        matchSelected.classList.add('wrong-match');
+        btn.classList.add('wrong-match');
+        markMistake(4);
+        setTimeout(() => {
+          matchSelected.classList.remove('wrong-match');
+          btn.classList.remove('wrong-match');
+          matchSelected = null;
+        }, 700);
+      }
+    };
+
+    // ── STAGE 5: Yozish ──
+    function renderStage5(word, card) {
+      card.innerHTML = `
+        <div class="word-sub">Quyidagi so'zni inglizcha yozing:</div>
+        <div class="word-display">${word.uz}</div>
+        ${word.example ? `<div class="word-example-text">"${word.example}"</div>` : ''}
+        <input type="text" class="type-input" id="type-input" placeholder="inglizcha so'zni yozing..." autocomplete="off" autocorrect="off" spellcheck="false" />
+        <div class="hint-text" id="type-hint"></div>
+      `;
+      document.getElementById('next-btn').disabled = true;
+
+      const input = document.getElementById('type-input');
+      input.focus();
+      input.addEventListener('input', () => {
+        const val = input.value.trim().toLowerCase();
+        const correct = word.en.toLowerCase();
+        if (val === correct) {
+          input.classList.add('correct-input');
+          document.getElementById('next-btn').disabled = false;
+          document.getElementById('type-hint').textContent = "✓ To'g'ri!";
+          document.getElementById('type-hint').style.color = 'var(--success)';
+        } else {
+          input.classList.remove('correct-input', 'wrong-input');
+          document.getElementById('type-hint').textContent = '';
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') checkTyping(word);
+      });
+    }
+
+    function checkTyping(word) {
+      const input = document.getElementById('type-input');
+      const val = input.value.trim().toLowerCase();
+      if (val === word.en.toLowerCase()) {
+        document.getElementById('next-btn').disabled = false;
+      } else {
+        input.classList.add('wrong-input');
+        document.getElementById('type-hint').textContent = `To'g'ri: ${word.en}`;
+        document.getElementById('type-hint').style.color = 'var(--danger)';
+        markMistake(5);
+        setTimeout(() => {
+          input.classList.remove('wrong-input');
+          input.value = '';
+          document.getElementById('type-hint').textContent = '';
+        }, 1500);
+      }
+    }
+
+    // ── STAGE 6: Gap tuzish (AI) ──
+    function renderStage6(word, card) {
+      card.innerHTML = `
+        <div class="word-sub">Quyidagi so'zni ishlatib inglizcha gap tuzing:</div>
+        <div class="word-display" style="font-size:1.5rem">${word.en}</div>
+        <div class="word-sub" style="color:var(--text-dim)">(${word.uz})</div>
+        <textarea class="sentence-input" id="sentence-input" placeholder="Write a sentence using '${word.en}'..."></textarea>
+        <div class="ai-feedback" id="ai-feedback"></div>
+      `;
+      document.getElementById('next-btn').textContent = "AI tekshirsin →";
+      document.getElementById('next-btn').disabled = false;
+      document.getElementById('sentence-input').focus();
+    }
+
+    async function checkSentenceWithAI(word) {
+      const sentence = document.getElementById('sentence-input').value.trim();
+      if (!sentence) return showToast("Avval gap yozing!", true);
+
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.disabled = true;
+      nextBtn.innerHTML = `Tekshirilmoqda <span class="loading-dots"><span></span><span></span><span></span></span>`;
+
+      try {
+        const response = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-6",
+            max_tokens: 1000,
+            messages: [{
+              role: "user",
+              content: `You are an English teacher helping Uzbek students. 
+The student was asked to write a sentence using the word "${word.en}" (which means "${word.uz}" in Uzbek).
+The student wrote: "${sentence}"
+
+Please check if:
+1. The word "${word.en}" is used correctly
+2. The sentence is grammatically correct
+3. The sentence makes sense
+
+Respond in Uzbek language. Be encouraging. 
+If correct: start with "✅" and briefly praise them, mention what was good.
+If incorrect: start with "❌" and kindly explain the mistake and show a correct example.
+Keep response under 3 sentences.`
+            }]
+          })
+        });
+
+        const data = await response.json();
+        const feedback = data.content[0].text;
+
+        const fbEl = document.getElementById('ai-feedback');
+        fbEl.textContent = feedback;
+        fbEl.style.display = 'block';
+
+        if (feedback.startsWith('✅')) {
+          fbEl.className = 'ai-feedback good';
+        } else {
+          fbEl.className = 'ai-feedback bad';
+          markMistake(6);
+        }
+
+        nextBtn.textContent = "Keyingi →";
+        nextBtn.disabled = false;
+        nextBtn.onclick = () => goNext();
+
+      } catch (e) {
+        showToast("AI bilan ulanishda xato", true);
+        nextBtn.textContent = "O'tkazib yuborish →";
+        nextBtn.disabled = false;
+      }
+    }
+
+    // ── NAVIGATION ──
+    window.nextAction = () => {
+      if (currentStage === 6) {
+        const fb = document.getElementById('ai-feedback');
+        if (fb && fb.style.display !== 'none' && fb.textContent) {
+          goNext();
+        } else {
+          const word = words[currentWordIndex];
+          checkSentenceWithAI(word);
+        }
+      } else {
+        goNext();
+      }
+    };
+
+    function goNext() {
+      if (currentStage < 6) {
+        currentStage++;
+        renderStage();
+      } else {
+        // Bu so'z tugadi, keyingi so'zga
+        currentWordIndex++;
+        currentStage = 1;
+        if (currentWordIndex >= words.length) {
+          finishStudy();
+        } else {
+          renderStage();
+        }
+      }
+    }
+
+    window.skipWord = () => {
+      markMistake(currentStage);
+      goNext();
+    };
+
+    function markMistake(stage) {
+      const word = words[currentWordIndex];
+      if (!results[word.id].mistakes.includes(stage)) {
+        results[word.id].mistakes.push(stage);
+      }
+    }
+
+    // ── FINISH ──
+    async function finishStudy() {
+      // Natijalarni saqlash
+      try {
+        const resultData = {
+          uid: currentUser.uid,
+          folderId,
+          completedAt: serverTimestamp(),
+          results: results,
+          totalWords: words.length,
+          perfectWords: Object.values(results).filter(r => r.mistakes.length === 0).length
+        };
+        await setDoc(
+          doc(db, 'studyResults', `${currentUser.uid}_${folderId}_${Date.now()}`),
+          resultData
+        );
+      } catch (e) { console.log('Natija saqlanmadi:', e); }
+
+      window.location.href = `results.html?id=${folderId}`;
+
+      // Natijani sessionStorage ga saqlash
+      sessionStorage.setItem('studyResults', JSON.stringify(results));
+      sessionStorage.setItem('studyWords', JSON.stringify(words));
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
