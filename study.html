@@ -719,12 +719,15 @@
       nextBtn.innerHTML = `Tekshirilmoqda <span class="loading-dots"><span></span><span></span><span></span></span>`;
 
       try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
-            max_tokens: 1000,
+            model: "llama-3.3-70b-versatile",
+            max_tokens: 200,
             messages: [{
               role: "user",
               content: `You are an English teacher helping Uzbek students. 
@@ -745,7 +748,7 @@ Keep response under 3 sentences.`
         });
 
         const data = await response.json();
-        const feedback = data.content[0].text;
+        const feedback = data.choices[0].message.content;
 
         const fbEl = document.getElementById('ai-feedback');
         fbEl.textContent = feedback;
