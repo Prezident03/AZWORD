@@ -374,25 +374,24 @@
       aiGeneratedExample = '';
 
       try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            max_tokens: 60,
+            model: "claude-sonnet-4-6",
+            max_tokens: 100,
             messages: [{
               role: "user",
-              content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). 
-The sentence should be easy to understand for beginners. 
-Reply ONLY with the sentence, nothing else. No quotes, no explanation.`
+              content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). The sentence should be easy to understand for beginners. Reply ONLY with the sentence, nothing else. No quotes, no explanation.`
             }]
           })
         });
         const data = await res.json();
-        const sentence = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+        const sentence = data.content[0].text.trim().replace(/^["']|["']$/g, '');
         aiGeneratedExample = sentence;
         textEl.textContent = '"' + sentence + '"';
       } catch(e) {
