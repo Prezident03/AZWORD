@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AzWord — Dashboard</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
@@ -73,7 +73,7 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { auth, db } from './js/firebase.js';
+    import { auth, db } from './firebase.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, serverTimestamp
