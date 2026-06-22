@@ -467,6 +467,39 @@
       renderPreview(parsedWords);
     }
 
+    async function generateExample(en, uz) {
+  try {
+    const res = await fetch(
+      "https://api.groq.com/openai/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer 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"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          max_tokens: 80,
+          messages: [{
+            role: "user",
+            content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). Reply ONLY with the sentence.`
+          }]
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) return '';
+
+    return data.choices?.[0]?.message?.content?.trim() || '';
+
+  } catch (e) {
+    console.error(e);
+    return '';
+  }
+}
+
     // TXT va CSV parser
     function parseTextOrCSV(text) {
       const lines = text.split(/\r?\n/).filter(l => l.trim());
@@ -597,13 +630,20 @@
         const wordsRef = collection(db, 'folders', folderId, 'words');
 
         for (const word of parsedWords) {
-          await addDoc(wordsRef, {
-            en: word.en,
-            uz: word.uz,
-            example: word.example || '',
-            createdAt: serverTimestamp()
-          });
-        }
+
+  let example = word.example || '';
+
+  if (!example) {
+    example = await generateExample(word.en, word.uz);
+  }
+
+  await addDoc(wordsRef, {
+    en: word.en,
+    uz: word.uz,
+    example: example,
+    createdAt: serverTimestamp()
+  });
+}
 
         // Papkadagi wordCount ni yangilash
         await updateDoc(doc(db, 'folders', folderId), {
