@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Fayl yuklash</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Excel (xlsx) va Word (docx) parsing uchun -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+  <style>
+    .upload-page { max-width: 760px; margin: 0 auto; padding: 40px 24px; }
+
+    /* Back */
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      margin-bottom: 28px;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-main); }
+
+    .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+    .page-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 36px; }
+
+    /* Namuna kartalar */
+    .samples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .sample-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+
+    .sample-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .sample-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .sample-icon.txt  { background: rgba(124,58,237,0.15); }
+    .sample-icon.csv  { background: rgba(52,211,153,0.15); }
+    .sample-icon.xlsx { background: rgba(34,197,94,0.15); }
+    .sample-icon.docx { background: rgba(59,130,246,0.15); }
+
+    .sample-title { font-weight: 600; font-size: 0.95rem; }
+    .sample-ext   { font-size: 0.75rem; color: var(--text-muted); }
+
+    .sample-code {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .sample-code .kw { color: var(--purple-light); }
+    .sample-code .val { color: var(--success); }
+    .sample-code .sep { color: var(--text-dim); }
+
+    .sample-note {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* Divider */
+    .divider-line {
+      height: 1px;
+      background: var(--border);
+      margin: 32px 0;
+    }
+
+    /* Upload zone */
+    .upload-section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+    }
+
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--purple-main);
+      background: var(--purple-glow);
+    }
+
+    .drop-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .drop-icon { font-size: 2.8rem; margin-bottom: 14px; }
+
+    .drop-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .drop-sub { font-size: 0.85rem; color: var(--text-muted); }
+
+    .drop-formats {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .fmt-tag {
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    /* Preview */
+    .preview-section {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .preview-section.show { display: block; }
+
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .preview-title { font-weight: 600; font-size: 0.95rem; }
+
+    .preview-count {
+      font-size: 0.82rem;
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    .preview-list {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .preview-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+
+    .preview-item:last-child { border-bottom: none; }
+
+    .preview-num {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .preview-en {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      min-width: 120px;
+    }
+
+    .preview-uz { color: var(--text-muted); min-width: 100px; }
+
+    .preview-example {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 0.8rem;
+      flex: 1;
+    }
+
+    .preview-item.error-row {
+      background: rgba(248,113,113,0.06);
+      color: var(--danger);
+    }
+
+    /* Error box */
+    .parse-error {
+      background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.3);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 16px;
+      display: none;
+    }
+
+    /* Save btn */
+    .save-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .save-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-save {
+      padding: 13px 28px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.2s;
+    }
+    .btn-save:hover { opacity: 0.88; }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* Scrollbar */
+    .preview-list::-webkit-scrollbar { width: 6px; }
+    .preview-list::-webkit-scrollbar-track { background: transparent; }
+    .preview-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <span id="user-name">...</span>
+      <button class="btn-sm" onclick="goBack()">Chiqish</button>
+    </div>
+  </nav>
+
+  <div class="upload-page">
+
+    <button class="back-btn" onclick="goBack()">← Orqaga</button>
+
+    <div class="page-title">📂 Fayl orqali so'z qo'shish</div>
+    <div class="page-sub">Quyidagi namunalardan birini ko'rib, fayl tayyorlab yuklang — so'zlar avtomatik qo'shiladi.</div>
+
+    <!-- NAMUNALAR -->
+    <div class="samples-grid">
+
+      <!-- TXT -->
+      <div class="sample-card">
+        <div class="sample-header">
+          <div class="sample-icon txt">📄</div>
+          <div>
+            <div class="sample-title">Matnli fayl</div>
+            <div class="sample-ext">.txt</div>
+          </div>
+        </div>
+        <div class="sample-code"><span class="val">apple</span><span class="sep">, </span><span class="val">olma</span><span class="sep">, </span>I eat an apple
+<span class="val">book</span><span class="sep">, </span><span class="val">kitob</span><span class="sep">, </span>I read a book
+<span class="val">water</span><span class="sep">, </span><span class="val">suv</span>
+<span class="val">school</span><span class="sep">, </span><span class="val">maktab</span></div>
+        <div class="sample-note">Har qatorda: <b>inglizcha, o'zbekcha, misol gap</b><br>Misol gap ixtiyoriy — bo'lmasa ham bo'ladi</div>
+      </div>
+      </div>
+        <div class="sample-code"><span class="kw">english</span><span class="sep">,</span><span class="kw">uzbek</span><span class="sep">,</span><span class="kw">example</span>
+<span class="val">apple</span><span class="sep">,</span><span class="val">olma</span><span class="sep">,</span>I eat an apple
+<span class="val">book</span><span class="sep">,</span><span class="val">kitob</span><span class="sep">,</span>I read a book
+<span class="val">water</span><span class="sep">,</span><span class="val">suv</span><span class="sep">,</span></div>
+        <div class="sample-note">Birinchi qator sarlavha bo'lishi mumkin — avtomatik o'tkaziladi</div>
+      </div>
+
+      <!-- Excel -->
+      <div class="sample-card">
+        <div class="sample-header">
+          <div class="sample-icon xlsx">🟢</div>
+          <div>
+            <div class="sample-title">Excel fayl</div>
+            <div class="sample-ext">.xlsx / .xls</div>
+          </div>
+        </div>
+        <div class="sample-code"><span class="kw">A ustun</span>    <span class="kw">B ustun</span>    <span class="kw">C ustun</span>
+<span class="val">apple</span>       <span class="val">olma</span>        I eat an apple
+<span class="val">book</span>        <span class="val">kitob</span>       I read a book
+<span class="val">water</span>       <span class="val">suv</span></div>
+        <div class="sample-note"><b>A</b> = inglizcha, <b>B</b> = o'zbekcha, <b>C</b> = misol gap (ixtiyoriy)</div>
+      </div>
+
+      <!-- Word -->
+      <div class="sample-card">
+        <div class="sample-header">
+          <div class="sample-icon docx">🔵</div>
+          <div>
+            <div class="sample-title">Word hujjat</div>
+            <div class="sample-ext">.docx</div>
+          </div>
+        </div>
+        <div class="sample-code"><span class="val">apple</span><span class="sep"> - </span><span class="val">olma</span><span class="sep"> - </span>I eat an apple
+<span class="val">book</span><span class="sep"> - </span><span class="val">kitob</span><span class="sep"> - </span>I read a book
+<span class="val">water</span><span class="sep"> - </span><span class="val">suv</span>
+<span class="val">school</span><span class="sep"> - </span><span class="val">maktab</span></div>
+        <div class="sample-note">Vergul (<b>,</b>) yoki tire (<b>-</b>) bilan ajrating. Har so'z yangi qatorda</div>
+      </div>
+
+    </div>
+
+    <div class="divider-line"></div>
+
+    <!-- YUKLASH -->
+    <div class="upload-section-title">📤 Faylni yuklang</div>
+
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept=".txt,.xlsx,.xls,.docx" />
+      <div class="drop-icon">📁</div>
+      <div class="drop-title">Faylni shu yerga tashlang yoki bosing</div>
+      <div class="drop-sub">Fayl tanlansin va so'zlar ko'rinadi</div>
+      <div class="drop-formats">
+        <span class="fmt-tag">TXT</span>
+        <span class="fmt-tag">XLSX</span>
+        <span class="fmt-tag">XLS</span>
+        <span class="fmt-tag">DOCX</span>
+      </div>
+    </div>
+
+    <div class="parse-error" id="parse-error"></div>
+
+    <!-- PREVIEW -->
+    <div class="preview-section" id="preview-section">
+      <div class="preview-header">
+        <div class="preview-title">👁 Ko'rib chiqing</div>
+        <div class="preview-count" id="preview-count"></div>
+      </div>
+      <div class="preview-list" id="preview-list"></div>
+      <div class="save-row">
+        <div class="save-info" id="save-info"></div>
+        <button class="btn-save" id="save-btn" onclick="saveWords()">✅ Saqlash</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, addDoc, serverTimestamp, updateDoc, doc, increment
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const folderId = params.get('id');
+    if (!folderId) window.location.href = 'dashboard.html';
+
+    let currentUser = null;
+    let parsedWords = []; // { en, uz, example }
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
+      document.getElementById('user-name').textContent = user.displayName || user.email;
+    });
+
+    window.goBack = () => window.location.href = `folder.html?id=${folderId}`;
+
+    // ── DROP ZONE ──
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file) processFile(file);
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) processFile(fileInput.files[0]);
+    });
+
+    // ── FAYL QAYTA ISHLASH ──
+    async function processFile(file) {
+      const ext = file.name.split('.').pop().toLowerCase();
+      hideError();
+      parsedWords = [];
+
+      try {
+        if (ext === 'txt' || ext === 'csv') {
+          const text = await file.text();
+          parsedWords = parseTextOrCSV(text);
+        } else if (ext === 'xlsx' || ext === 'xls') {
+          parsedWords = await parseExcel(file);
+        } else if (ext === 'docx') {
+          parsedWords = await parseDocx(file);
+        } else {
+          showError("Noto'g'ri fayl formati. TXT, CSV, XLSX, XLS yoki DOCX yuklang.");
+          return;
+        }
+      } catch(e) {
+        showError("Faylni o'qishda xato: " + e.message);
+        return;
+      }
+
+      if (parsedWords.length === 0) {
+        showError("Faylda so'z topilmadi. Namuna formatiga qarang.");
+        return;
+      }
+
+      renderPreview(parsedWords);
+    }
+
+    // TXT va CSV parser
+    function parseTextOrCSV(text) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim());
+      const words = [];
+
+      for (const line of lines) {
+        // Vergul yoki tire bilan ajratish
+        let parts;
+        if (line.includes(',')) {
+          parts = line.split(',').map(p => p.trim());
+        } else if (line.includes(' - ')) {
+          parts = line.split(' - ').map(p => p.trim());
+        } else if (line.includes('\t')) {
+          parts = line.split('\t').map(p => p.trim());
+        } else {
+          continue;
+        }
+
+        const en = parts[0];
+        const uz = parts[1];
+
+        // Sarlavha qatorini o'tkazib yuborish
+        if (!en || !uz) continue;
+        if (en.toLowerCase() === 'english' || en.toLowerCase() === 'en' ||
+            en.toLowerCase() === 'inglizcha' || en.toLowerCase() === 'word') continue;
+
+        words.push({
+          en: en,
+          uz: uz,
+          example: parts[2] || ''
+        });
+      }
+      return words;
+    }
+
+    // Excel parser (SheetJS)
+    async function parseExcel(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const wb = XLSX.read(data, { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+            const words = [];
+            for (const row of rows) {
+              const en = (row[0] || '').toString().trim();
+              const uz = (row[1] || '').toString().trim();
+              const example = (row[2] || '').toString().trim();
+
+              if (!en || !uz) continue;
+              // Sarlavha qatorini o'tkazib yuborish
+              if (en.toLowerCase() === 'english' || en.toLowerCase() === 'en' ||
+                  en.toLowerCase() === 'inglizcha' || en.toLowerCase() === 'a ustun') continue;
+
+              words.push({ en, uz, example });
+            }
+            resolve(words);
+          } catch(err) {
+            reject(err);
+          }
+        };
+        reader.onerror = () => reject(new Error('Fayl o\'qilmadi'));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // Word (docx) parser — mammoth.js
+    async function parseDocx(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const result = await mammoth.extractRawText({ arrayBuffer: e.target.result });
+            const text = result.value;
+            resolve(parseTextOrCSV(text));
+          } catch(err) {
+            reject(err);
+          }
+        };
+        reader.onerror = () => reject(new Error('Word fayl o\'qilmadi'));
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    // ── PREVIEW ──
+    function renderPreview(words) {
+      const section = document.getElementById('preview-section');
+      const list = document.getElementById('preview-list');
+      const count = document.getElementById('preview-count');
+      const saveInfo = document.getElementById('save-info');
+
+      count.textContent = `${words.length} ta so'z topildi`;
+      saveInfo.textContent = `${words.length} ta so'z bo'limga qo'shiladi`;
+
+      list.innerHTML = '';
+      words.forEach((w, i) => {
+        const div = document.createElement('div');
+        div.className = 'preview-item';
+        div.innerHTML = `
+          <div class="preview-num">${i + 1}</div>
+          <div class="preview-en">${w.en}</div>
+          <div class="preview-uz">${w.uz}</div>
+          <div class="preview-example">${w.example || ''}</div>
+        `;
+        list.appendChild(div);
+      });
+
+      section.classList.add('show');
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ── SAQLASH ──
+    window.saveWords = async () => {
+      if (!parsedWords.length) return;
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saqlanmoqda...';
+
+      try {
+        const wordsRef = collection(db, 'folders', folderId, 'words');
+
+        for (const word of parsedWords) {
+          await addDoc(wordsRef, {
+            en: word.en,
+            uz: word.uz,
+            example: word.example || '',
+            createdAt: serverTimestamp()
+          });
+        }
+
+        // Papkadagi wordCount ni yangilash
+        await updateDoc(doc(db, 'folders', folderId), {
+          wordCount: increment(parsedWords.length)
+        });
+
+        showToast(`${parsedWords.length} ta so'z qo'shildi! ✅`);
+        setTimeout(() => window.location.href = `folder.html?id=${folderId}`, 1500);
+
+      } catch(e) {
+        showError("Saqlashda xato: " + e.message);
+        btn.disabled = false;
+        btn.textContent = '✅ Saqlash';
+      }
+    };
+
+    // ── HELPERS ──
+    function showError(msg) {
+      const el = document.getElementById('parse-error');
+      el.textContent = '⚠️ ' + msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('parse-error').style.display = 'none';
+    }
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

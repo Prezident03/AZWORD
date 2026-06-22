@@ -79,6 +79,43 @@
       font-weight: 600;
     }
 
+    .example-wrap {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .translate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 99px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .translate-btn:hover { border-color: var(--purple-main); color: var(--purple-light); }
+    .translate-btn:disabled { opacity: 0.5; cursor: default; }
+
+    .example-translation {
+      font-size: 0.85rem;
+      color: var(--purple-light);
+      font-style: italic;
+      background: var(--purple-glow);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 8px;
+      padding: 8px 14px;
+      max-width: 100%;
+    }
+
     /* Stage 2 */
     .options-grid {
       display: grid;
@@ -436,10 +473,54 @@
       card.innerHTML = `
         <div class="word-display">${word.en}</div>
         <div class="intro-translation">${word.uz}</div>
-        ${word.example ? `<div class="word-example-text">"${word.example}"</div>` : ''}
+        ${word.example ? `
+          <div class="example-wrap">
+            <div class="word-example-text" id="example-text">"${word.example}"</div>
+            <button class="translate-btn" id="translate-btn" onclick="translateExample('${word.example.replace(/'/g, "\\'")}')">
+              🌐 Tarjima
+            </button>
+            <div class="example-translation" id="example-translation" style="display:none"></div>
+          </div>
+        ` : ''}
       `;
       document.getElementById('next-btn').textContent = "Tushundim →";
     }
+
+    // ── TARJIMA (Stage 1) ──
+    window.translateExample = async (sentence) => {
+      const btn = document.getElementById('translate-btn');
+      const translationEl = document.getElementById('example-translation');
+      if (!btn || !translationEl) return;
+
+      btn.disabled = true;
+      btn.textContent = '⏳ ...';
+
+      try {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            max_tokens: 80,
+            messages: [{
+              role: "user",
+              content: `Translate this English sentence to Uzbek. Reply ONLY with the translation, nothing else:\n"${sentence}"`
+            }]
+          })
+        });
+        const data = await res.json();
+        const translation = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+        translationEl.textContent = '🇺🇿 ' + translation;
+        translationEl.style.display = 'block';
+        btn.style.display = 'none';
+      } catch(e) {
+        btn.disabled = false;
+        btn.textContent = '🌐 Tarjima';
+      }
+    };
 
     // ── STAGE 2: Variantlar — barcha so'zlar ──
     function renderStage2(word, card) {
