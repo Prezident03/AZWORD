@@ -374,27 +374,36 @@
       aiGeneratedExample = '';
 
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
+            "Authorization": "Bearer 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"
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
-            max_tokens: 100,
+            model: "llama-3.3-70b-versatile",
+            max_tokens: 80,
             messages: [{
               role: "user",
               content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). The sentence should be easy to understand for beginners. Reply ONLY with the sentence, nothing else. No quotes, no explanation.`
             }]
           })
         });
+
+        if (!res.ok) {
+          const err = await res.json();
+          console.error('Groq error:', err);
+          box.style.display = 'none';
+          aiGeneratedExample = '';
+          return;
+        }
+
         const data = await res.json();
-        const sentence = data.content[0].text.trim().replace(/^["']|["']$/g, '');
+        const sentence = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
         aiGeneratedExample = sentence;
         textEl.textContent = '"' + sentence + '"';
       } catch(e) {
+        console.error('generateExample error:', e);
         box.style.display = 'none';
         aiGeneratedExample = '';
       }
@@ -409,9 +418,14 @@
       const btn = document.getElementById('add-btn');
       btn.disabled = true;
 
+      // Agar AI hali ishlamagan bo'lsa, bitta urinib ko'ramiz
+      if (!aiGeneratedExample && en.length >= 2 && uz.length >= 1) {
+        await generateExample(en, uz);
+      }
+
       await addDoc(collection(db, 'folders', folderId, 'words'), {
         en, uz,
-        example: aiGeneratedExample,
+        example: aiGeneratedExample || '',
         createdAt: serverTimestamp()
       });
 
@@ -421,7 +435,11 @@
 
       btn.disabled = false;
       closeAddModal();
-      showToast("So'z qo'shildi! ✅");
+      if (aiGeneratedExample) {
+        showToast("So'z qo'shildi! ✅");
+      } else {
+        showToast("So'z qo'shildi (misol gap yo'q) ✅");
+      }
       await loadWords();
     };
 

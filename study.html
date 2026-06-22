@@ -502,16 +502,15 @@
       btn.textContent = '⏳ ...';
 
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
+            "Authorization": "Bearer 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"
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
-            max_tokens: 100,
+            model: "llama-3.3-70b-versatile",
+            max_tokens: 80,
             messages: [{
               role: "user",
               content: `Translate this English sentence to Uzbek. Reply ONLY with the translation, nothing else:\n"${sentence}"`
@@ -519,7 +518,7 @@
           })
         });
         const data = await res.json();
-        const translation = data.content[0].text.trim().replace(/^["']|["']$/g, '');
+        const translation = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
         translationEl.textContent = '🇺🇿 ' + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
@@ -803,15 +802,14 @@
       nextBtn.innerHTML = `Tekshirilmoqda <span class="loading-dots"><span></span><span></span><span></span></span>`;
 
       try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
+            "Authorization": "Bearer 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"
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "llama-3.3-70b-versatile",
             max_tokens: 200,
             messages: [{
               role: "user",
@@ -821,7 +819,7 @@
         });
 
         const data = await response.json();
-        const feedback = data.content[0].text;
+        const feedback = data.choices[0].message.content;
 
         const fbEl = document.getElementById('ai-feedback');
         fbEl.textContent = feedback;
