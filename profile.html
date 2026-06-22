@@ -1,9 +1,81 @@
-<!DOCTYPE html><html lang="uz"><head><meta charset="UTF-8"><title>Profil</title><link rel="stylesheet" href="style.css"></head><body>
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Profil</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.profile-wrap{max-width:800px;margin:40px auto;padding:20px}
+.profile-card{background:#1a1628;border:1px solid #2e2845;border-radius:24px;padding:30px}
+.avatar{width:120px;height:120px;border-radius:50%;background:#7c3aed;margin:auto;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:bold}
+.center{text-align:center}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:25px 0}
+.stat{background:#0f0d1a;padding:15px;border-radius:14px;text-align:center}
+input{width:100%;padding:12px;margin-top:8px;margin-bottom:12px;background:#0f0d1a;color:white;border:1px solid #2e2845;border-radius:10px}
+button{padding:12px 18px;border:none;border-radius:10px;background:#7c3aed;color:white;cursor:pointer}
+</style>
+</head>
+<body>
 <nav class="navbar"><div class="nav-logo">AzWord</div></nav>
-<div class="dashboard">
-<h1>Mening Profilim</h1>
-<div class="modal" style="max-width:700px">
-<h3>Profil</h3>
-<p>Bu yerga keyingi bosqichda rasm yuklash va statistika qo'shiladi.</p>
-<a href="dashboard.html">← Dashboard</a>
-</div></div></body></html>
+<div class="profile-wrap">
+<div class="profile-card">
+<div class="avatar" id="avatar">A</div>
+<div class="center">
+<h2 id="name">Yuklanmoqda...</h2>
+<p id="email"></p>
+</div>
+
+<div class="statgrid">
+<div class="stat"><b id="folders">0</b><br>Bo'limlar</div>
+<div class="stat"><b id="words">0</b><br>So'zlar</div>
+<div class="stat"><b>AZWORD</b><br>Hisob</div>
+</div>
+
+<h3>Ismni o'zgartirish</h3>
+<input id="newName" placeholder="Yangi ism">
+<button id="saveName">Saqlash</button>
+
+<br><br>
+
+<h3>Parolni tiklash</h3>
+<p>Emailingizga parolni tiklash havolasi yuboriladi.</p>
+<button id="resetPass">Parolni tiklash</button>
+
+<br><br>
+<a href="dashboard.html">← Dashboardga qaytish</a>
+</div>
+</div>
+
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection,getDocs,query,where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+onAuthStateChanged(auth, async(user)=>{
+ if(!user) location='index.html';
+ document.getElementById('name').textContent=user.displayName||'Foydalanuvchi';
+ document.getElementById('email').textContent=user.email;
+ document.getElementById('avatar').textContent=(user.displayName||user.email)[0].toUpperCase();
+
+ const snap=await getDocs(query(collection(db,'folders'),where('uid','==',user.uid)));
+ document.getElementById('folders').textContent=snap.size;
+ let words=0;
+ snap.forEach(d=> words += d.data().wordCount || 0);
+ document.getElementById('words').textContent=words;
+
+ document.getElementById('saveName').onclick=async()=>{
+   const n=document.getElementById('newName').value.trim();
+   if(!n) return;
+   await updateProfile(user,{displayName:n});
+   alert('Ism saqlandi');
+   location.reload();
+ };
+
+ document.getElementById('resetPass').onclick=async()=>{
+   await sendPasswordResetEmail(auth,user.email);
+   alert('Emailga yuborildi');
+ };
+});
+</script>
+</body></html>
