@@ -8,10 +8,7 @@
   <style>
     .study-wrap { max-width: 680px; margin: 0 auto; padding: 36px 24px; }
 
-    /* Progress bar */
-    .study-progress {
-      margin-bottom: 28px;
-    }
+    .study-progress { margin-bottom: 28px; }
     .progress-top {
       display: flex;
       justify-content: space-between;
@@ -32,7 +29,6 @@
       transition: width 0.4s ease;
     }
 
-    /* Stage badge */
     .stage-badge {
       display: inline-flex;
       align-items: center;
@@ -47,7 +43,6 @@
       margin-bottom: 20px;
     }
 
-    /* Card */
     .study-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
@@ -70,12 +65,7 @@
       margin-bottom: 10px;
     }
 
-    .word-sub {
-      font-size: 1rem;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
-
+    .word-sub { font-size: 1rem; color: var(--text-muted); margin-bottom: 6px; }
     .word-example-text {
       font-size: 0.875rem;
       color: var(--text-dim);
@@ -83,15 +73,13 @@
       margin-top: 8px;
     }
 
-    /* Stage 1 - intro */
-    .intro-card { gap: 8px; }
     .intro-translation {
       font-size: 1.1rem;
       color: var(--purple-light);
       font-weight: 600;
     }
 
-    /* Stage 2 - multiple choice */
+    /* Stage 2 */
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -113,25 +101,11 @@
       transition: all 0.15s;
       text-align: center;
     }
+    .option-btn:hover:not(:disabled) { border-color: var(--purple-main); background: var(--bg-hover); }
+    .option-btn.correct { border-color: var(--success); background: rgba(52,211,153,0.12); color: var(--success); }
+    .option-btn.wrong { border-color: var(--danger); background: rgba(248,113,113,0.12); color: var(--danger); }
 
-    .option-btn:hover:not(:disabled) {
-      border-color: var(--purple-main);
-      background: var(--bg-hover);
-    }
-
-    .option-btn.correct {
-      border-color: var(--success);
-      background: rgba(52, 211, 153, 0.12);
-      color: var(--success);
-    }
-
-    .option-btn.wrong {
-      border-color: var(--danger);
-      background: rgba(248, 113, 113, 0.12);
-      color: var(--danger);
-    }
-
-    /* Stage 3 - word pieces */
+    /* Stage 3 */
     .pieces-area {
       display: flex;
       flex-wrap: wrap;
@@ -153,7 +127,6 @@
       cursor: pointer;
       transition: all 0.15s;
     }
-
     .piece-btn:hover:not(.used) { border-color: var(--purple-main); }
     .piece-btn.used { opacity: 0.3; cursor: default; }
 
@@ -167,7 +140,7 @@
       letter-spacing: 2px;
     }
 
-    /* Stage 4 - matching */
+    /* Stage 4 */
     .match-area {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -175,9 +148,7 @@
       width: 100%;
       margin-top: 16px;
     }
-
     .match-col { display: flex; flex-direction: column; gap: 10px; }
-
     .match-btn {
       padding: 12px 16px;
       background: var(--bg-deep);
@@ -191,13 +162,12 @@
       transition: all 0.15s;
       text-align: center;
     }
-
     .match-btn:hover:not(.matched):not(.wrong-match) { border-color: var(--purple-main); }
     .match-btn.selected { border-color: var(--purple-light); background: var(--purple-glow); color: var(--purple-light); }
     .match-btn.matched { border-color: var(--success); background: rgba(52,211,153,0.1); color: var(--success); opacity: 0.7; cursor: default; }
     .match-btn.wrong-match { border-color: var(--danger); background: rgba(248,113,113,0.1); }
 
-    /* Stage 5 - typing */
+    /* Stage 5 */
     .type-input {
       width: 100%;
       background: var(--bg-deep);
@@ -214,12 +184,11 @@
       transition: border-color 0.2s;
       letter-spacing: 1px;
     }
-
     .type-input:focus { border-color: var(--purple-main); }
     .type-input.correct-input { border-color: var(--success); }
     .type-input.wrong-input { border-color: var(--danger); }
 
-    /* Stage 6 - sentence */
+    /* Stage 6 */
     .sentence-input {
       width: 100%;
       background: var(--bg-deep);
@@ -236,7 +205,6 @@
       transition: border-color 0.2s;
       line-height: 1.6;
     }
-
     .sentence-input:focus { border-color: var(--purple-main); }
 
     .ai-feedback {
@@ -248,7 +216,6 @@
       text-align: left;
       display: none;
     }
-
     .ai-feedback.good { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
     .ai-feedback.bad { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
 
@@ -266,20 +233,13 @@
       font-weight: 700;
       display: none;
     }
-
     .feedback-overlay.show { display: flex; }
     .feedback-overlay.correct-ov { background: rgba(52,211,153,0.15); }
     .feedback-overlay.wrong-ov { background: rgba(248,113,113,0.15); }
     .feedback-overlay p { font-size: 1rem; font-weight: 600; }
 
-    /* Hint */
-    .hint-text {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin-top: 10px;
-    }
+    .hint-text { font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; }
 
-    /* Nav buttons */
     .study-nav {
       display: flex;
       gap: 12px;
@@ -299,8 +259,8 @@
       font-family: 'Inter', sans-serif;
       transition: opacity 0.2s;
     }
-
     .btn-next:hover { opacity: 0.88; }
+    .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-skip {
       padding: 14px 20px;
@@ -313,23 +273,15 @@
       font-size: 0.9rem;
       transition: all 0.2s;
     }
-
     .btn-skip:hover { border-color: var(--text-muted); color: var(--text-main); }
 
-    /* Loading */
-    .loading-dots {
-      display: inline-flex;
-      gap: 5px;
-      margin-left: 8px;
-    }
-
+    .loading-dots { display: inline-flex; gap: 5px; margin-left: 8px; }
     .loading-dots span {
       width: 6px; height: 6px;
       border-radius: 50%;
       background: var(--purple-light);
       animation: dot-bounce 1.2s infinite;
     }
-
     .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
     .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
 
@@ -356,11 +308,9 @@
   </nav>
 
   <div class="study-wrap">
-
-    <!-- Progress -->
     <div class="study-progress">
       <div class="progress-top">
-        <span class="progress-label" id="progress-text">1 / 1</span>
+        <span class="progress-label" id="progress-text">So'z 1 / 1</span>
         <span class="progress-label" id="stage-text">1-bosqich</span>
       </div>
       <div class="progress-bar">
@@ -368,23 +318,18 @@
       </div>
     </div>
 
-    <!-- Stage badge -->
     <div class="stage-badge" id="stage-badge">📖 Tanishish</div>
 
-    <!-- Study card -->
     <div class="study-card" id="study-card">
       <div style="color:var(--text-muted)">Yuklanmoqda...</div>
     </div>
 
-    <!-- Nav -->
     <div class="study-nav">
       <button class="btn-skip" id="skip-btn" onclick="skipWord()">O'tkazib yuborish</button>
       <button class="btn-next" id="next-btn" onclick="nextAction()">Davom etish →</button>
     </div>
-
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
   <script type="module">
@@ -395,12 +340,12 @@
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const STAGES = [
-      { id: 1, name: "Tanishish",       emoji: "📖" },
-      { id: 2, name: "Variantlar",       emoji: "🔤" },
-      { id: 3, name: "Bo'laklash",       emoji: "🧩" },
-      { id: 4, name: "Moslashtirish",    emoji: "🔗" },
-      { id: 5, name: "Yozish",           emoji: "✍️" },
-      { id: 6, name: "Gap tuzish",       emoji: "📝" },
+      { id: 1, name: "Tanishish",    emoji: "📖" },
+      { id: 2, name: "Variantlar",   emoji: "🔤" },
+      { id: 3, name: "Bo'laklash",   emoji: "🧩" },
+      { id: 4, name: "Moslashtirish",emoji: "🔗" },
+      { id: 5, name: "Yozish",       emoji: "✍️" },
+      { id: 6, name: "Gap tuzish",   emoji: "📝" },
     ];
 
     const params = new URLSearchParams(window.location.search);
@@ -408,9 +353,11 @@
     if (!folderId) window.location.href = 'dashboard.html';
 
     let words = [];
-    let currentWordIndex = 0;
+    // Yangi logika: bosqich bo'yicha barcha so'zlar
+    // currentStage: 1-6, currentWordIndex: joriy so'z indeksi (bosqich ichida)
     let currentStage = 1;
-    let results = {}; // wordId -> { mistakes: [stageNums] }
+    let currentWordIndex = 0;
+    let results = {}; // wordId -> { en, uz, mistakes: [] }
     let currentUser = null;
 
     // Matching state
@@ -443,11 +390,26 @@
     }
 
     function updateProgress() {
+      // Jami: 6 bosqich * N so'z
+      // Stage 4 (moslashtirish) bitta boss bo'ladi, shuning uchun uni alohida hisoblash
       const totalSteps = words.length * 6;
-      const doneSteps = currentWordIndex * 6 + (currentStage - 1);
+      // Stage 4 da 1 ta qadam (barcha so'zlar uchun bitta matching)
+      let doneSteps;
+      if (currentStage < 4) {
+        doneSteps = (currentStage - 1) * words.length + currentWordIndex;
+      } else if (currentStage === 4) {
+        doneSteps = 3 * words.length; // 1,2,3 bosqichlar tugagan
+      } else {
+        doneSteps = (currentStage - 1) * words.length + currentWordIndex;
+      }
       const pct = Math.round((doneSteps / totalSteps) * 100);
       document.getElementById('progress-fill').style.width = pct + '%';
-      document.getElementById('progress-text').textContent = `${currentWordIndex + 1} / ${words.length}`;
+
+      if (currentStage === 4) {
+        document.getElementById('progress-text').textContent = `Moslashtirish`;
+      } else {
+        document.getElementById('progress-text').textContent = `So'z ${currentWordIndex + 1} / ${words.length}`;
+      }
       document.getElementById('stage-text').textContent = `${currentStage}-bosqich`;
       const s = STAGES[currentStage - 1];
       document.getElementById('stage-badge').textContent = `${s.emoji} ${s.name}`;
@@ -455,21 +417,21 @@
 
     function renderStage() {
       updateProgress();
-      const word = words[currentWordIndex];
       const card = document.getElementById('study-card');
       const nextBtn = document.getElementById('next-btn');
       nextBtn.textContent = 'Davom etish →';
       nextBtn.disabled = false;
+      nextBtn.onclick = () => nextAction();
 
-      if (currentStage === 1) renderStage1(word, card);
-      else if (currentStage === 2) renderStage2(word, card);
-      else if (currentStage === 3) renderStage3(word, card);
+      if (currentStage === 1) renderStage1(words[currentWordIndex], card);
+      else if (currentStage === 2) renderStage2(words[currentWordIndex], card);
+      else if (currentStage === 3) renderStage3(words[currentWordIndex], card);
       else if (currentStage === 4) renderStage4(card);
-      else if (currentStage === 5) renderStage5(word, card);
-      else if (currentStage === 6) renderStage6(word, card);
+      else if (currentStage === 5) renderStage5(words[currentWordIndex], card);
+      else if (currentStage === 6) renderStage6(words[currentWordIndex], card);
     }
 
-    // ── STAGE 1: Tanishtirish ──
+    // ── STAGE 1: Tanishtirish — barcha so'zlar ──
     function renderStage1(word, card) {
       card.innerHTML = `
         <div class="word-display">${word.en}</div>
@@ -479,7 +441,7 @@
       document.getElementById('next-btn').textContent = "Tushundim →";
     }
 
-    // ── STAGE 2: Variantlar ──
+    // ── STAGE 2: Variantlar — barcha so'zlar ──
     function renderStage2(word, card) {
       const opts = generateOptions(word, 'en', 4);
       card.innerHTML = `
@@ -510,14 +472,12 @@
       const correct = word[field];
       const others = words.filter(w => w.id !== word.id).map(w => w[field]);
       const shuffled = others.sort(() => Math.random() - 0.5).slice(0, count - 1);
-      const all = [...shuffled, correct].sort(() => Math.random() - 0.5);
-      return all;
+      return [...shuffled, correct].sort(() => Math.random() - 0.5);
     }
 
-    // ── STAGE 3: Bo'laklash ──
+    // ── STAGE 3: Bo'laklash — barcha so'zlar ──
     function renderStage3(word, card) {
       const en = word.en.toLowerCase();
-      // 2-3 bo'lakka ajratish
       pieces = splitWord(en);
       assembled = '';
 
@@ -552,11 +512,11 @@
       const display = document.getElementById('assembled-display');
       display.textContent = assembled;
 
-      // Check if all pieces used
       const allUsed = pieces.every((_, i) => document.getElementById(`piece-${i}`).classList.contains('used'));
       if (allUsed) {
         if (assembled === correct) {
           display.style.color = 'var(--success)';
+          document.getElementById('next-btn').disabled = false;
         } else {
           display.style.color = 'var(--danger)';
           display.textContent = assembled + ' ✗';
@@ -567,18 +527,16 @@
             display.style.color = '';
             pieces.forEach((_, i) => document.getElementById(`piece-${i}`).classList.remove('used'));
           }, 1200);
-          return;
         }
-        document.getElementById('next-btn').disabled = false;
       }
     };
 
-    // ── STAGE 4: Moslashtirish (hamma so'zlar) ──
+    // ── STAGE 4: Moslashtirish — BITTA, barcha so'zlar uchun ──
     function renderStage4(card) {
       matchSelected = null;
       matchedPairs = 0;
 
-      const sample = words.slice(0, Math.min(words.length, 6));
+      const sample = words.slice(0, Math.min(words.length, 8));
       const enList = [...sample].sort(() => Math.random() - 0.5);
       const uzList = [...sample].sort(() => Math.random() - 0.5);
 
@@ -612,7 +570,6 @@
         return;
       }
 
-      // Check if different sides
       if (matchSelected.dataset.side === btn.dataset.side) {
         document.querySelectorAll('.match-btn.selected').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
@@ -620,7 +577,6 @@
         return;
       }
 
-      // Check match
       if (matchSelected.dataset.word === btn.dataset.word) {
         matchSelected.classList.remove('selected');
         matchSelected.classList.add('matched');
@@ -628,7 +584,7 @@
         matchSelected = null;
         matchedPairs++;
 
-        const total = Math.min(words.length, 6);
+        const total = Math.min(words.length, 8);
         if (matchedPairs === total) {
           document.getElementById('next-btn').disabled = false;
           showToast("Hammasi to'g'ri! 🎉");
@@ -637,16 +593,28 @@
         matchSelected.classList.remove('selected');
         matchSelected.classList.add('wrong-match');
         btn.classList.add('wrong-match');
-        markMistake(4);
+        // Stage 4 xatosini faqat bir marta belgilash
+        markMistakeForAll(4);
         setTimeout(() => {
-          matchSelected.classList.remove('wrong-match');
+          matchSelected && matchSelected.classList.remove('wrong-match');
           btn.classList.remove('wrong-match');
           matchSelected = null;
         }, 700);
       }
     };
 
-    // ── STAGE 5: Yozish ──
+    // Stage 4 da barcha so'zlarga xato belgilash (1 xato = hamma xato emas, faqat xato qilinganlar)
+    function markMistakeForAll(stage) {
+      // Matching da aniq qaysi so'z xato qilingani bilinmaydi,
+      // shuning uchun hozirgi tanlovni topamiz
+      if (matchSelected) {
+        const wordEn = matchSelected.dataset.word;
+        const word = words.find(w => w.en === wordEn);
+        if (word) markMistake(stage, word.id);
+      }
+    }
+
+    // ── STAGE 5: Yozish — barcha so'zlar ──
     function renderStage5(word, card) {
       card.innerHTML = `
         <div class="word-sub">Quyidagi so'zni inglizcha yozing:</div>
@@ -696,7 +664,7 @@
       }
     }
 
-    // ── STAGE 6: Gap tuzish (AI) ──
+    // ── STAGE 6: Gap tuzish (AI) — barcha so'zlar ──
     function renderStage6(word, card) {
       card.innerHTML = `
         <div class="word-sub">Quyidagi so'zni ishlatib inglizcha gap tuzing:</div>
@@ -707,6 +675,7 @@
       `;
       document.getElementById('next-btn').textContent = "AI tekshirsin →";
       document.getElementById('next-btn').disabled = false;
+      document.getElementById('next-btn').onclick = () => nextAction();
       document.getElementById('sentence-input').focus();
     }
 
@@ -769,6 +738,7 @@ Keep response under 3 sentences.`
         showToast("AI bilan ulanishda xato", true);
         nextBtn.textContent = "O'tkazib yuborish →";
         nextBtn.disabled = false;
+        nextBtn.onclick = () => goNext();
       }
     }
 
@@ -779,8 +749,7 @@ Keep response under 3 sentences.`
         if (fb && fb.style.display !== 'none' && fb.textContent) {
           goNext();
         } else {
-          const word = words[currentWordIndex];
-          checkSentenceWithAI(word);
+          checkSentenceWithAI(words[currentWordIndex]);
         }
       } else {
         goNext();
@@ -788,56 +757,87 @@ Keep response under 3 sentences.`
     };
 
     function goNext() {
-      if (currentStage < 6) {
+      // Stage 4 (moslashtirish) bitta: keyingi bosqichga o'tamiz
+      if (currentStage === 4) {
+        currentStage = 5;
+        currentWordIndex = 0;
+        renderStage();
+        return;
+      }
+
+      // Joriy bosqichda keyingi so'zga o'tamiz
+      currentWordIndex++;
+      if (currentWordIndex >= words.length) {
+        // Bu bosqich tugadi, keyingi bosqichga
         currentStage++;
+        currentWordIndex = 0;
+
+        if (currentStage > 6) {
+          finishStudy();
+          return;
+        }
+
+        // Stage 4 ga o'tganda wordIndex = 0 (bitta matching)
         renderStage();
       } else {
-        // Bu so'z tugadi, keyingi so'zga
-        currentWordIndex++;
-        currentStage = 1;
-        if (currentWordIndex >= words.length) {
-          finishStudy();
-        } else {
-          renderStage();
-        }
+        renderStage();
       }
     }
 
     window.skipWord = () => {
-      markMistake(currentStage);
+      if (currentStage !== 4) markMistake(currentStage);
       goNext();
     };
 
-    function markMistake(stage) {
-      const word = words[currentWordIndex];
-      if (!results[word.id].mistakes.includes(stage)) {
-        results[word.id].mistakes.push(stage);
+    function markMistake(stage, wordId = null) {
+      const id = wordId || words[currentWordIndex]?.id;
+      if (!id || !results[id]) return;
+      if (!results[id].mistakes.includes(stage)) {
+        results[id].mistakes.push(stage);
       }
     }
 
     // ── FINISH ──
     async function finishStudy() {
-      // Natijalarni saqlash
+      // BUG FIX: avval sessionStorage, keyin redirect
+      sessionStorage.setItem('studyResults', JSON.stringify(results));
+      sessionStorage.setItem('studyWords', JSON.stringify(words));
+
       try {
+        const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
         const resultData = {
           uid: currentUser.uid,
           folderId,
           completedAt: serverTimestamp(),
-          results: results,
+          results,
           totalWords: words.length,
-          perfectWords: Object.values(results).filter(r => r.mistakes.length === 0).length
+          perfectWords,
+          score: `${perfectWords}/${words.length}`
         };
         await setDoc(
           doc(db, 'studyResults', `${currentUser.uid}_${folderId}_${Date.now()}`),
           resultData
         );
-      } catch (e) { console.log('Natija saqlanmadi:', e); }
+
+        // Papka reytingini yangilash
+        const { doc: docRef, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+        // db allaqachon import qilingan, updateDoc ishlatamiz
+      } catch (e) {
+        console.log('Natija saqlanmadi:', e);
+      }
+
+      // Papka reytingini yangilash
+      try {
+        const { updateDoc, doc: firestoreDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+        const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
+        await updateDoc(firestoreDoc(db, 'folders', folderId), {
+          lastScore: `${perfectWords}/${words.length}`,
+          lastStudied: serverTimestamp()
+        });
+      } catch(e) { console.log(e); }
 
       window.location.href = `results.html?id=${folderId}`;
-
-      // Natijani sessionStorage ga saqlash
-      sessionStorage.setItem('studyResults', JSON.stringify(results));
-      sessionStorage.setItem('studyWords', JSON.stringify(words));
     }
 
     function showToast(msg, isError = false) {

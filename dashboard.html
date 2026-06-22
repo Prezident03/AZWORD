@@ -5,10 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AzWord — Dashboard</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--purple-glow);
+      border: 1.5px solid var(--purple-main);
+      border-radius: 99px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--purple-light);
+      margin-top: 8px;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-logo">AzWord</div>
     <div class="nav-user">
@@ -17,10 +31,8 @@
     </div>
   </nav>
 
-  <!-- Dashboard -->
   <div class="dashboard">
 
-    <!-- Header -->
     <div class="dash-header">
       <h1>Salom, <span id="greeting-name">...</span> 👋</h1>
       <button class="btn-add" onclick="openModal()">
@@ -28,7 +40,6 @@
       </button>
     </div>
 
-    <!-- Admin bo'limlari -->
     <div id="admin-section" style="display:none">
       <div class="section-label">📚 Umumiy bo'limlar</div>
       <div class="folder-grid" id="admin-folders">
@@ -39,7 +50,6 @@
       </div>
     </div>
 
-    <!-- Mening bo'limlarim -->
     <div class="section-label">🗂️ Mening bo'limlarim</div>
     <div class="folder-grid" id="my-folders">
       <div class="empty-state" id="empty-msg">
@@ -50,7 +60,6 @@
 
   </div>
 
-  <!-- Modal: Yangi bo'lim -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <h3>Yangi bo'lim yaratish</h3>
@@ -69,7 +78,6 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div class="toast" id="toast"></div>
 
   <script type="module">
@@ -79,9 +87,7 @@
       collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ADMIN EMAIL — o'zingiznikini yozing
     const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
-
     let currentUser = null;
 
     onAuthStateChanged(auth, async (user) => {
@@ -90,7 +96,6 @@
       document.getElementById('user-name').textContent = user.displayName || user.email;
       document.getElementById('greeting-name').textContent = user.displayName?.split(' ')[0] || 'Foydalanuvchi';
 
-      // Admin bo'limlarini ko'rsatish
       if (user.email === ADMIN_EMAIL) {
         document.getElementById('admin-section').style.display = 'block';
       }
@@ -99,7 +104,6 @@
     });
 
     async function loadFolders() {
-      // Mening papkalarim
       const myQ = query(
         collection(db, 'folders'),
         where('uid', '==', currentUser.uid),
@@ -108,11 +112,7 @@
       const mySnap = await getDocs(myQ);
       renderFolders(mySnap, 'my-folders', false);
 
-      // Admin papkalarini yuklash
-      const adminQ = query(
-        collection(db, 'folders'),
-        where('isAdmin', '==', true)
-      );
+      const adminQ = query(collection(db, 'folders'), where('isAdmin', '==', true));
       const adminSnap = await getDocs(adminQ);
       if (!adminSnap.empty) {
         document.getElementById('admin-section').style.display = 'block';
@@ -139,12 +139,18 @@
         const id = docSnap.id;
         const canDelete = !isAdminSection || currentUser.email === ADMIN_EMAIL;
 
+        // Reyting badge
+        const scoreBadge = data.lastScore
+          ? `<div class="score-badge">⭐ ${data.lastScore}</div>`
+          : '';
+
         const card = document.createElement('div');
         card.className = 'folder-card';
         card.innerHTML = `
           <div class="folder-icon">${data.emoji || '📁'}</div>
           <div class="folder-name">${data.name}</div>
           <div class="folder-meta">${data.wordCount || 0} ta so'z</div>
+          ${scoreBadge}
           <div class="folder-progress">
             <div class="folder-progress-bar" style="width:${data.progress || 0}%"></div>
           </div>
@@ -175,7 +181,6 @@
       const emoji = document.getElementById('folder-emoji').value.trim() || '📁';
       if (!name) return;
 
-      const isAdmin = currentUser.email === ADMIN_EMAIL;
       await addDoc(collection(db, 'folders'), {
         name,
         emoji,
@@ -183,19 +188,20 @@
         isAdmin: false,
         wordCount: 0,
         progress: 0,
+        lastScore: null,
         createdAt: serverTimestamp()
       });
 
       closeModal();
-      showToast('Bo\'lim yaratildi! 🎉');
+      showToast("Bo'lim yaratildi! 🎉");
       await loadFolders();
     };
 
     window.deleteFolder = async (e, id) => {
       e.stopPropagation();
-      if (!confirm('Bu bo\'limni o\'chirasizmi?')) return;
+      if (!confirm("Bu bo'limni o'chirasizmi?")) return;
       await deleteDoc(doc(db, 'folders', id));
-      showToast('Bo\'lim o\'chirildi', true);
+      showToast("Bo'lim o'chirildi", true);
       await loadFolders();
     };
 
@@ -212,7 +218,6 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // Enter bilan modal yopish
     document.getElementById('folder-name').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') window.createFolder();
     });
