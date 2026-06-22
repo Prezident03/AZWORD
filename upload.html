@@ -473,25 +473,30 @@
       const words = [];
 
       for (const line of lines) {
-        // Vergul yoki tire bilan ajratish
         let parts;
-        if (line.includes(',')) {
+        // Tab (bir yoki bir nechta) bilan ajratilgan
+        if (/\t/.test(line)) {
+          parts = line.split(/\t+/).map(p => p.trim()).filter(p => p);
+        } else if (line.includes(',')) {
           parts = line.split(',').map(p => p.trim());
         } else if (line.includes(' - ')) {
           parts = line.split(' - ').map(p => p.trim());
-        } else if (line.includes('\t')) {
-          parts = line.split('\t').map(p => p.trim());
         } else {
-          continue;
+          // Bo'sh joy bilan ajratilgan bo'lishi mumkin (2+ bo'sh joy)
+          const spaceMatch = line.match(/^(\S+)\s{2,}(.+)$/);
+          if (spaceMatch) {
+            parts = [spaceMatch[1].trim(), spaceMatch[2].trim()];
+          } else {
+            continue;
+          }
         }
 
         const en = parts[0];
         const uz = parts[1];
 
-        // Sarlavha qatorini o'tkazib yuborish
         if (!en || !uz) continue;
-        if (en.toLowerCase() === 'english' || en.toLowerCase() === 'en' ||
-            en.toLowerCase() === 'inglizcha' || en.toLowerCase() === 'word') continue;
+        // Sarlavha qatorini o'tkazib yuborish
+        if (['english','en','inglizcha','word','so\'z'].includes(en.toLowerCase())) continue;
 
         words.push({
           en: en,
