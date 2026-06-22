@@ -42,7 +42,7 @@
         </div>
 
         <button class="profile-btn-item" onclick="logout()">
-          🚪 Chiqish
+          🛡️ Admin Panel</button><button class="profile-btn-item" id="logoutBtn">🚪 Chiqish
         </button>
       </div>
 
@@ -123,7 +123,7 @@
         document.getElementById('admin-section').style.display = 'block';
       }
 
-      await loadFolders();
+      await loadFolders(); document.getElementById('statFolders').textContent=document.querySelectorAll('.folder-card').length;
     });
 
     async function loadFolders() {
@@ -217,7 +217,7 @@
 
       closeModal();
       showToast("Bo'lim yaratildi! 🎉");
-      await loadFolders();
+      await loadFolders(); document.getElementById('statFolders').textContent=document.querySelectorAll('.folder-card').length;
     };
 
     window.deleteFolder = async (e, id) => {
@@ -225,10 +225,13 @@
       if (!confirm("Bu bo'limni o'chirasizmi?")) return;
       await deleteDoc(doc(db, 'folders', id));
       showToast("Bo'lim o'chirildi", true);
-      await loadFolders();
+      await loadFolders(); document.getElementById('statFolders').textContent=document.querySelectorAll('.folder-card').length;
     };
 
-    window.logout = async () => {
+    document.getElementById('logoutBtn').onclick = async ()=>{
+      await signOut(auth); window.location.href='index.html';};
+
+window.logout = async () => {
       await signOut(auth);
       window.location.href = 'index.html';
     };
