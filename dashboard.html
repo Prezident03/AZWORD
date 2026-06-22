@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <span id="user-name">...</span>
+      <button class="btn-sm" onclick="logout()">Chiqish</button>
+    </div>
+  </nav>
+
+  <!-- Dashboard -->
+  <div class="dashboard">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <h1>Salom, <span id="greeting-name">...</span> 👋</h1>
+      <button class="btn-add" onclick="openModal()">
+        <span>＋</span> Yangi bo'lim
+      </button>
+    </div>
+
+    <!-- Admin bo'limlari -->
+    <div id="admin-section" style="display:none">
+      <div class="section-label">📚 Umumiy bo'limlar</div>
+      <div class="folder-grid" id="admin-folders">
+        <div class="empty-state">
+          <div class="emoji">📭</div>
+          <p>Hozircha umumiy bo'limlar yo'q</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mening bo'limlarim -->
+    <div class="section-label">🗂️ Mening bo'limlarim</div>
+    <div class="folder-grid" id="my-folders">
+      <div class="empty-state" id="empty-msg">
+        <div class="emoji">✨</div>
+        <p>Hali bo'lim yo'q. Birinchi bo'limingizni yarating!</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal: Yangi bo'lim -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3>Yangi bo'lim yaratish</h3>
+      <div class="form-group">
+        <label>Bo'lim nomi</label>
+        <input type="text" id="folder-name" placeholder="Masalan: Mevalar, Hayvonlar..." />
+      </div>
+      <div class="form-group">
+        <label>Emoji (ixtiyoriy)</label>
+        <input type="text" id="folder-emoji" placeholder="🍎" maxlength="2" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
+        <button class="btn-confirm" onclick="createFolder()">Yaratish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { auth, db } from './js/firebase.js';
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ADMIN EMAIL — o'zingiznikini yozing
+    const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
+      document.getElementById('user-name').textContent = user.displayName || user.email;
+      document.getElementById('greeting-name').textContent = user.displayName?.split(' ')[0] || 'Foydalanuvchi';
+
+      // Admin bo'limlarini ko'rsatish
+      if (user.email === ADMIN_EMAIL) {
+        document.getElementById('admin-section').style.display = 'block';
+      }
+
+      await loadFolders();
+    });
+
+    async function loadFolders() {
+      // Mening papkalarim
+      const myQ = query(
+        collection(db, 'folders'),
+        where('uid', '==', currentUser.uid),
+        where('isAdmin', '==', false)
+      );
+      const mySnap = await getDocs(myQ);
+      renderFolders(mySnap, 'my-folders', false);
+
+      // Admin papkalarini yuklash
+      const adminQ = query(
+        collection(db, 'folders'),
+        where('isAdmin', '==', true)
+      );
+      const adminSnap = await getDocs(adminQ);
+      if (!adminSnap.empty) {
+        document.getElementById('admin-section').style.display = 'block';
+        renderFolders(adminSnap, 'admin-folders', true);
+      }
+    }
+
+    function renderFolders(snap, containerId, isAdminSection) {
+      const container = document.getElementById(containerId);
+      if (snap.empty) {
+        if (containerId === 'my-folders') {
+          container.innerHTML = `
+            <div class="empty-state" id="empty-msg">
+              <div class="emoji">✨</div>
+              <p>Hali bo'lim yo'q. Birinchi bo'limingizni yarating!</p>
+            </div>`;
+        }
+        return;
+      }
+
+      container.innerHTML = '';
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const id = docSnap.id;
+        const canDelete = !isAdminSection || currentUser.email === ADMIN_EMAIL;
+
+        const card = document.createElement('div');
+        card.className = 'folder-card';
+        card.innerHTML = `
+          <div class="folder-icon">${data.emoji || '📁'}</div>
+          <div class="folder-name">${data.name}</div>
+          <div class="folder-meta">${data.wordCount || 0} ta so'z</div>
+          <div class="folder-progress">
+            <div class="folder-progress-bar" style="width:${data.progress || 0}%"></div>
+          </div>
+          ${canDelete ? `<div class="folder-actions">
+            <button class="icon-btn" onclick="deleteFolder(event, '${id}')">🗑</button>
+          </div>` : ''}
+        `;
+        card.addEventListener('click', () => {
+          window.location.href = `folder.html?id=${id}`;
+        });
+        container.appendChild(card);
+      });
+    }
+
+    window.openModal = () => {
+      document.getElementById('modal').classList.add('open');
+      setTimeout(() => document.getElementById('folder-name').focus(), 100);
+    };
+
+    window.closeModal = () => {
+      document.getElementById('modal').classList.remove('open');
+      document.getElementById('folder-name').value = '';
+      document.getElementById('folder-emoji').value = '';
+    };
+
+    window.createFolder = async () => {
+      const name = document.getElementById('folder-name').value.trim();
+      const emoji = document.getElementById('folder-emoji').value.trim() || '📁';
+      if (!name) return;
+
+      const isAdmin = currentUser.email === ADMIN_EMAIL;
+      await addDoc(collection(db, 'folders'), {
+        name,
+        emoji,
+        uid: currentUser.uid,
+        isAdmin: false,
+        wordCount: 0,
+        progress: 0,
+        createdAt: serverTimestamp()
+      });
+
+      closeModal();
+      showToast('Bo\'lim yaratildi! 🎉');
+      await loadFolders();
+    };
+
+    window.deleteFolder = async (e, id) => {
+      e.stopPropagation();
+      if (!confirm('Bu bo\'limni o\'chirasizmi?')) return;
+      await deleteDoc(doc(db, 'folders', id));
+      showToast('Bo\'lim o\'chirildi', true);
+      await loadFolders();
+    };
+
+    window.logout = async () => {
+      await signOut(auth);
+      window.location.href = 'index.html';
+    };
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Enter bilan modal yopish
+    document.getElementById('folder-name').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') window.createFolder();
+    });
+  </script>
+</body>
+</html>
