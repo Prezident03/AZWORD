@@ -98,6 +98,21 @@
 
   <div class="toast" id="toast"></div>
 
+<div class="modal-overlay" id="profileModal">
+  <div class="profile-modal">
+    <div class="profile-top">
+      <div class="profile-big-avatar" id="profileBigAvatar">A</div>
+      <h2 id="profileName">Foydalanuvchi</h2>
+      <p id="profileEmail">email</p>
+    </div>
+    <input id="profileNewName" placeholder="Ismni o'zgartirish">
+    <button class="btn-confirm">💾 Saqlash</button>
+    <button class="btn-cancel">🔑 Parolni tiklash</button>
+    <button class="btn-cancel" onclick="logout()">🚪 Chiqish</button>
+  </div>
+</div>
+
+
   <script type="module">
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -246,7 +261,7 @@
     const dropdown = document.getElementById('profile-dropdown');
 
     avatar?.addEventListener('click', () => {
-      dropdown.classList.toggle('open');
+      document.getElementById('profileModal').classList.add('open');
     });
 
     document.addEventListener('click', (e) => {
