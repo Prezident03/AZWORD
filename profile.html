@@ -1,81 +1,102 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Profil</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.profile-wrap{max-width:800px;margin:40px auto;padding:20px}
-.profile-card{background:#1a1628;border:1px solid #2e2845;border-radius:24px;padding:30px}
-.avatar{width:120px;height:120px;border-radius:50%;background:#7c3aed;margin:auto;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:bold}
-.center{text-align:center}
-.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:25px 0}
-.stat{background:#0f0d1a;padding:15px;border-radius:14px;text-align:center}
-input{width:100%;padding:12px;margin-top:8px;margin-bottom:12px;background:#0f0d1a;color:white;border:1px solid #2e2845;border-radius:10px}
-button{padding:12px 18px;border:none;border-radius:10px;background:#7c3aed;color:white;cursor:pointer}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil | AzWord</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --bg: #0f0d1a;
+            --card: #1a1628;
+            --border: #2e2845;
+        }
+        body { background: #050508; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
+        .profile-wrap { max-width: 500px; margin: 50px auto; padding: 20px; }
+        .profile-card { 
+            background: rgba(26, 22, 40, 0.7); 
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            border-radius: 30px; padding: 40px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .avatar { 
+            width: 100px; height: 100px; border-radius: 25px; 
+            background: var(--primary); margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 40px; font-weight: bold; box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+        }
+        .statgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 30px 0; }
+        .stat { background: var(--bg); padding: 15px; border-radius: 20px; }
+        .stat b { font-size: 1.5em; color: var(--primary); }
+        input { 
+            width: 100%; padding: 15px; box-sizing: border-box;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 15px; color: white; margin-top: 10px;
+        }
+        button { 
+            width: 100%; padding: 15px; border: none; border-radius: 15px;
+            background: var(--primary); color: white; cursor: pointer;
+            margin-top: 10px; font-weight: bold; transition: 0.3s;
+        }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; }
+    </style>
 </head>
 <body>
-<nav class="navbar"><div class="nav-logo">AzWord</div></nav>
+
 <div class="profile-wrap">
-<div class="profile-card">
-<div class="avatar" id="avatar">A</div>
-<div class="center">
-<h2 id="name">Yuklanmoqda...</h2>
-<p id="email"></p>
-</div>
+    <div class="profile-card">
+        <div class="avatar" id="avatar">A</div>
+        <h2 id="name">Yuklanmoqda...</h2>
+        <p id="email" style="color: #888;"></p>
 
-<div class="statgrid">
-<div class="stat"><b id="folders">0</b><br>Bo'limlar</div>
-<div class="stat"><b id="words">0</b><br>So'zlar</div>
-<div class="stat"><b>AZWORD</b><br>Hisob</div>
-</div>
+        <div class="statgrid">
+            <div class="stat"><b id="folders">0</b><br><small>Papka</small></div>
+            <div class="stat"><b id="words">0</b><br><small>So'z</small></div>
+        </div>
 
-<h3>Ismni o'zgartirish</h3>
-<input id="newName" placeholder="Yangi ism">
-<button id="saveName">Saqlash</button>
+        <input id="newName" placeholder="Yangi ismingiz">
+        <button id="saveName">Ismni saqlash</button>
+        <button id="resetPass" style="background: #333;">Parolni tiklash</button>
 
-<br><br>
-
-<h3>Parolni tiklash</h3>
-<p>Emailingizga parolni tiklash havolasi yuboriladi.</p>
-<button id="resetPass">Parolni tiklash</button>
-
-<br><br>
-<a href="dashboard.html">← Dashboardga qaytish</a>
-</div>
+        <a href="dashboard.html" class="back-link">← Dashboardga qaytish</a>
+    </div>
 </div>
 
 <script type="module">
-import { auth, db } from './firebase.js';
-import { onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection,getDocs,query,where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-onAuthStateChanged(auth, async(user)=>{
- if(!user) location='index.html';
- document.getElementById('name').textContent=user.displayName||'Foydalanuvchi';
- document.getElementById('email').textContent=user.email;
- document.getElementById('avatar').textContent=(user.displayName||user.email)[0].toUpperCase();
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { location.href = 'index.html'; return; }
+        
+        document.getElementById('name').textContent = user.displayName || 'Foydalanuvchi';
+        document.getElementById('email').textContent = user.email;
+        document.getElementById('avatar').textContent = (user.displayName || user.email)[0].toUpperCase();
 
- const snap=await getDocs(query(collection(db,'folders'),where('uid','==',user.uid)));
- document.getElementById('folders').textContent=snap.size;
- let words=0;
- snap.forEach(d=> words += d.data().wordCount || 0);
- document.getElementById('words').textContent=words;
+        try {
+            const snap = await getDocs(query(collection(db, 'folders'), where('uid', '==', user.uid)));
+            document.getElementById('folders').textContent = snap.size;
+            let totalWords = 0;
+            snap.forEach(d => totalWords += (d.data().wordCount || 0));
+            document.getElementById('words').textContent = totalWords;
+        } catch (e) { console.error("Data fetch error", e); }
 
- document.getElementById('saveName').onclick=async()=>{
-   const n=document.getElementById('newName').value.trim();
-   if(!n) return;
-   await updateProfile(user,{displayName:n});
-   alert('Ism saqlandi');
-   location.reload();
- };
+        document.getElementById('saveName').onclick = async () => {
+            const n = document.getElementById('newName').value.trim();
+            if (!n) return;
+            await updateProfile(user, { displayName: n });
+            alert('Ism muvaffaqiyatli o‘zgartirildi!');
+            location.reload();
+        };
 
- document.getElementById('resetPass').onclick=async()=>{
-   await sendPasswordResetEmail(auth,user.email);
-   alert('Emailga yuborildi');
- };
-});
+        document.getElementById('resetPass').onclick = async () => {
+            await sendPasswordResetEmail(auth, user.email);
+            alert('Parolni tiklash uchun havolani emailingizdan tekshiring.');
+        };
+    });
 </script>
-</body></html>
+</body>
+</html>
