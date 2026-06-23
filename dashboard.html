@@ -23,33 +23,32 @@
 </head>
 <body>
 
-<nav class="navbar">
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
 
-  <div class="nav-logo">AzWord</div>
+      <div class="profile-avatar" id="profile-avatar">
+        <span id="avatar-text">A</span>
+      </div>
 
-  <div class="nav-user">
+      <div class="profile-dropdown" id="profile-dropdown">
+        <div class="profile-head">
+          <div class="profile-avatar-lg">
+            <span id="avatar-text-lg">A</span>
+          </div>
 
-    <div class="profile-avatar" id="profile-avatar">
-      <span id="avatar-text">A</span>
+          <h4 id="user-name">...</h4>
+          <p id="user-email">...</p>
+        </div>
+
+        <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div><button class="profile-btn-item" onclick="window.location.href='profile.html'">👤 Profil</button><button class="profile-btn-item" onclick="logout()">
+          🚪 Chiqish
+        </button>
+      </div>
+
     </div>
+  </nav>
 
-  </div>
-
-</nav>
-
-  <div class="modal-overlay" id="profileModal">
-  <div class="profile-modal">
-    <div class="profile-top">
-      <div class="profile-big-avatar" id="profileBigAvatar">A</div>
-      <h2 id="profileName">Foydalanuvchi</h2>
-      <p id="profileEmail">email</p>
-    </div>
-    <input id="profileNewName" placeholder="Ismni o'zgartirish">
-    <button class="btn-confirm">💾 Saqlash</button>
-    <button class="btn-cancel">🔑 Parolni tiklash</button>
-    <button class="btn-cancel" onclick="logout()">🚪 Chiqish</button>
-  </div>
-</div>
   <div class="dashboard">
 
     <div class="dash-header">
@@ -98,8 +97,6 @@
   </div>
 
   <div class="toast" id="toast"></div>
-
-
 
   <script type="module">
     import { auth, db } from './firebase.js';
@@ -249,7 +246,7 @@
     const dropdown = document.getElementById('profile-dropdown');
 
     avatar?.addEventListener('click', () => {
-      document.getElementById('profileModal').classList.add('open');
+      dropdown.classList.toggle('open');
     });
 
     document.addEventListener('click', (e) => {
