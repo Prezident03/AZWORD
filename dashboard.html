@@ -31,7 +31,59 @@
         <span id="avatar-text">A</span>
       </div>
 
-      <div class="profile-dropdown" id="profile-dropdown">
+      <div class="modal-overlay" id="profileModal">
+
+  <div class="profile-modal">
+
+    <button class="profile-close" onclick="closeProfileModal()">
+      ✕
+    </button>
+
+    <div class="profile-header">
+
+      <div class="profile-image-wrapper">
+
+        <div class="profile-big-avatar" id="profileBigAvatar">
+          A
+        </div>
+
+      </div>
+
+      <h2 id="profileName">
+        Yuklanmoqda...
+      </h2>
+
+      <p id="profileEmail">
+        Yuklanmoqda...
+      </p>
+
+    </div>
+
+    <div class="profile-form">
+
+      <input
+        type="text"
+        id="newName"
+        placeholder="Ism Familiya">
+
+      <button class="profile-primary-btn">
+        💾 Saqlash
+      </button>
+
+      <button class="profile-secondary-btn">
+        🔑 Parolni tiklash
+      </button>
+
+      <button onclick="logout()"
+        class="profile-danger-btn">
+        🚪 Chiqish
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
         <div class="profile-head">
           <div class="profile-avatar-lg">
             <span id="avatar-text-lg">A</span>
