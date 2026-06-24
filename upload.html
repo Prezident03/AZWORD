@@ -399,7 +399,7 @@
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      collection, addDoc, serverTimestamp, updateDoc, doc, increment
+      collection, addDoc, getDocs, serverTimestamp, updateDoc, doc, increment
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const params = new URLSearchParams(window.location.search);
@@ -617,33 +617,55 @@
       if (!parsedWords.length) return;
       const btn = document.getElementById('save-btn');
       btn.disabled = true;
-      btn.textContent = 'Saqlanmoqda...';
+      btn.textContent = 'Tekshirilmoqda...';
 
       try {
         const wordsRef = collection(db, 'folders', folderId, 'words');
 
-        for (const word of parsedWords) {
+        // ── DUPLIKAT TEKSHIRUVI ──
+        // Mavjud so'zlarni yuklab olamiz
+        const existingSnap = await getDocs(wordsRef);
+        const existingWords = new Set();
+        existingSnap.forEach(d => existingWords.add(d.data().en.toLowerCase()));
 
-  let example = word.example || '';
+        // Duplikatlarni filtrlash
+        const newWords = parsedWords.filter(w => !existingWords.has(w.en.toLowerCase()));
+        const skipped = parsedWords.length - newWords.length;
 
-  if (!example) {
-    example = await generateExample(word.en, word.uz);
-  }
+        if (newWords.length === 0) {
+          showError(`Barcha ${parsedWords.length} ta so'z bu bo'limda allaqachon mavjud!`);
+          btn.disabled = false;
+          btn.textContent = '✅ Saqlash';
+          return;
+        }
 
-  await addDoc(wordsRef, {
-    en: word.en,
-    uz: word.uz,
-    example: example,
-    createdAt: serverTimestamp()
-  });
-}
+        if (skipped > 0) {
+          showToast(`${skipped} ta takroriy so'z o'tkazib yuborildi`, true);
+          await new Promise(r => setTimeout(r, 1500));
+        }
 
-        // Papkadagi wordCount ni yangilash
+        // Faqat yangi so'zlarni AI bilan boyitib saqlash
+        btn.textContent = `🤖 AI misol yozmoqda... (0/${newWords.length})`;
+        for (let i = 0; i < newWords.length; i++) {
+          const word = newWords[i];
+          btn.textContent = `🤖 AI misol yozmoqda... (${i + 1}/${newWords.length})`;
+          if (!word.example) {
+            word.example = await generateExample(word.en, word.uz);
+          }
+          await addDoc(wordsRef, {
+            en: word.en.toLowerCase(),
+            uz: word.uz,
+            example: word.example || '',
+            createdAt: serverTimestamp()
+          });
+        }
+
+        // wordCount yangilash
         await updateDoc(doc(db, 'folders', folderId), {
-          wordCount: increment(parsedWords.length)
+          wordCount: increment(newWords.length)
         });
 
-        showToast(`${parsedWords.length} ta so'z qo'shildi! ✅`);
+        showToast(`${newWords.length} ta yangi so'z qo'shildi! ✅`);
         setTimeout(() => window.location.href = `folder.html?id=${folderId}`, 1500);
 
       } catch(e) {

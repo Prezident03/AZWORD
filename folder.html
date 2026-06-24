@@ -409,10 +409,17 @@
     }
 
     window.addWord = async () => {
-      const en = document.getElementById('word-en').value.trim();
+      const en = document.getElementById('word-en').value.trim().toLowerCase();
       const uz = document.getElementById('word-uz').value.trim();
 
       if (!en || !uz) return showToast("Inglizcha va o'zbekcha so'zlarni kiriting!", true);
+
+      // ── DUPLIKAT TEKSHIRUVI ──
+      const duplicate = words.find(w => w.en.toLowerCase() === en);
+      if (duplicate) {
+        showToast(`"${en}" bu bo'limda allaqachon bor! ❌`, true);
+        return;
+      }
 
       const btn = document.getElementById('add-btn');
       btn.disabled = true;
