@@ -6,6 +6,36 @@
   <title>AzWord — Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <style>
+    /* Coin & Star badges */
+    .nav-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .nav-badge.star {
+      background: rgba(251,191,36,0.12);
+      border: 1.5px solid rgba(251,191,36,0.35);
+      color: #fbbf24;
+    }
+    .nav-badge.coin {
+      background: rgba(52,211,153,0.1);
+      border: 1.5px solid rgba(52,211,153,0.3);
+      color: #34d399;
+    }
+    .nav-badge .badge-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+    }
+
     .score-badge {
       display: inline-flex;
       align-items: center;
@@ -26,6 +56,18 @@
   <nav class="navbar">
     <div class="nav-logo">AzWord</div>
     <div class="nav-user">
+
+      <!-- Coin & Star badges -->
+      <div class="nav-badges">
+        <div class="nav-badge star" title="Yulduzchalar (reyting)">
+          <span class="badge-icon">⭐</span>
+          <span class="badge-val" id="nav-stars">0</span>
+        </div>
+        <div class="nav-badge coin" title="Tangalar (xarid)">
+          <span class="badge-icon">🪙</span>
+          <span class="badge-val" id="nav-coins">0</span>
+        </div>
+      </div>
 
       <div class="profile-avatar" id="profile-avatar">
         <span id="avatar-text">A</span>
@@ -137,8 +179,20 @@
         document.getElementById('admin-section').style.display = 'block';
       }
 
+      await loadUserStats(user.uid);
       await loadFolders();
     });
+
+    async function loadUserStats(uid) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          document.getElementById('nav-stars').textContent = data.stars || 0;
+          document.getElementById('nav-coins').textContent = data.coins || 0;
+        }
+      } catch(e) {}
+    }
 
     async function loadFolders() {
       const myQ = query(
