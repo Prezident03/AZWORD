@@ -230,7 +230,7 @@
   <script type="module">
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, setDoc, increment, collection, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -261,40 +261,70 @@
     // Score display
     document.getElementById('score-num').textContent = `${perfectWords}/${totalWords}`;
 
-    // Reward: har mukammal so'z uchun 1 coin + 1 star
-    const earnedCoins = perfectWords;
-    const earnedStars = perfectWords;
-
-    // Reward box ko'rsatish
-    if (earnedCoins > 0) {
-      const rewardBox = document.createElement('div');
-      rewardBox.className = 'reward-box';
-      rewardBox.innerHTML = `
-        <div class="reward-item">
-          <div class="reward-icon">⭐</div>
-          <div class="reward-amount star">+${earnedStars}</div>
-          <div class="reward-label">Yulduzcha</div>
-        </div>
-        <div class="reward-divider"></div>
-        <div class="reward-item">
-          <div class="reward-icon">🪙</div>
-          <div class="reward-amount coin">+${earnedCoins}</div>
-          <div class="reward-label">Tanga</div>
-        </div>
-      `;
-      document.querySelector('.results-hero').appendChild(rewardBox);
-    }
-
-    // Firebase ga saqlash
+    // Reward: faqat birinchi marta mukammal o'zlashtirilgan so'zlar uchun
     onAuthStateChanged(auth, async (user) => {
-      if (!user || earnedCoins === 0) return;
+      if (!user) return;
+
       try {
-        await setDoc(doc(db, 'users', user.uid), {
-          coins: increment(earnedCoins),
-          stars: increment(earnedStars)
-        }, { merge: true });
+        // Mukammal so'zlarni topamiz
+        const perfectWordsList = words.filter(w => results[w.id] && results[w.id].mistakes.length === 0);
+        if (perfectWordsList.length === 0) return;
+
+        // Har bir so'zning folderId sini topamiz (sessionStorage dan)
+        const folderId = params.get('id');
+        if (!folderId) return;
+
+        // Qaysi so'zlar hali reward olmagan — tekshiramiz
+        let newlyRewarded = 0;
+        for (const word of perfectWordsList) {
+          const wordRef = doc(db, 'folders', folderId, 'words', word.id);
+          const wordSnap = await getDoc(wordRef);
+          if (wordSnap.exists() && !wordSnap.data().rewarded) {
+            // Birinchi marta — reward beramiz va belgilaymiz
+            await updateDoc(wordRef, { rewarded: true });
+            newlyRewarded++;
+          }
+        }
+
+        // Faqat yangi so'zlar uchun coin/star beramiz
+        if (newlyRewarded > 0) {
+          await setDoc(doc(db, 'users', user.uid), {
+            coins: increment(newlyRewarded),
+            stars: increment(newlyRewarded)
+          }, { merge: true });
+
+          // Reward box ko'rsatish
+          const rewardBox = document.createElement('div');
+          rewardBox.className = 'reward-box';
+          rewardBox.innerHTML = `
+            <div class="reward-item">
+              <div class="reward-icon">⭐</div>
+              <div class="reward-amount star">+${newlyRewarded}</div>
+              <div class="reward-label">Yulduzcha</div>
+            </div>
+            <div class="reward-divider"></div>
+            <div class="reward-item">
+              <div class="reward-icon">🪙</div>
+              <div class="reward-amount coin">+${newlyRewarded}</div>
+              <div class="reward-label">Tanga</div>
+            </div>
+          `;
+          document.querySelector('.results-hero').appendChild(rewardBox);
+        } else {
+          // Hammasi oldin reward olgan
+          const infoBox = document.createElement('div');
+          infoBox.className = 'reward-box';
+          infoBox.style.opacity = '0.6';
+          infoBox.innerHTML = `
+            <div style="text-align:center;color:var(--text-muted);font-size:0.9rem;">
+              🏅 Bu so'zlar uchun mukofot oldin berilgan
+            </div>
+          `;
+          document.querySelector('.results-hero').appendChild(infoBox);
+        }
+
       } catch(e) {
-        console.error('Reward saqlashda xato:', e);
+        console.error('Reward xato:', e);
       }
     });
 
