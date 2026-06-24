@@ -469,30 +469,23 @@
 
     async function generateExample(en, uz) {
   try {
-    const res = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer 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"
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          max_tokens: 80,
-          messages: [{
-            role: "user",
-            content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). Reply ONLY with the sentence.`
-          }]
-        })
-      }
-    );
-
-    const data = await res.json();
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 80,
+        messages: [{
+          role: "user",
+          content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). Reply ONLY with the sentence, no quotes, no explanation.`
+        }]
+      })
+    });
 
     if (!res.ok) return '';
 
-    return data.choices?.[0]?.message?.content?.trim() || '';
+    const data = await res.json();
+    return (data.content?.[0]?.text || '').trim().replace(/^["'"]|["'"]$/g, '');
 
   } catch (e) {
     console.error(e);

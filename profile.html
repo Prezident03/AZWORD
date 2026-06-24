@@ -1,102 +1,445 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil | AzWord</title>
-    <style>
-        :root {
-            --primary: #7c3aed;
-            --bg: #0f0d1a;
-            --card: #1a1628;
-            --border: #2e2845;
-        }
-        body { background: #050508; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; }
-        .profile-wrap { max-width: 500px; margin: 50px auto; padding: 20px; }
-        .profile-card { 
-            background: rgba(26, 22, 40, 0.7); 
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 30px; padding: 40px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .avatar { 
-            width: 100px; height: 100px; border-radius: 25px; 
-            background: var(--primary); margin: 0 auto 20px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 40px; font-weight: bold; box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
-        }
-        .statgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 30px 0; }
-        .stat { background: var(--bg); padding: 15px; border-radius: 20px; }
-        .stat b { font-size: 1.5em; color: var(--primary); }
-        input { 
-            width: 100%; padding: 15px; box-sizing: border-box;
-            background: var(--bg); border: 1px solid var(--border);
-            border-radius: 15px; color: white; margin-top: 10px;
-        }
-        button { 
-            width: 100%; padding: 15px; border: none; border-radius: 15px;
-            background: var(--primary); color: white; cursor: pointer;
-            margin-top: 10px; font-weight: bold; transition: 0.3s;
-        }
-        button:hover { opacity: 0.9; transform: translateY(-2px); }
-        .back-link { display: block; margin-top: 20px; color: #888; text-decoration: none; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Profil</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .profile-page {
+      max-width: 520px;
+      margin: 48px auto;
+      padding: 0 20px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      margin-bottom: 28px;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-main); }
+
+    .profile-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    /* Header qism */
+    .profile-header {
+      background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(157,92,246,0.15));
+      padding: 36px 32px 28px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 90px;
+      margin: 0 auto 16px;
+    }
+
+    .avatar-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      border: 3px solid rgba(157,92,246,0.4);
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .avatar-edit-btn {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--purple-main);
+      border: 2px solid var(--bg-card);
+      color: #fff;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .profile-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .profile-header .email {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Stats */
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item {
+      padding: 18px 12px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--purple-light);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Body */
+    .profile-body {
+      padding: 28px 32px;
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .profile-field {
+      margin-bottom: 14px;
+    }
+
+    .profile-field label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .profile-field input {
+      width: 100%;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .profile-field input:focus {
+      border-color: var(--purple-main);
+      box-shadow: 0 0 0 3px var(--purple-glow);
+    }
+
+    .profile-field input:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .field-note {
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: opacity 0.2s;
+      margin-top: 6px;
+    }
+    .btn-save:hover { opacity: 0.88; }
+    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .divider-line {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    .btn-password {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-password:hover {
+      border-color: var(--purple-main);
+      color: var(--purple-light);
+    }
+
+    .btn-logout {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 1.5px solid rgba(248,113,113,0.3);
+      border-radius: 10px;
+      color: var(--danger);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .btn-logout:hover {
+      background: rgba(248,113,113,0.08);
+      border-color: var(--danger);
+    }
+
+    /* Password reset success */
+    .reset-success {
+      display: none;
+      background: rgba(52,211,153,0.08);
+      border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 0.85rem;
+      color: var(--success);
+      margin-top: 10px;
+      text-align: center;
+    }
+    .reset-success.show { display: block; }
+  </style>
 </head>
 <body>
 
-<div class="profile-wrap">
-    <div class="profile-card">
-        <div class="avatar" id="avatar">A</div>
-        <h2 id="name">Yuklanmoqda...</h2>
-        <p id="email" style="color: #888;"></p>
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <span id="nav-username">...</span>
+    </div>
+  </nav>
 
-        <div class="statgrid">
-            <div class="stat"><b id="folders">0</b><br><small>Papka</small></div>
-            <div class="stat"><b id="words">0</b><br><small>So'z</small></div>
+  <div class="profile-page">
+
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      ← Orqaga
+    </button>
+
+    <div class="profile-card">
+
+      <!-- Header -->
+      <div class="profile-header">
+        <div class="avatar-wrap">
+          <div class="avatar-circle" id="avatar-circle">
+            <span id="avatar-letter">A</span>
+          </div>
+          <div class="avatar-edit-btn" title="Rasm o'zgartirish">✏️</div>
+        </div>
+        <h2 id="profile-name">Yuklanmoqda...</h2>
+        <div class="email" id="profile-email">—</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-folders">0</div>
+          <div class="stat-label">Bo'limlar</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-words">0</div>
+          <div class="stat-label">So'zlar</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">AZ</div>
+          <div class="stat-label">AzWord</div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="profile-body">
+
+        <div class="section-title">Shaxsiy ma'lumotlar</div>
+
+        <div class="profile-field">
+          <label>Ism Familiya</label>
+          <input type="text" id="input-name" placeholder="Ismingizni kiriting" />
         </div>
 
-        <input id="newName" placeholder="Yangi ismingiz">
-        <button id="saveName">Ismni saqlash</button>
-        <button id="resetPass" style="background: #333;">Parolni tiklash</button>
+        <div class="profile-field">
+          <label>Gmail (o'zgartirib bo'lmaydi)</label>
+          <input type="email" id="input-email" disabled />
+          <div class="field-note">🔒 Email Firebase orqali boshqariladi</div>
+        </div>
 
-        <a href="dashboard.html" class="back-link">← Dashboardga qaytish</a>
+        <button class="btn-save" id="btn-save" onclick="saveName()">
+          💾 Saqlash
+        </button>
+
+        <div class="divider-line"></div>
+
+        <div class="section-title">Parolni o'zgartirish</div>
+
+        <button class="btn-password" onclick="resetPassword()">
+          🔑 Parolni o'zgartirish
+        </button>
+
+        <div class="reset-success" id="reset-success">
+          ✅ Emailingizga parolni tiklash havolasi yuborildi!
+        </div>
+
+        <div class="divider-line"></div>
+
+        <button class="btn-logout" onclick="logoutUser()">
+          🚪 Hisobdan chiqish
+        </button>
+
+      </div>
     </div>
-</div>
+  </div>
 
-<script type="module">
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
     import { auth, db } from './firebase.js';
-    import { onAuthStateChanged, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      onAuthStateChanged, signOut, updateProfile, sendPasswordResetEmail
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let currentUser = null;
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user) { location.href = 'index.html'; return; }
-        
-        document.getElementById('name').textContent = user.displayName || 'Foydalanuvchi';
-        document.getElementById('email').textContent = user.email;
-        document.getElementById('avatar').textContent = (user.displayName || user.email)[0].toUpperCase();
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
 
-        try {
-            const snap = await getDocs(query(collection(db, 'folders'), where('uid', '==', user.uid)));
-            document.getElementById('folders').textContent = snap.size;
-            let totalWords = 0;
-            snap.forEach(d => totalWords += (d.data().wordCount || 0));
-            document.getElementById('words').textContent = totalWords;
-        } catch (e) { console.error("Data fetch error", e); }
+      const name = user.displayName || '';
+      const email = user.email || '';
+      const letter = (name || email).charAt(0).toUpperCase();
 
-        document.getElementById('saveName').onclick = async () => {
-            const n = document.getElementById('newName').value.trim();
-            if (!n) return;
-            await updateProfile(user, { displayName: n });
-            alert('Ism muvaffaqiyatli o‘zgartirildi!');
-            location.reload();
-        };
+      document.getElementById('nav-username').textContent = name || email;
+      document.getElementById('profile-name').textContent = name || 'Foydalanuvchi';
+      document.getElementById('profile-email').textContent = email;
+      document.getElementById('avatar-letter').textContent = letter;
+      document.getElementById('input-name').value = name;
+      document.getElementById('input-email').value = email;
 
-        document.getElementById('resetPass').onclick = async () => {
-            await sendPasswordResetEmail(auth, user.email);
-            alert('Parolni tiklash uchun havolani emailingizdan tekshiring.');
-        };
+      // Statistika
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'folders'),
+          where('uid', '==', user.uid),
+          where('isAdmin', '==', false)
+        ));
+        document.getElementById('stat-folders').textContent = snap.size;
+        let totalWords = 0;
+        snap.forEach(d => totalWords += d.data().wordCount || 0);
+        document.getElementById('stat-words').textContent = totalWords;
+      } catch(e) {}
     });
-</script>
+
+    window.saveName = async () => {
+      const newName = document.getElementById('input-name').value.trim();
+      if (!newName) return showToast("Ism bo'sh bo'lmasin!", true);
+
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true;
+      btn.textContent = 'Saqlanmoqda...';
+
+      try {
+        await updateProfile(currentUser, { displayName: newName });
+        document.getElementById('profile-name').textContent = newName;
+        document.getElementById('nav-username').textContent = newName;
+        document.getElementById('avatar-letter').textContent = newName.charAt(0).toUpperCase();
+        showToast('Ism saqlandi! ✅');
+      } catch(e) {
+        showToast('Xato yuz berdi', true);
+      }
+
+      btn.disabled = false;
+      btn.textContent = '💾 Saqlash';
+    };
+
+    window.resetPassword = async () => {
+      try {
+        await sendPasswordResetEmail(auth, currentUser.email);
+        document.getElementById('reset-success').classList.add('show');
+        showToast('Emailga yuborildi! 📧');
+      } catch(e) {
+        showToast('Xato yuz berdi', true);
+      }
+    };
+
+    window.logoutUser = async () => {
+      await signOut(auth);
+      window.location.href = 'index.html';
+    };
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
 </body>
 </html>

@@ -374,14 +374,13 @@
       aiGeneratedExample = '';
 
       try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
+            "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
+            model: "claude-sonnet-4-6",
             max_tokens: 80,
             messages: [{
               role: "user",
@@ -392,14 +391,14 @@
 
         if (!res.ok) {
           const err = await res.json();
-          console.error('Groq error:', err);
+          console.error('API error:', err);
           box.style.display = 'none';
           aiGeneratedExample = '';
           return;
         }
 
         const data = await res.json();
-        const sentence = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+        const sentence = (data.content?.[0]?.text || '').trim().replace(/^["']|["']$/g, '');
         aiGeneratedExample = sentence;
         textEl.textContent = '"' + sentence + '"';
       } catch(e) {
