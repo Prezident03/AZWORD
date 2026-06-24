@@ -622,18 +622,23 @@
       try {
         const wordsRef = collection(db, 'folders', folderId, 'words');
 
-        // ── DUPLIKAT TEKSHIRUVI ──
-        // Mavjud so'zlarni yuklab olamiz
-        const existingSnap = await getDocs(wordsRef);
-        const existingWords = new Set();
-        existingSnap.forEach(d => existingWords.add(d.data().en.toLowerCase()));
+        // ── GLOBAL DUPLIKAT TEKSHIRUVI (barcha bo'limlar) ──
+        const allFoldersSnap = await getDocs(query(
+          collection(db, 'folders'),
+          where('uid', '==', currentUser.uid)
+        ));
+        const globalExisting = new Set();
+        for (const folderDoc of allFoldersSnap.docs) {
+          const wSnap = await getDocs(collection(db, 'folders', folderDoc.id, 'words'));
+          wSnap.forEach(d => globalExisting.add(d.data().en.toLowerCase()));
+        }
 
         // Duplikatlarni filtrlash
-        const newWords = parsedWords.filter(w => !existingWords.has(w.en.toLowerCase()));
+        const newWords = parsedWords.filter(w => !globalExisting.has(w.en.toLowerCase()));
         const skipped = parsedWords.length - newWords.length;
 
         if (newWords.length === 0) {
-          showError(`Barcha ${parsedWords.length} ta so'z bu bo'limda allaqachon mavjud!`);
+          showError(`Barcha ${parsedWords.length} ta so'z sizning lug'atlarda allaqachon mavjud!`);
           btn.disabled = false;
           btn.textContent = '✅ Saqlash';
           return;
@@ -641,7 +646,7 @@
 
         if (skipped > 0) {
           showToast(`${skipped} ta takroriy so'z o'tkazib yuborildi`, true);
-          await new Promise(r => setTimeout(r, 1500));
+          await new Promise(r => setTimeout(r, 1200));
         }
 
         // Faqat yangi so'zlarni AI bilan boyitib saqlash

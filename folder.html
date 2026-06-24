@@ -414,11 +414,23 @@
 
       if (!en || !uz) return showToast("Inglizcha va o'zbekcha so'zlarni kiriting!", true);
 
-      // ── DUPLIKAT TEKSHIRUVI ──
-      const duplicate = words.find(w => w.en.toLowerCase() === en);
-      if (duplicate) {
-        showToast(`"${en}" bu bo'limda allaqachon bor! ❌`, true);
-        return;
+      // ── GLOBAL DUPLIKAT TEKSHIRUVI (barcha bo'limlar) ──
+      const allFoldersSnap = await getDocs(query(
+        collection(db, 'folders'),
+        where('uid', '==', currentUser.uid)
+      ));
+      for (const folderDoc of allFoldersSnap.docs) {
+        const wordsSnap = await getDocs(
+          collection(db, 'folders', folderDoc.id, 'words')
+        );
+        for (const w of wordsSnap.docs) {
+          if (w.data().en.toLowerCase() === en) {
+            const folderName = folderDoc.data().name;
+            showToast(`"${en}" allaqachon "${folderName}" bo'limida bor! ❌`, true);
+            document.getElementById('add-btn').disabled = false;
+            return;
+          }
+        }
       }
 
       const btn = document.getElementById('add-btn');
