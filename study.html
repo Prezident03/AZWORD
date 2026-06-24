@@ -281,7 +281,42 @@
     .feedback-overlay.wrong-ov { background: rgba(248,113,113,0.15); }
     .feedback-overlay p { font-size: 1rem; font-weight: 600; }
 
-    .hint-text { font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; }
+    .hint-text { font-size: 0.9rem; color: var(--text-dim); margin-top: 10px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: 2px; }
+
+    .undo-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 8px 18px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .undo-btn:hover { border-color: var(--warning); color: var(--warning); }
+
+    .hint-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      padding: 8px 18px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--warning);
+      border-color: rgba(251,191,36,0.4);
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .hint-btn:hover { background: rgba(251,191,36,0.08); border-color: var(--warning); }
 
     .study-nav {
       display: flex;
@@ -388,6 +423,7 @@
       { id: 3, name: "Bo'laklash",   emoji: "🧩" },
       { id: 4, name: "Moslashtirish",emoji: "🔗" },
       { id: 5, name: "Yozish",       emoji: "✍️" },
+      { id: 6, name: "Gap tuzish",   emoji: "📝" },
     ];
 
     const params = new URLSearchParams(window.location.search);
@@ -395,6 +431,7 @@
     if (!folderId) window.location.href = 'dashboard.html';
 
     let words = [];
+    let assembledPieces = []; // stage 3 undo uchun
     // Yangi logika: bosqich bo'yicha barcha so'zlar
     // currentStage: 1-6, currentWordIndex: joriy so'z indeksi (bosqich ichida)
     let currentStage = 1;
@@ -470,6 +507,7 @@
       else if (currentStage === 3) renderStage3(words[currentWordIndex], card);
       else if (currentStage === 4) renderStage4(card);
       else if (currentStage === 5) renderStage5(words[currentWordIndex], card);
+      else if (currentStage === 6) renderStage6(words[currentWordIndex], card);
     }
 
     // ── STAGE 1: Tanishtirish — barcha so'zlar ──
@@ -500,11 +538,14 @@
       btn.textContent = '⏳ ...';
 
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "llama-3.3-70b-versatile",
             max_tokens: 80,
             messages: [{
               role: "user",
@@ -513,7 +554,7 @@
           })
         });
         const data = await res.json();
-        const translation = data.content?.[0]?.text || ''.trim().replace(/^["']|["']$/g, '');
+        const translation = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
         translationEl.textContent = '🇺🇿 ' + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
@@ -562,6 +603,7 @@
       const en = word.en.toLowerCase();
       pieces = splitWord(en);
       assembled = '';
+      assembledPieces = []; // qaysi indexlar bosilgani
 
       card.innerHTML = `
         <div class="word-sub">Bu so'zni to'g'ri yig'ing:</div>
@@ -570,6 +612,7 @@
         <div class="pieces-area" id="pieces-area">
           ${pieces.map((p, i) => `<button class="piece-btn" id="piece-${i}" onclick="addPiece(${i}, '${p}', '${en}')">${p}</button>`).join('')}
         </div>
+        <button class="undo-btn" id="undo-btn" onclick="undoPiece()" style="display:none">↩ Orqaga</button>
       `;
       document.getElementById('next-btn').disabled = true;
     }
@@ -600,13 +643,21 @@
       if (btn.classList.contains('used')) return;
       btn.classList.add('used');
       assembled += piece;
+      assembledPieces.push(idx);
       const display = document.getElementById('assembled-display');
       display.textContent = assembled;
+      display.style.color = '';
+
+      // Undo tugmasini ko'rsatish
+      const undoBtn = document.getElementById('undo-btn');
+      if (undoBtn) undoBtn.style.display = 'inline-flex';
 
       const allUsed = pieces.every((_, i) => document.getElementById(`piece-${i}`).classList.contains('used'));
       if (allUsed) {
         if (assembled === correct) {
           display.style.color = 'var(--success)';
+          display.textContent = assembled + ' ✓';
+          if (undoBtn) undoBtn.style.display = 'none';
           document.getElementById('next-btn').disabled = false;
         } else {
           display.style.color = 'var(--danger)';
@@ -614,12 +665,28 @@
           markMistake(3);
           setTimeout(() => {
             assembled = '';
+            assembledPieces = [];
             display.textContent = '_';
             display.style.color = '';
+            if (undoBtn) undoBtn.style.display = 'none';
             pieces.forEach((_, i) => document.getElementById(`piece-${i}`).classList.remove('used'));
           }, 1200);
         }
       }
+    };
+
+    window.undoPiece = () => {
+      if (assembledPieces.length === 0) return;
+      const lastIdx = assembledPieces.pop();
+      const lastPiece = pieces[lastIdx];
+      assembled = assembled.slice(0, assembled.length - lastPiece.length);
+      document.getElementById(`piece-${lastIdx}`).classList.remove('used');
+      const display = document.getElementById('assembled-display');
+      display.textContent = assembled || '_';
+      display.style.color = '';
+      const undoBtn = document.getElementById('undo-btn');
+      if (undoBtn && assembledPieces.length === 0) undoBtn.style.display = 'none';
+      document.getElementById('next-btn').disabled = true;
     };
 
     // ── STAGE 4: Moslashtirish — chap EN, o'ng UZ, har biri alohida qatorda ──
@@ -724,13 +791,17 @@
     }
 
     // ── STAGE 5: Yozish — barcha so'zlar ──
+    let hintLevel = 0;
+
     function renderStage5(word, card) {
+      hintLevel = 0;
       card.innerHTML = `
         <div class="word-sub">Quyidagi so'zni inglizcha yozing:</div>
         <div class="word-display">${word.uz}</div>
         ${word.example ? `<div class="word-example-text">"${word.example}"</div>` : ''}
         <input type="text" class="type-input" id="type-input" placeholder="inglizcha so'zni yozing..." autocomplete="off" autocorrect="off" spellcheck="false" />
         <div class="hint-text" id="type-hint"></div>
+        <button class="hint-btn" id="hint-btn" onclick="showHint('${word.en}')">💡 Ko'rsatma</button>
       `;
       document.getElementById('next-btn').disabled = true;
 
@@ -755,6 +826,24 @@
       });
     }
 
+    window.showHint = (word) => {
+      hintLevel++;
+      const revealCount = Math.min(hintLevel * 2, Math.ceil(word.length / 2));
+      const hint = word.slice(0, revealCount) + '_'.repeat(word.length - revealCount);
+      const hintEl = document.getElementById('type-hint');
+      hintEl.textContent = '💡 ' + hint;
+      hintEl.style.color = 'var(--warning)';
+      markMistake(5);
+
+      // Barcha harflar ochilsa tugmani o'chiramiz
+      const hintBtn = document.getElementById('hint-btn');
+      if (revealCount >= Math.ceil(word.length / 2) && hintBtn) {
+        hintBtn.textContent = '💡 ' + word; // to'liq so'zni ko'rsatish
+        hintBtn.disabled = true;
+        hintBtn.style.opacity = '0.5';
+      }
+    };
+
     function checkTyping(word) {
       const input = document.getElementById('type-input');
       const val = input.value.trim().toLowerCase();
@@ -773,10 +862,84 @@
       }
     }
 
+    // ── STAGE 6: Gap tuzish (AI) — barcha so'zlar ──
+    function renderStage6(word, card) {
+      card.innerHTML = `
+        <div class="word-sub">Quyidagi so'zni ishlatib inglizcha gap tuzing:</div>
+        <div class="word-display" style="font-size:1.5rem">${word.en}</div>
+        <div class="word-sub" style="color:var(--text-dim)">(${word.uz})</div>
+        <textarea class="sentence-input" id="sentence-input" placeholder="Write a sentence using '${word.en}'..."></textarea>
+        <div class="ai-feedback" id="ai-feedback"></div>
+      `;
+      document.getElementById('next-btn').textContent = "AI tekshirsin →";
+      document.getElementById('next-btn').disabled = false;
+      document.getElementById('next-btn').onclick = () => nextAction();
+      document.getElementById('sentence-input').focus();
+    }
+
+    async function checkSentenceWithAI(word) {
+      const sentence = document.getElementById('sentence-input').value.trim();
+      if (!sentence) return showToast("Avval gap yozing!", true);
+
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.disabled = true;
+      nextBtn.innerHTML = `Tekshirilmoqda <span class="loading-dots"><span></span><span></span><span></span></span>`;
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            max_tokens: 200,
+            messages: [{
+              role: "user",
+              content: `You are an English teacher helping Uzbek students. The student was asked to write a sentence using the word "${word.en}" (which means "${word.uz}" in Uzbek). The student wrote: "${sentence}". Please check if the word is used correctly and the sentence is grammatically correct. Respond in Uzbek language. Be encouraging. If correct: start with "✅" and briefly praise them. If incorrect: start with "❌" and kindly explain the mistake and show a correct example. Keep response under 3 sentences.`
+            }]
+          })
+        });
+
+        const data = await response.json();
+        const feedback = data.choices[0].message.content;
+
+        const fbEl = document.getElementById('ai-feedback');
+        fbEl.textContent = feedback;
+        fbEl.style.display = 'block';
+
+        if (feedback.startsWith('✅')) {
+          fbEl.className = 'ai-feedback good';
+        } else {
+          fbEl.className = 'ai-feedback bad';
+          markMistake(6);
+        }
+
+        nextBtn.textContent = "Keyingi →";
+        nextBtn.disabled = false;
+        nextBtn.onclick = () => goNext();
+
+      } catch (e) {
+        showToast("AI bilan ulanishda xato", true);
+        nextBtn.textContent = "O'tkazib yuborish →";
+        nextBtn.disabled = false;
+        nextBtn.onclick = () => goNext();
+      }
+    }
 
     // ── NAVIGATION ──
     window.nextAction = () => {
-      goNext();
+      if (currentStage === 6) {
+        const fb = document.getElementById('ai-feedback');
+        if (fb && fb.style.display !== 'none' && fb.textContent) {
+          goNext();
+        } else {
+          checkSentenceWithAI(words[currentWordIndex]);
+        }
+      } else {
+        goNext();
+      }
     };
 
     function goNext() {
@@ -795,7 +958,7 @@
         currentStage++;
         currentWordIndex = 0;
 
-        if (currentStage > 5) {
+        if (currentStage > 6) {
           finishStudy();
           return;
         }
@@ -821,7 +984,22 @@
     }
 
     // ── FINISH ──
+    let isSecondRound = false;
+
     async function finishStudy() {
+      // Xato so'zlar bormi? — 2-urinish
+      const mistakeWords = words.filter(w => results[w.id] && results[w.id].mistakes.length > 0);
+      if (!isSecondRound && mistakeWords.length > 0) {
+        isSecondRound = true;
+        words = mistakeWords;
+        currentStage = 1;
+        currentWordIndex = 0;
+        // Xato so'zlarning natijalarini reset qilamiz
+        mistakeWords.forEach(w => { results[w.id].mistakes = []; });
+        showRoundBanner(mistakeWords.length);
+        return;
+      }
+
       // BUG FIX: avval sessionStorage, keyin redirect
       sessionStorage.setItem('studyResults', JSON.stringify(results));
       sessionStorage.setItem('studyWords', JSON.stringify(words));
@@ -861,6 +1039,21 @@
       } catch(e) { console.log(e); }
 
       window.location.href = `results.html?id=${folderId}`;
+    }
+
+    function showRoundBanner(count) {
+      // 2-urinish banneri
+      const card = document.getElementById('study-card');
+      if (card) {
+        card.innerHTML = `
+          <div style="text-align:center;padding:20px;">
+            <div style="font-size:3rem;margin-bottom:16px;">🔄</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:10px;">2-urinish!</div>
+            <div style="color:var(--text-muted);font-size:0.95rem;">${count} ta xato so'z qaytadan ishlanadi</div>
+          </div>
+        `;
+      }
+      setTimeout(() => renderStage(), 2000);
     }
 
     function showToast(msg, isError = false) {
