@@ -283,6 +283,23 @@
 
     .hint-text { font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; }
 
+    .undo-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 8px 18px;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .undo-btn:hover { border-color: var(--warning); color: var(--warning); }
+
     .study-nav {
       display: flex;
       gap: 12px;
@@ -409,6 +426,7 @@
     // Piece state
     let pieces = [];
     let assembled = '';
+    let assembledPieces = [];
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = 'index.html';
@@ -565,6 +583,7 @@
       const en = word.en.toLowerCase();
       pieces = splitWord(en);
       assembled = '';
+      assembledPieces = [];
 
       card.innerHTML = `
         <div class="word-sub">Bu so'zni to'g'ri yig'ing:</div>
@@ -573,6 +592,7 @@
         <div class="pieces-area" id="pieces-area">
           ${pieces.map((p, i) => `<button class="piece-btn" id="piece-${i}" onclick="addPiece(${i}, '${p}', '${en}')">${p}</button>`).join('')}
         </div>
+        <button class="undo-btn" id="undo-btn" onclick="undoPiece()" style="display:none">↩ Orqaga</button>
       `;
       document.getElementById('next-btn').disabled = true;
     }
@@ -603,13 +623,21 @@
       if (btn.classList.contains('used')) return;
       btn.classList.add('used');
       assembled += piece;
+      assembledPieces.push(idx);
       const display = document.getElementById('assembled-display');
       display.textContent = assembled;
+      display.style.color = '';
+
+      // Undo tugmasini ko'rsatish
+      const undoBtn = document.getElementById('undo-btn');
+      if (undoBtn) undoBtn.style.display = 'inline-flex';
 
       const allUsed = pieces.every((_, i) => document.getElementById(`piece-${i}`).classList.contains('used'));
       if (allUsed) {
         if (assembled === correct) {
           display.style.color = 'var(--success)';
+          display.textContent = assembled + ' ✓';
+          if (undoBtn) undoBtn.style.display = 'none';
           document.getElementById('next-btn').disabled = false;
         } else {
           display.style.color = 'var(--danger)';
@@ -617,12 +645,28 @@
           markMistake(3);
           setTimeout(() => {
             assembled = '';
+            assembledPieces = [];
             display.textContent = '_';
             display.style.color = '';
+            if (undoBtn) undoBtn.style.display = 'none';
             pieces.forEach((_, i) => document.getElementById(`piece-${i}`).classList.remove('used'));
           }, 1200);
         }
       }
+    };
+
+    window.undoPiece = () => {
+      if (assembledPieces.length === 0) return;
+      const lastIdx = assembledPieces.pop();
+      const lastPiece = pieces[lastIdx];
+      assembled = assembled.slice(0, assembled.length - lastPiece.length);
+      document.getElementById(`piece-${lastIdx}`).classList.remove('used');
+      const display = document.getElementById('assembled-display');
+      display.textContent = assembled || '_';
+      display.style.color = '';
+      const undoBtn = document.getElementById('undo-btn');
+      if (undoBtn && assembledPieces.length === 0) undoBtn.style.display = 'none';
+      document.getElementById('next-btn').disabled = true;
     };
 
     // ── STAGE 4: Moslashtirish — chap EN, o'ng UZ, har biri alohida qatorda ──
