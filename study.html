@@ -388,7 +388,6 @@
       { id: 3, name: "Bo'laklash",   emoji: "🧩" },
       { id: 4, name: "Moslashtirish",emoji: "🔗" },
       { id: 5, name: "Yozish",       emoji: "✍️" },
-      { id: 6, name: "Gap tuzish",   emoji: "📝" },
     ];
 
     const params = new URLSearchParams(window.location.search);
@@ -471,7 +470,6 @@
       else if (currentStage === 3) renderStage3(words[currentWordIndex], card);
       else if (currentStage === 4) renderStage4(card);
       else if (currentStage === 5) renderStage5(words[currentWordIndex], card);
-      else if (currentStage === 6) renderStage6(words[currentWordIndex], card);
     }
 
     // ── STAGE 1: Tanishtirish — barcha so'zlar ──
@@ -515,7 +513,7 @@
           })
         });
         const data = await res.json();
-        const translation = (data.content?.[0]?.text || '').trim().replace(/^["']|["']$/g, '');
+        const translation = data.content?.[0]?.text || ''.trim().replace(/^["']|["']$/g, '');
         translationEl.textContent = '🇺🇿 ' + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
@@ -775,81 +773,10 @@
       }
     }
 
-    // ── STAGE 6: Gap tuzish (AI) — barcha so'zlar ──
-    function renderStage6(word, card) {
-      card.innerHTML = `
-        <div class="word-sub">Quyidagi so'zni ishlatib inglizcha gap tuzing:</div>
-        <div class="word-display" style="font-size:1.5rem">${word.en}</div>
-        <div class="word-sub" style="color:var(--text-dim)">(${word.uz})</div>
-        <textarea class="sentence-input" id="sentence-input" placeholder="Write a sentence using '${word.en}'..."></textarea>
-        <div class="ai-feedback" id="ai-feedback"></div>
-      `;
-      document.getElementById('next-btn').textContent = "AI tekshirsin →";
-      document.getElementById('next-btn').disabled = false;
-      document.getElementById('next-btn').onclick = () => nextAction();
-      document.getElementById('sentence-input').focus();
-    }
-
-    async function checkSentenceWithAI(word) {
-      const sentence = document.getElementById('sentence-input').value.trim();
-      if (!sentence) return showToast("Avval gap yozing!", true);
-
-      const nextBtn = document.getElementById('next-btn');
-      nextBtn.disabled = true;
-      nextBtn.innerHTML = `Tekshirilmoqda <span class="loading-dots"><span></span><span></span><span></span></span>`;
-
-      try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-6",
-            max_tokens: 200,
-            messages: [{
-              role: "user",
-              content: `You are an English teacher helping Uzbek students. The student was asked to write a sentence using the word "${word.en}" (which means "${word.uz}" in Uzbek). The student wrote: "${sentence}". Please check if the word is used correctly and the sentence is grammatically correct. Respond in Uzbek language. Be encouraging. If correct: start with "✅" and briefly praise them. If incorrect: start with "❌" and kindly explain the mistake and show a correct example. Keep response under 3 sentences.`
-            }]
-          })
-        });
-
-        const data = await response.json();
-        const feedback = data.content?.[0]?.text || '';
-
-        const fbEl = document.getElementById('ai-feedback');
-        fbEl.textContent = feedback;
-        fbEl.style.display = 'block';
-
-        if (feedback.startsWith('✅')) {
-          fbEl.className = 'ai-feedback good';
-        } else {
-          fbEl.className = 'ai-feedback bad';
-          markMistake(6);
-        }
-
-        nextBtn.textContent = "Keyingi →";
-        nextBtn.disabled = false;
-        nextBtn.onclick = () => goNext();
-
-      } catch (e) {
-        showToast("AI bilan ulanishda xato", true);
-        nextBtn.textContent = "O'tkazib yuborish →";
-        nextBtn.disabled = false;
-        nextBtn.onclick = () => goNext();
-      }
-    }
 
     // ── NAVIGATION ──
     window.nextAction = () => {
-      if (currentStage === 6) {
-        const fb = document.getElementById('ai-feedback');
-        if (fb && fb.style.display !== 'none' && fb.textContent) {
-          goNext();
-        } else {
-          checkSentenceWithAI(words[currentWordIndex]);
-        }
-      } else {
-        goNext();
-      }
+      goNext();
     };
 
     function goNext() {
@@ -868,7 +795,7 @@
         currentStage++;
         currentWordIndex = 0;
 
-        if (currentStage > 6) {
+        if (currentStage > 5) {
           finishStudy();
           return;
         }
