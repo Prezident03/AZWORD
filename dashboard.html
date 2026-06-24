@@ -102,7 +102,7 @@
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy, serverTimestamp
+      collection, addDoc, getDocs, deleteDoc, doc, getDoc, query, where, orderBy, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
@@ -114,11 +114,18 @@
       document.getElementById('user-email').textContent = user.email;
       const letter = (user.displayName || user.email).charAt(0).toUpperCase();
 
-      // Avatar: rasm yoki harf
-      if (user.photoURL) {
-        document.getElementById('avatar-text').innerHTML = `<img src="${user.photoURL}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" />`;
-        document.getElementById('avatar-text-lg').innerHTML = `<img src="${user.photoURL}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;" />`;
-      } else {
+      // Avatar: Firestore dan rasm yuklaymiz
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists() && userDoc.data().photoBase64) {
+          const b64 = userDoc.data().photoBase64;
+          document.getElementById('avatar-text').innerHTML = `<img src="${b64}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" />`;
+          document.getElementById('avatar-text-lg').innerHTML = `<img src="${b64}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;" />`;
+        } else {
+          document.getElementById('avatar-text').textContent = letter;
+          document.getElementById('avatar-text-lg').textContent = letter;
+        }
+      } catch(e) {
         document.getElementById('avatar-text').textContent = letter;
         document.getElementById('avatar-text-lg').textContent = letter;
       }
