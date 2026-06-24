@@ -86,7 +86,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.2s;
     }
+    .avatar-edit-btn:hover { background: var(--purple-light); }
+    #photo-input { display: none; }
 
     .profile-header h2 {
       font-size: 1.3rem;
@@ -290,8 +293,9 @@
           <div class="avatar-circle" id="avatar-circle">
             <span id="avatar-letter">A</span>
           </div>
-          <div class="avatar-edit-btn" title="Rasm o'zgartirish">✏️</div>
+          <div class="avatar-edit-btn" title="Rasm o'zgartirish" onclick="document.getElementById('photo-input').click()">📷</div>
         </div>
+        <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" />
         <h2 id="profile-name">Yuklanmoqda...</h2>
         <div class="email" id="profile-email">—</div>
       </div>
@@ -378,9 +382,18 @@
       document.getElementById('nav-username').textContent = name || email;
       document.getElementById('profile-name').textContent = name || 'Foydalanuvchi';
       document.getElementById('profile-email').textContent = email;
-      document.getElementById('avatar-letter').textContent = letter;
       document.getElementById('input-name').value = name;
       document.getElementById('input-email').value = email;
+
+      // Avatar: rasm yoki harf
+      const avatarCircle = document.getElementById('avatar-circle');
+      if (user.photoURL && user.photoURL.startsWith('data:')) {
+        avatarCircle.innerHTML = `<img src="${user.photoURL}" alt="avatar" />`;
+      } else if (user.photoURL) {
+        avatarCircle.innerHTML = `<img src="${user.photoURL}" alt="avatar" />`;
+      } else {
+        document.getElementById('avatar-letter').textContent = letter;
+      }
 
       // Statistika
       try {
@@ -426,6 +439,32 @@
       } catch(e) {
         showToast('Xato yuz berdi', true);
       }
+    };
+
+    window.uploadPhoto = async (input) => {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 500 * 1024) return showToast("Rasm 500KB dan kichik bo'lsin!", true);
+
+      const avatarCircle = document.getElementById('avatar-circle');
+      avatarCircle.style.opacity = '0.5';
+      showToast('Yuklanmoqda...');
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target.result;
+        try {
+          await updateProfile(currentUser, { photoURL: base64 });
+          // Show image
+          avatarCircle.innerHTML = `<img src="${base64}" alt="avatar" />`;
+          avatarCircle.style.opacity = '1';
+          showToast('Rasm saqlandi! ✅');
+        } catch(err) {
+          avatarCircle.style.opacity = '1';
+          showToast('Xato: ' + err.message, true);
+        }
+      };
+      reader.readAsDataURL(file);
     };
 
     window.logoutUser = async () => {

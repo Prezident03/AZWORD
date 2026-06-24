@@ -113,8 +113,15 @@
       currentUser = user;
       document.getElementById('user-email').textContent = user.email;
       const letter = (user.displayName || user.email).charAt(0).toUpperCase();
-      document.getElementById('avatar-text').textContent = letter;
-      document.getElementById('avatar-text-lg').textContent = letter;
+
+      // Avatar: rasm yoki harf
+      if (user.photoURL) {
+        document.getElementById('avatar-text').innerHTML = `<img src="${user.photoURL}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" />`;
+        document.getElementById('avatar-text-lg').innerHTML = `<img src="${user.photoURL}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;" />`;
+      } else {
+        document.getElementById('avatar-text').textContent = letter;
+        document.getElementById('avatar-text-lg').textContent = letter;
+      }
 
       document.getElementById('user-name').textContent = user.displayName || user.email;
       document.getElementById('greeting-name').textContent = user.displayName?.split(' ')[0] || 'Foydalanuvchi';
@@ -133,6 +140,13 @@
         where('isAdmin', '==', false)
       );
       const mySnap = await getDocs(myQ);
+
+      // Dropdown statistikani yangilash
+      let totalWords = 0;
+      mySnap.forEach(d => totalWords += d.data().wordCount || 0);
+      const statsEl = document.getElementById('profileStats');
+      if (statsEl) statsEl.innerHTML = `📚 ${mySnap.size} bo'lim &nbsp;·&nbsp; 📝 ${totalWords} so'z`;
+
       renderFolders(mySnap, 'my-folders', false);
 
       const adminQ = query(collection(db, 'folders'), where('isAdmin', '==', true));
