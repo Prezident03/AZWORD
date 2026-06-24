@@ -535,3 +535,58 @@ a:hover { text-decoration: underline; }
   padding:14px;cursor:pointer;
 }
 .profile-btn-item:hover{background:#221e35;}
+
+/* ── COIN & STAR BADGES ── */
+.nav-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: default;
+  transition: transform 0.15s;
+}
+.nav-badge:hover { transform: scale(1.05); }
+
+.nav-badge.star {
+  background: rgba(251,191,36,0.12);
+  border: 1.5px solid rgba(251,191,36,0.35);
+  color: #fbbf24;
+}
+
+.nav-badge.coin {
+  background: rgba(52,211,153,0.1);
+  border: 1.5px solid rgba(52,211,153,0.3);
+  color: #34d399;
+}
+
+.nav-badge .badge-icon { font-size: 1rem; }
+.nav-badge .badge-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+}
+
+/* Reward popup animation */
+@keyframes reward-pop {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  60%  { transform: translateY(-40px) scale(1.3); opacity: 1; }
+  100% { transform: translateY(-70px) scale(1); opacity: 0; }
+}
+.reward-float {
+  position: fixed;
+  font-size: 1.1rem;
+  font-weight: 700;
+  pointer-events: none;
+  animation: reward-pop 1.2s ease forwards;
+  z-index: 9999;
+}
+.reward-float.star { color: #fbbf24; }
+.reward-float.coin { color: #34d399; }

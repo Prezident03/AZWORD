@@ -27,6 +27,18 @@
     <div class="nav-logo">AzWord</div>
     <div class="nav-user">
 
+      <!-- Coin & Star badges -->
+      <div class="nav-badges">
+        <div class="nav-badge star" title="Yulduzchalar (reyting)">
+          <span class="badge-icon">⭐</span>
+          <span class="badge-val" id="nav-stars">0</span>
+        </div>
+        <div class="nav-badge coin" title="Tangalar (xarid)">
+          <span class="badge-icon">🪙</span>
+          <span class="badge-val" id="nav-coins">0</span>
+        </div>
+      </div>
+
       <div class="profile-avatar" id="profile-avatar">
         <span id="avatar-text">A</span>
       </div>
@@ -102,7 +114,7 @@
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      collection, addDoc, getDocs, deleteDoc, doc, getDoc, query, where, orderBy, serverTimestamp
+      collection, addDoc, getDocs, deleteDoc, doc, getDoc, query, where, orderBy, serverTimestamp, increment
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
@@ -137,8 +149,26 @@
         document.getElementById('admin-section').style.display = 'block';
       }
 
+      // Coin & Star yuklaymiz
+      await loadUserStats(user.uid);
       await loadFolders();
     });
+
+    async function loadUserStats(uid) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          document.getElementById('nav-stars').textContent = data.stars || 0;
+          document.getElementById('nav-coins').textContent = data.coins || 0;
+          // Dropdown statistikaga ham qo'shamiz
+          const statsEl = document.getElementById('profileStats');
+          if (statsEl) {
+            statsEl.innerHTML = `⭐ ${data.stars || 0} &nbsp;·&nbsp; 🪙 ${data.coins || 0}`;
+          }
+        }
+      } catch(e) {}
+    }
 
     async function loadFolders() {
       const myQ = query(
@@ -147,12 +177,6 @@
         where('isAdmin', '==', false)
       );
       const mySnap = await getDocs(myQ);
-
-      // Dropdown statistikani yangilash
-      let totalWords = 0;
-      mySnap.forEach(d => totalWords += d.data().wordCount || 0);
-      const statsEl = document.getElementById('profileStats');
-      if (statsEl) statsEl.innerHTML = `📚 ${mySnap.size} bo'lim &nbsp;·&nbsp; 📝 ${totalWords} so'z`;
 
       renderFolders(mySnap, 'my-folders', false);
 

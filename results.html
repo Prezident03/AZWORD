@@ -157,6 +157,35 @@
       transition: opacity 0.2s;
     }
     .btn-home:hover { opacity: 0.88; }
+
+    /* Reward box */
+    .reward-box {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin: 0 auto 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+    }
+    .reward-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .reward-icon { font-size: 2rem; }
+    .reward-amount {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .reward-amount.star { color: #fbbf24; }
+    .reward-amount.coin { color: #34d399; }
+    .reward-label { font-size: 0.75rem; color: var(--text-muted); }
+    .reward-divider { width: 1px; height: 48px; background: var(--border); }
   </style>
 </head>
 <body>
@@ -198,7 +227,11 @@
 
   </div>
 
-  <script>
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
 
@@ -227,6 +260,43 @@
 
     // Score display
     document.getElementById('score-num').textContent = `${perfectWords}/${totalWords}`;
+
+    // Reward: har mukammal so'z uchun 1 coin + 1 star
+    const earnedCoins = perfectWords;
+    const earnedStars = perfectWords;
+
+    // Reward box ko'rsatish
+    if (earnedCoins > 0) {
+      const rewardBox = document.createElement('div');
+      rewardBox.className = 'reward-box';
+      rewardBox.innerHTML = `
+        <div class="reward-item">
+          <div class="reward-icon">⭐</div>
+          <div class="reward-amount star">+${earnedStars}</div>
+          <div class="reward-label">Yulduzcha</div>
+        </div>
+        <div class="reward-divider"></div>
+        <div class="reward-item">
+          <div class="reward-icon">🪙</div>
+          <div class="reward-amount coin">+${earnedCoins}</div>
+          <div class="reward-label">Tanga</div>
+        </div>
+      `;
+      document.querySelector('.results-hero').appendChild(rewardBox);
+    }
+
+    // Firebase ga saqlash
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || earnedCoins === 0) return;
+      try {
+        await setDoc(doc(db, 'users', user.uid), {
+          coins: increment(earnedCoins),
+          stars: increment(earnedStars)
+        }, { merge: true });
+      } catch(e) {
+        console.error('Reward saqlashda xato:', e);
+      }
+    });
 
     // Emoji & title
     const pct = perfectWords / totalWords;
