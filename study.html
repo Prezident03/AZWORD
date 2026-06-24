@@ -283,6 +283,34 @@
 
     .hint-text { font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; }
 
+    /* 🔊 Audio button */
+    .speak-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 14px;
+      padding: 9px 20px;
+      background: rgba(124,58,237,0.1);
+      border: 1.5px solid rgba(124,58,237,0.3);
+      border-radius: 99px;
+      color: var(--purple-light);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .speak-btn:hover { background: var(--purple-glow); border-color: var(--purple-main); }
+    .speak-btn.speaking {
+      background: var(--purple-glow);
+      border-color: var(--purple-main);
+      animation: pulse-speak 1s infinite;
+    }
+    @keyframes pulse-speak {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
     .undo-btn {
       display: inline-flex;
       align-items: center;
@@ -492,13 +520,17 @@
 
     // ── STAGE 1: Tanishtirish — barcha so'zlar ──
     function renderStage1(word, card) {
+      const exStr = word.example ? word.example.replace(/\\/g, '\\\\').replace(/'/g, "\\'") : '';
       card.innerHTML = `
         <div class="word-display">${word.en}</div>
         <div class="intro-translation">${word.uz}</div>
+        <button class="speak-btn" id="speak-btn" onclick="speakWord('${word.en.replace(/'/g, "\\'")}')">
+          🔊 Tinglash
+        </button>
         ${word.example ? `
           <div class="example-wrap">
             <div class="word-example-text" id="example-text">"${word.example}"</div>
-            <button class="translate-btn" id="translate-btn" onclick="translateExample('${word.example.replace(/'/g, "\\'")}')">
+            <button class="translate-btn" id="translate-btn" onclick="translateExample('${exStr}')">
               🌐 Tarjima
             </button>
             <div class="example-translation" id="example-translation" style="display:none"></div>
@@ -506,7 +538,33 @@
         ` : ''}
       `;
       document.getElementById('next-btn').textContent = "Tushundim →";
+
+      // Avtomatik o'qib berish
+      setTimeout(() => speakWord(word.en), 600);
     }
+
+    // ── TEXT-TO-SPEECH ──
+    window.speakWord = (text) => {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+
+      const btn = document.getElementById('speak-btn');
+      if (btn) { btn.classList.add('speaking'); btn.innerHTML = '🔊 ...'; }
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'en-US';
+      utter.rate = 0.85;
+      utter.pitch = 1;
+
+      utter.onend = () => {
+        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
+      };
+      utter.onerror = () => {
+        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
+      };
+
+      window.speechSynthesis.speak(utter);
+    };
 
     // ── TARJIMA (Stage 1) ──
     window.translateExample = async (sentence) => {
@@ -518,14 +576,11 @@
       btn.textContent = '⏳ ...';
 
       try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
+            model: "claude-sonnet-4-6",
             max_tokens: 80,
             messages: [{
               role: "user",
@@ -534,7 +589,7 @@
           })
         });
         const data = await res.json();
-        const translation = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
+        const translation = (data.content?.[0]?.text || '').trim().replace(/^["'"]|["'"]$/g, '');
         translationEl.textContent = '🇺🇿 ' + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
