@@ -288,9 +288,17 @@
 
         // Faqat yangi so'zlar uchun coin/star beramiz
         if (newlyRewarded > 0) {
+          // Haftalik reset uchun weekKey (2024-W01 formatda)
+          const now = new Date();
+          const weekNum = Math.ceil((((now - new Date(now.getFullYear(), 0, 1)) / 86400000) + new Date(now.getFullYear(), 0, 1).getDay() + 1) / 7);
+          const weekKey = `${now.getFullYear()}-W${String(weekNum).padStart(2,'0')}`;
+
           await setDoc(doc(db, 'users', user.uid), {
             coins: increment(newlyRewarded),
-            stars: increment(newlyRewarded)
+            stars: increment(newlyRewarded),
+            weeklyStars: increment(newlyRewarded),
+            weekKey: weekKey,
+            displayName: user.displayName || user.email.split('@')[0]
           }, { merge: true });
 
           // Reward box ko'rsatish

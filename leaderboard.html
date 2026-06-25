@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Leaderboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .lb-page { max-width: 760px; margin: 0 auto; padding: 36px 24px; }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      margin-bottom: 28px;
+      font-family: 'Inter', sans-serif;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-main); }
+
+    .lb-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .lb-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+    .lb-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* Tabs */
+    .lb-tabs {
+      display: flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 5px;
+      margin-bottom: 28px;
+      gap: 4px;
+    }
+    .lb-tab {
+      flex: 1;
+      padding: 11px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .lb-tab.active {
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+    }
+
+    /* Weekly info */
+    .week-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(124,58,237,0.08);
+      border: 1px solid rgba(124,58,237,0.2);
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .week-info span { color: var(--purple-light); font-weight: 600; }
+
+    /* Leaderboard list */
+    .lb-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .lb-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 18px;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .lb-item:hover { border-color: var(--purple-main); transform: translateX(4px); }
+
+    /* Top 3 */
+    .lb-item.rank-1 {
+      border-color: rgba(251,191,36,0.5);
+      background: rgba(251,191,36,0.05);
+    }
+    .lb-item.rank-2 {
+      border-color: rgba(148,163,184,0.4);
+      background: rgba(148,163,184,0.04);
+    }
+    .lb-item.rank-3 {
+      border-color: rgba(180,120,60,0.4);
+      background: rgba(180,120,60,0.04);
+    }
+    .lb-item.is-me {
+      border-color: rgba(124,58,237,0.5);
+      background: rgba(124,58,237,0.06);
+    }
+
+    .lb-rank {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      min-width: 36px;
+      text-align: center;
+      color: var(--text-dim);
+    }
+    .lb-item.rank-1 .lb-rank { color: #fbbf24; font-size: 1.4rem; }
+    .lb-item.rank-2 .lb-rank { color: #94a3b8; font-size: 1.2rem; }
+    .lb-item.rank-3 .lb-rank { color: #b4783c; font-size: 1.15rem; }
+
+    .lb-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 1rem;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .lb-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .lb-info { flex: 1; }
+    .lb-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .lb-name .you-badge {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 0.68rem;
+      background: var(--purple-glow);
+      border: 1px solid var(--purple-main);
+      color: var(--purple-light);
+      border-radius: 99px;
+      padding: 1px 7px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+    }
+    .lb-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    .lb-score {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    /* Empty / Loading */
+    .lb-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+    .lb-empty .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+
+    .lb-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+    }
+
+    /* My rank banner */
+    .my-rank-banner {
+      background: rgba(124,58,237,0.1);
+      border: 1.5px solid rgba(124,58,237,0.3);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+    .my-rank-banner .rank-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--purple-light);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">AzWord</div>
+    <div class="nav-user">
+      <div class="nav-badges">
+        <div class="nav-badge star">
+          <span class="badge-icon">⭐</span>
+          <span class="badge-val" id="nav-stars">0</span>
+        </div>
+        <div class="nav-badge coin">
+          <span class="badge-icon">🪙</span>
+          <span class="badge-val" id="nav-coins">0</span>
+        </div>
+      </div>
+      <div class="profile-avatar" id="nav-avatar">A</div>
+    </div>
+  </nav>
+
+  <div class="lb-page">
+
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
+
+    <div class="lb-header">
+      <h1>🏆 Leaderboard</h1>
+      <p>Eng ko'p so'z o'rganganlar reytingi</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="lb-tabs">
+      <button class="lb-tab active" id="tab-weekly" onclick="switchTab('weekly')">
+        🔥 Haftalik
+      </button>
+      <button class="lb-tab" id="tab-alltime" onclick="switchTab('alltime')">
+        👑 Alltime
+      </button>
+    </div>
+
+    <!-- Weekly info -->
+    <div class="week-info" id="week-info">
+      📅 <span id="week-label">Yuklanmoqda...</span>
+      &nbsp;·&nbsp; Dushanbada reset bo'ladi
+    </div>
+
+    <!-- List -->
+    <div class="lb-list" id="lb-list">
+      <div class="lb-loading">⏳ Yuklanmoqda...</div>
+    </div>
+
+    <!-- My rank -->
+    <div class="my-rank-banner" id="my-rank-banner" style="display:none">
+      <span>Sizning o'rningiz:</span>
+      <span class="rank-num" id="my-rank-num">#—</span>
+      <span id="my-rank-score">⭐ 0</span>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, getDocs, doc, getDoc, query, orderBy, limit
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let currentUser = null;
+    let currentTab = 'weekly';
+    let allUsers = [];
+
+    // Hafta nomeri hisoblash
+    function getWeekKey() {
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const weekNum = Math.ceil((((now - startOfYear) / 86400000) + startOfYear.getDay() + 1) / 7);
+      return `${now.getFullYear()}-W${String(weekNum).padStart(2,'0')}`;
+    }
+
+    function getWeekLabel() {
+      const now = new Date();
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      const fmt = d => `${d.getDate()}-${d.toLocaleString('uz', {month:'short'})}`;
+      return `${fmt(monday)} — ${fmt(sunday)}`;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = 'index.html';
+      currentUser = user;
+
+      // Avatar
+      const letter = (user.displayName || user.email).charAt(0).toUpperCase();
+      try {
+        const uDoc = await getDoc(doc(db, 'users', user.uid));
+        if (uDoc.exists()) {
+          const d = uDoc.data();
+          document.getElementById('nav-stars').textContent = d.stars || 0;
+          document.getElementById('nav-coins').textContent = d.coins || 0;
+          if (d.photoBase64) {
+            document.getElementById('nav-avatar').innerHTML = `<img src="${d.photoBase64}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">`;
+          } else {
+            document.getElementById('nav-avatar').textContent = letter;
+          }
+        }
+      } catch(e) {}
+
+      // Week label
+      document.getElementById('week-label').textContent = getWeekLabel();
+
+      // Load all users
+      await loadAllUsers();
+      renderBoard('weekly');
+    });
+
+    async function loadAllUsers() {
+      const snap = await getDocs(collection(db, 'users'));
+      allUsers = [];
+      const currentWeekKey = getWeekKey();
+
+      snap.forEach(d => {
+        const data = d.data();
+        // Haftalik reset: weekKey mos kelmasa weeklyStars = 0
+        const weeklyStars = data.weekKey === currentWeekKey ? (data.weeklyStars || 0) : 0;
+        allUsers.push({
+          uid: d.id,
+          name: data.displayName || 'Foydalanuvchi',
+          photo: data.photoBase64 || null,
+          stars: data.stars || 0,
+          weeklyStars: weeklyStars,
+          coins: data.coins || 0,
+        });
+      });
+    }
+
+    window.switchTab = (tab) => {
+      currentTab = tab;
+      document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly');
+      document.getElementById('tab-alltime').classList.toggle('active', tab === 'alltime');
+      document.getElementById('week-info').style.display = tab === 'weekly' ? 'flex' : 'none';
+      renderBoard(tab);
+    };
+
+    function renderBoard(tab) {
+      const list = document.getElementById('lb-list');
+      const scoreField = tab === 'weekly' ? 'weeklyStars' : 'stars';
+
+      // Saralash
+      const sorted = [...allUsers]
+        .filter(u => u[scoreField] > 0)
+        .sort((a, b) => b[scoreField] - a[scoreField]);
+
+      if (sorted.length === 0) {
+        list.innerHTML = `
+          <div class="lb-empty">
+            <div class="emoji">${tab === 'weekly' ? '🔥' : '👑'}</div>
+            <p>${tab === 'weekly' ? 'Bu hafta hali hech kim ball yig\'magan' : 'Hali hech kim ball yig\'magan'}</p>
+          </div>`;
+        document.getElementById('my-rank-banner').style.display = 'none';
+        return;
+      }
+
+      // Top 10
+      const top10 = sorted.slice(0, 10);
+      const rankEmojis = ['🥇', '🥈', '🥉'];
+
+      list.innerHTML = '';
+      top10.forEach((user, i) => {
+        const rank = i + 1;
+        const isMe = user.uid === currentUser.uid;
+        const div = document.createElement('div');
+        div.className = `lb-item ${rank <= 3 ? `rank-${rank}` : ''} ${isMe ? 'is-me' : ''}`;
+
+        const avatarContent = user.photo
+          ? `<img src="${user.photo}" alt="avatar">`
+          : user.name.charAt(0).toUpperCase();
+
+        div.innerHTML = `
+          <div class="lb-rank">${rank <= 3 ? rankEmojis[rank-1] : rank}</div>
+          <div class="lb-avatar">${avatarContent}</div>
+          <div class="lb-info">
+            <div class="lb-name">
+              ${user.name}
+              ${isMe ? '<span class="you-badge">Siz</span>' : ''}
+            </div>
+            <div class="lb-sub">${user.coins} 🪙 tanga</div>
+          </div>
+          <div class="lb-score">⭐ ${user[scoreField]}</div>
+        `;
+        list.appendChild(div);
+      });
+
+      // Mening o'rnim (top 10 da bo'lmasa)
+      const myRank = sorted.findIndex(u => u.uid === currentUser.uid);
+      const myRankBanner = document.getElementById('my-rank-banner');
+
+      if (myRank >= 10) {
+        myRankBanner.style.display = 'flex';
+        document.getElementById('my-rank-num').textContent = `#${myRank + 1}`;
+        document.getElementById('my-rank-score').textContent = `⭐ ${sorted[myRank][scoreField]}`;
+      } else {
+        myRankBanner.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
