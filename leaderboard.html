@@ -209,7 +209,7 @@
           <span class="badge-val" id="nav-coins">0</span>
         </div>
       </div>
-      <div class="profile-avatar" id="nav-avatar">A</div>
+      <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer;" title="Profil">A</div>
     </div>
   </nav>
 
@@ -318,9 +318,16 @@
         const data = d.data();
         // Haftalik reset: weekKey mos kelmasa weeklyStars = 0
         const weeklyStars = data.weekKey === currentWeekKey ? (data.weeklyStars || 0) : 0;
+        // displayName: Firestore dan, yo'q bo'lsa email boshidan olamiz
+        let userName = data.displayName || data.name || '';
+        if (!userName && data.email) {
+          userName = data.email.split('@')[0];
+        }
+        if (!userName) userName = 'Foydalanuvchi';
+
         allUsers.push({
           uid: d.id,
-          name: data.displayName || 'Foydalanuvchi',
+          name: userName,
           photo: data.photoBase64 || null,
           stars: data.stars || 0,
           weeklyStars: weeklyStars,
