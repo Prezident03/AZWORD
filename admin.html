@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AzWord — Admin Panel</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-wrap { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .admin-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .admin-title h1 { font-size: 1.6rem; font-weight: 700; }
+    .admin-badge {
+      background: rgba(248,113,113,0.15);
+      border: 1.5px solid rgba(248,113,113,0.4);
+      color: var(--danger);
+      border-radius: 8px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: var(--purple-main); }
+    .stat-card .s-icon { font-size: 1.8rem; margin-bottom: 10px; }
+    .stat-card .s-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--purple-light);
+      line-height: 1;
+    }
+    .stat-card .s-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    .admin-tabs {
+      display: flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+      gap: 4px;
+      overflow-x: auto;
+    }
+    .admin-tab {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 16px;
+      text-align: center;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    .admin-tab.active {
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+    }
+
+    /* Users table */
+    .users-table {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .table-search {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .table-search input {
+      flex: 1;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 14px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+    .table-search input:focus { border-color: var(--purple-main); }
+
+    .user-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .user-row:last-child { border-bottom: none; }
+    .user-row:hover { background: var(--bg-hover); }
+
+    .user-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 0.9rem;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .user-info { flex: 1; min-width: 0; }
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user-email { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+
+    .user-stats {
+      display: flex;
+      gap: 12px;
+      font-size: 0.82rem;
+    }
+    .user-stats span { color: var(--text-muted); }
+    .user-stats .val { color: var(--text-main); font-weight: 600; }
+
+    .user-actions { display: flex; gap: 6px; }
+
+    .btn-icon-sm {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .btn-icon-sm:hover { border-color: var(--purple-main); color: var(--purple-light); }
+    .btn-icon-sm.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Coin modal */
+    .coin-modal-content { padding: 0; }
+    .coin-modal-content .user-info-block {
+      background: var(--bg-deep);
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .coin-modal-content .user-info-block strong { color: var(--text-main); }
+
+    .coin-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .coin-btn {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: transparent;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .coin-btn.add { border-color: rgba(52,211,153,0.4); color: var(--success); }
+    .coin-btn.add:hover { background: rgba(52,211,153,0.08); }
+    .coin-btn.remove { border-color: rgba(248,113,113,0.4); color: var(--danger); }
+    .coin-btn.remove:hover { background: rgba(248,113,113,0.08); }
+
+    /* Folders section */
+    .admin-folders-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .admin-folder-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      transition: border-color 0.2s;
+    }
+    .admin-folder-card:hover { border-color: var(--purple-main); }
+    .admin-folder-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .admin-folder-name { font-weight: 600; font-size: 0.95rem; margin-top: 4px; }
+    .admin-folder-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .admin-folder-owner {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Empty */
+    .admin-empty {
+      text-align: center;
+      padding: 48px;
+      color: var(--text-muted);
+    }
+
+    /* Loading */
+    .admin-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .blocked-badge {
+      font-size: 0.68rem;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      color: var(--danger);
+      border-radius: 99px;
+      padding: 1px 7px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-logo">AzWord <span style="font-size:0.75rem;color:var(--danger);font-family:'Inter',sans-serif;">ADMIN</span></div>
+    <div class="nav-user">
+      <button class="btn-sm" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+    </div>
+  </nav>
+
+  <div class="admin-wrap">
+
+    <div class="admin-header">
+      <div class="admin-title">
+        <h1>⚙️ Admin Panel</h1>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+      <button class="btn-add" onclick="refreshAll()">🔄 Yangilash</button>
+    </div>
+
+    <!-- Statistika -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="s-icon">👥</div>
+        <div class="s-num" id="stat-users">—</div>
+        <div class="s-label">Jami foydalanuvchilar</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon">📚</div>
+        <div class="s-num" id="stat-folders">—</div>
+        <div class="s-label">Jami bo'limlar</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon">📝</div>
+        <div class="s-num" id="stat-words">—</div>
+        <div class="s-label">Jami so'zlar</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon">⭐</div>
+        <div class="s-num" id="stat-stars">—</div>
+        <div class="s-label">Jami yulduzchalar</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon">🪙</div>
+        <div class="s-num" id="stat-coins">—</div>
+        <div class="s-label">Jami tangalar</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchTab('users')">👥 Foydalanuvchilar</button>
+      <button class="admin-tab" onclick="switchTab('folders')">📚 Bo'limlar</button>
+    </div>
+
+    <!-- Content -->
+    <div id="tab-users">
+      <div class="users-table">
+        <div class="table-search">
+          <input type="text" id="user-search" placeholder="🔍 Ism yoki email bo'yicha qidirish..." oninput="filterUsers()" />
+          <span id="user-count" style="color:var(--text-muted);font-size:0.85rem;white-space:nowrap;"></span>
+        </div>
+        <div id="users-list"><div class="admin-loading">⏳ Yuklanmoqda...</div></div>
+      </div>
+    </div>
+
+    <div id="tab-folders" style="display:none">
+      <div class="admin-folders-grid" id="folders-list">
+        <div class="admin-loading">⏳ Yuklanmoqda...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Coin/Star modal -->
+  <div class="modal-overlay" id="coin-modal">
+    <div class="modal">
+      <h3>💰 Coin / Star boshqarish</h3>
+      <div class="coin-modal-content">
+        <div class="user-info-block" id="coin-user-info">—</div>
+        <div class="form-group">
+          <label>Miqdor</label>
+          <input type="number" id="coin-amount" placeholder="10" min="1" max="10000" value="10" />
+        </div>
+        <div class="coin-buttons">
+          <button class="coin-btn add" onclick="adjustCoins('add', 'coins')">🪙 +Tanga</button>
+          <button class="coin-btn remove" onclick="adjustCoins('remove', 'coins')">🪙 -Tanga</button>
+          <button class="coin-btn add" onclick="adjustCoins('add', 'stars')">⭐ +Yulduz</button>
+          <button class="coin-btn remove" onclick="adjustCoins('remove', 'stars')">⭐ -Yulduz</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeCoinModal()">Yopish</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import {
+      collection, getDocs, doc, getDoc, setDoc, updateDoc,
+      deleteDoc, query, where, orderBy, increment
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
+    let allUsers = [];
+    let allFolders = [];
+    let selectedUid = null;
+    let currentTab = 'users';
+
+    // ── AUTH CHECK ──
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = 'index.html';
+      if (user.email !== ADMIN_EMAIL) return window.location.href = 'dashboard.html';
+      await loadAll();
+    });
+
+    // ── LOAD ALL DATA ──
+    async function loadAll() {
+      await Promise.all([loadUsers(), loadFolders()]);
+      renderStats();
+    }
+
+    window.refreshAll = () => loadAll();
+
+    async function loadUsers() {
+      const snap = await getDocs(collection(db, 'users'));
+      allUsers = [];
+      snap.forEach(d => {
+        allUsers.push({ uid: d.id, ...d.data() });
+      });
+      // Stars bo'yicha saralash
+      allUsers.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+      renderUsers(allUsers);
+    }
+
+    async function loadFolders() {
+      const snap = await getDocs(collection(db, 'folders'));
+      allFolders = [];
+      let totalWords = 0;
+      for (const d of snap.docs) {
+        const data = d.data();
+        allFolders.push({ id: d.id, ...data });
+        totalWords += data.wordCount || 0;
+      }
+      document.getElementById('stat-folders').textContent = allFolders.length;
+      document.getElementById('stat-words').textContent = totalWords;
+      renderFolders();
+    }
+
+    function renderStats() {
+      document.getElementById('stat-users').textContent = allUsers.length;
+      const totalStars = allUsers.reduce((s, u) => s + (u.stars || 0), 0);
+      const totalCoins = allUsers.reduce((s, u) => s + (u.coins || 0), 0);
+      document.getElementById('stat-stars').textContent = totalStars;
+      document.getElementById('stat-coins').textContent = totalCoins;
+    }
+
+    // ── USERS ──
+    function renderUsers(users) {
+      const list = document.getElementById('users-list');
+      document.getElementById('user-count').textContent = `${users.length} ta`;
+
+      if (users.length === 0) {
+        list.innerHTML = '<div class="admin-empty">👤 Foydalanuvchi topilmadi</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      users.forEach(user => {
+        const name = user.displayName || user.email?.split('@')[0] || 'Noma\'lum';
+        const letter = name.charAt(0).toUpperCase();
+        const avatarHtml = user.photoBase64
+          ? `<img src="${user.photoBase64}" alt="avatar">`
+          : letter;
+
+        const row = document.createElement('div');
+        row.className = 'user-row';
+        row.innerHTML = `
+          <div class="user-avatar">${avatarHtml}</div>
+          <div class="user-info">
+            <div class="user-name">
+              ${name}
+              ${user.blocked ? '<span class="blocked-badge">BLOKLANGAN</span>' : ''}
+            </div>
+            <div class="user-email">${user.email || '—'}</div>
+          </div>
+          <div class="user-stats">
+            <span>⭐ <span class="val">${user.stars || 0}</span></span>
+            <span>🪙 <span class="val">${user.coins || 0}</span></span>
+            <span>🔥 <span class="val">${user.weeklyStars || 0}</span> hafta</span>
+          </div>
+          <div class="user-actions">
+            <button class="btn-icon-sm" onclick="openCoinModal('${user.uid}')" title="Coin/Star boshqarish">💰</button>
+            <button class="btn-icon-sm danger" onclick="toggleBlock('${user.uid}', ${!!user.blocked})" title="${user.blocked ? 'Blokdan chiqarish' : 'Bloklash'}">
+              ${user.blocked ? '✅' : '🚫'}
+            </button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    window.filterUsers = () => {
+      const q = document.getElementById('user-search').value.toLowerCase();
+      const filtered = allUsers.filter(u =>
+        (u.displayName || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q)
+      );
+      renderUsers(filtered);
+    };
+
+    // ── BLOCK/UNBLOCK ──
+    window.toggleBlock = async (uid, isBlocked) => {
+      const action = isBlocked ? 'blokdan chiqarasizmi' : 'bloklamoqchimisiz';
+      if (!confirm(`Bu foydalanuvchini ${action}?`)) return;
+      await updateDoc(doc(db, 'users', uid), { blocked: !isBlocked });
+      showToast(isBlocked ? 'Blokdan chiqarildi ✅' : 'Bloklandi 🚫');
+      await loadUsers();
+    };
+
+    // ── COIN MODAL ──
+    window.openCoinModal = (uid) => {
+      selectedUid = uid;
+      const user = allUsers.find(u => u.uid === uid);
+      if (!user) return;
+      const name = user.displayName || user.email?.split('@')[0] || 'Noma\'lum';
+      document.getElementById('coin-user-info').innerHTML = `
+        <strong>${name}</strong><br>
+        ⭐ ${user.stars || 0} yulduz &nbsp;·&nbsp; 🪙 ${user.coins || 0} tanga
+      `;
+      document.getElementById('coin-modal').classList.add('open');
+    };
+
+    window.closeCoinModal = () => {
+      document.getElementById('coin-modal').classList.remove('open');
+      selectedUid = null;
+    };
+
+    window.adjustCoins = async (action, type) => {
+      if (!selectedUid) return;
+      const amount = parseInt(document.getElementById('coin-amount').value) || 0;
+      if (amount <= 0) return showToast("Miqdor 0 dan katta bo'lsin!", true);
+
+      const delta = action === 'add' ? amount : -amount;
+      await updateDoc(doc(db, 'users', selectedUid), {
+        [type]: increment(delta)
+      });
+
+      const typeLabel = type === 'coins' ? 'tanga' : 'yulduz';
+      showToast(`${action === 'add' ? '+' : '-'}${amount} ${typeLabel} berildi ✅`);
+      closeCoinModal();
+      await loadUsers();
+    };
+
+    // ── FOLDERS ──
+    function renderFolders() {
+      const grid = document.getElementById('folders-list');
+      if (allFolders.length === 0) {
+        grid.innerHTML = '<div class="admin-empty">📁 Bo\'limlar yo\'q</div>';
+        return;
+      }
+
+      grid.innerHTML = '';
+      allFolders.forEach(folder => {
+        const owner = allUsers.find(u => u.uid === folder.uid);
+        const ownerName = owner?.displayName || owner?.email?.split('@')[0] || folder.uid?.slice(0,8);
+
+        const card = document.createElement('div');
+        card.className = 'admin-folder-card';
+        card.innerHTML = `
+          <div class="admin-folder-top">
+            <span style="font-size:1.5rem">${folder.emoji || '📁'}</span>
+            <button class="btn-icon-sm danger" onclick="deleteFolder('${folder.id}')" title="O'chirish">🗑</button>
+          </div>
+          <div class="admin-folder-name">${folder.name}</div>
+          <div class="admin-folder-meta">${folder.wordCount || 0} ta so'z ${folder.isAdmin ? '· 🌐 Umumiy' : ''}</div>
+          <div class="admin-folder-owner">👤 ${ownerName}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    window.deleteFolder = async (id) => {
+      if (!confirm("Bu bo'limni o'chirasizmi? Ichidagi so'zlar ham o'chadi!")) return;
+      await deleteDoc(doc(db, 'folders', id));
+      showToast("Bo'lim o'chirildi 🗑");
+      await loadFolders();
+    };
+
+    // ── TABS ──
+    window.switchTab = (tab) => {
+      currentTab = tab;
+      document.querySelectorAll('.admin-tab').forEach((t, i) => {
+        t.classList.toggle('active', ['users','folders'][i] === tab);
+      });
+      document.getElementById('tab-users').style.display = tab === 'users' ? 'block' : 'none';
+      document.getElementById('tab-folders').style.display = tab === 'folders' ? 'block' : 'none';
+    };
+
+    function showToast(msg, isError = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast' + (isError ? ' error' : '');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // Modal yopish
+    document.getElementById('coin-modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('coin-modal')) closeCoinModal();
+    });
+  </script>
+</body>
+</html>

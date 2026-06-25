@@ -103,9 +103,12 @@
           <p id="user-email">...</p>
         </div>
 
-        <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div><button class="profile-btn-item" onclick="window.location.href='profile.html'">👤 Profil</button><button class="profile-btn-item" onclick="logout()">
-          🚪 Chiqish
-        </button>
+        <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div>
+        <button class="profile-btn-item" onclick="window.location.href='profile.html'">👤 Profil</button>
+        <div id="admin-btn-wrap" style="display:none">
+          <button class="profile-btn-item" style="color:var(--danger)" onclick="window.location.href='admin.html'">⚙️ Admin panel</button>
+        </div>
+        <button class="profile-btn-item" onclick="logout()">🚪 Chiqish</button>
       </div>
 
     </div>
@@ -202,6 +205,8 @@
 
       if (user.email === ADMIN_EMAIL) {
         document.getElementById('admin-section').style.display = 'block';
+        const adminBtn = document.getElementById('admin-btn-wrap');
+        if (adminBtn) adminBtn.style.display = 'block';
       }
 
       // Foydalanuvchi ma'lumotlarini Firestoreda yangilash (displayName, email)
