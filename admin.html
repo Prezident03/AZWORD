@@ -867,7 +867,7 @@
     function renderAdminFolders(folders) {
       const grid = document.getElementById('admin-folders-grid');
       if (folders.length === 0) {
-        grid.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">📁 Hali umumiy bo'lim yo'q</div>`;
+        grid.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">📁 Hali umumiy bolim yoq</div>`;
         return;
       }
       grid.innerHTML = '';
@@ -878,8 +878,8 @@
           <div class="afc-top">
             <span class="afc-emoji">${f.emoji || '📁'}</span>
             <div class="afc-actions">
-              <button class="act-btn" onclick="event.stopPropagation();openWordsModal('${f.id}')" title="So'zlarni ko'rish">📝</button>
-              <button class="act-btn red" onclick="event.stopPropagation();deleteAdminFolder('${f.id}')" title="O'chirish">🗑</button>
+              <button class="act-btn" onclick="event.stopPropagation();openWordsModal('${f.id}')" title="Sozlarni korish">📝</button>
+              <button class="act-btn red" onclick="event.stopPropagation();deleteAdminFolder('${f.id}')" title="Ochirish">🗑</button>
             </div>
           </div>
           <div class="afc-name">${f.name}</div>
@@ -950,7 +950,7 @@
     window.openWordsModal = async (folderId) => {
       currentFolderId = folderId;
       const folder = adminFolders.find(f => f.id === folderId);
-      document.getElementById('wm-title').textContent = `${folder?.emoji || '📁'} ${folder?.name || 'Bo'lim'}`;
+      document.getElementById('wm-title').textContent = `${folder?.emoji || "📁"} ${folder?.name || "Bolim"}`;
       document.getElementById('words-modal').classList.add('open');
       await loadWordsModal(folderId);
     };
@@ -975,7 +975,7 @@
       document.getElementById('wm-meta').textContent = `${snap.size} ta soz`;
 
       if (snap.empty) {
-        list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted)">📝 Hali so'z yo'q</div>`;
+        list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted)">📝 Hali soz yoq</div>`;
         return;
       }
 
@@ -990,7 +990,7 @@
           <span class="wr-en">${w.en}</span>
           <span class="wr-uz">${w.uz}</span>
           <span class="wr-example">${w.example ? '"'+w.example+'"' : ''}</span>
-          <button class="act-btn red" onclick="deleteAdminWord('${folderId}','${d.id}')" title="O'chirish">🗑</button>
+          <button class="act-btn red" onclick="deleteAdminWord('${folderId}','${d.id}')" title="Ochirish">🗑</button>
         `;
         list.appendChild(row);
       });
@@ -1020,13 +1020,13 @@
         document.getElementById('aw-example').value = '';
         document.getElementById('aw-en').focus();
 
-        showToast(`"${en}" qo'shildi ✅`);
+        showToast(`"${en}" qoshildi`);
         await loadWordsModal(currentFolderId);
         await loadAdminFolders();
       } catch(e) {
         showToast('Xato: ' + e.message, true);
       } finally {
-        if (btn) { btn.disabled = false; btn.textContent = '✅ Qo'shish'; }
+        if (btn) { btn.disabled = false; btn.textContent = "Qoshish"; }
       }
     };
 
@@ -1050,7 +1050,7 @@
         updateTimestamp();
       } catch(e) {
         console.error('loadAll xato:', e);
-        showToast('Ma'lumot yuklashda xato: ' + e.message, true);
+        showToast("Malumot yuklashda xato: " + e.message, true);
       }
     }
 
@@ -1174,7 +1174,7 @@
 
     // ── USER ROW HTML ──
     function userRowHTML(user, showRank = false, rank = 0) {
-      const name = user.displayName || user.email?.split('@')[0] || "Noma'lum";
+      const name = user.displayName || user.email?.split('@')[0] || "Noma lum";
       const letter = name.charAt(0).toUpperCase();
       const avatarHtml = user.photoBase64
         ? `<img src="${user.photoBase64}" alt="a">`
@@ -1236,11 +1236,11 @@
       const sorted = [...allUsers].sort((a,b) => (b.stars||0)-(a.stars||0));
       const container = document.getElementById('lb-admin-list');
       if (sorted.length === 0) {
-        container.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">Hali ma\'lumot yo\'q</div>`;
+        container.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">Hali malumot yoq</div>`;
         return;
       }
       container.innerHTML = sorted.map((u, i) => {
-        const name = u.displayName || u.email?.split('@')[0] || "Noma'lum";
+        const name = u.displayName || u.email?.split('@')[0] || "Noma lum";
         const avatarHtml = u.photoBase64 ? `<img src="${u.photoBase64}" alt="a">` : name.charAt(0).toUpperCase();
         const rankEmoji = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
         return `
@@ -1285,7 +1285,7 @@
       selectedUid = uid;
       const u = allUsers.find(x => x.uid === uid);
       if (!u) return;
-      const name = u.displayName || u.email?.split('@')[0] || "Noma'lum";
+      const name = u.displayName || u.email?.split('@')[0] || "Noma lum";
       document.getElementById('coin-user-info').innerHTML =
         `<strong style="color:var(--text-main)">${name}</strong><br>⭐ ${u.stars||0} yulduz &nbsp;·&nbsp; 🪙 ${u.coins||0} tanga`;
       document.getElementById('coin-modal').classList.add('open');
@@ -1316,7 +1316,7 @@
       const snap = await getDocs(query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(10)));
       const list = document.getElementById('announce-list');
       if (snap.empty) {
-        list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted)">📢 Hali e\'lon yo\'q</div>`;
+        list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted)">📢 Hali elon yoq</div>`;
         return;
       }
       list.innerHTML = '';
@@ -1331,7 +1331,7 @@
             ${data.text}
             <div class="announce-date">${date}</div>
           </div>
-          <button class="act-btn red" onclick="deleteAnnounce('${d.id}')" title="O'chirish">🗑</button>
+          <button class="act-btn red" onclick="deleteAnnounce('${d.id}')" title="Ochirish">🗑</button>
         `;
         list.appendChild(div);
       });
