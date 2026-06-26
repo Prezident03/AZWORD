@@ -849,7 +849,7 @@
 
     async function loadAdminFolders() {
       const grid = document.getElementById('admin-folders-grid');
-      grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>';
+      grid.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>`;
 
       const snap = await getDocs(query(
         collection(db, 'folders'),
@@ -860,14 +860,14 @@
       snap.forEach(d => adminFolders.push({ id: d.id, ...d.data() }));
       adminFolders.sort((a, b) => (b.wordCount||0) - (a.wordCount||0));
 
-      document.getElementById('folder-count').textContent = `${adminFolders.length} ta bo'lim`;
+      document.getElementById('folder-count').textContent = `${adminFolders.length} ta bolim`;
       renderAdminFolders(adminFolders);
     }
 
     function renderAdminFolders(folders) {
       const grid = document.getElementById('admin-folders-grid');
       if (folders.length === 0) {
-        grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">📁 Hali umumiy bo'lim yo'q</div>';
+        grid.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">📁 Hali umumiy bo'lim yo'q</div>`;
         return;
       }
       grid.innerHTML = '';
@@ -883,7 +883,7 @@
             </div>
           </div>
           <div class="afc-name">${f.name}</div>
-          <div class="afc-meta">${f.wordCount || 0} ta so'z</div>
+          <div class="afc-meta">${f.wordCount || 0} ta soz</div>
           <div class="afc-badge">🌐 Umumiy</div>
         `;
         card.addEventListener('click', () => openWordsModal(f.id));
@@ -910,7 +910,7 @@
     window.createAdminFolder = async () => {
       const name = document.getElementById('nf-name').value.trim();
       const emoji = document.getElementById('nf-emoji').value.trim() || '📚';
-      if (!name) return showToast("Bo'lim nomi kiriting!", true);
+      if (!name) return showToast("Bolim nomi kiriting!", true);
 
       // Duplikat tekshiruvi
       const exists = adminFolders.find(f => f.name.toLowerCase() === name.toLowerCase());
@@ -926,14 +926,14 @@
         createdAt: serverTimestamp()
       });
 
-      showToast(`"${name}" bo'limi yaratildi! 🎉`);
+      showToast(`"${name}" bolimi yaratildi! `);
       closeNewFolderModal();
       await loadAdminFolders();
     };
 
     window.deleteAdminFolder = async (id) => {
       const folder = adminFolders.find(f => f.id === id);
-      if (!confirm(`"${folder?.name}" bo'limini o'chirasizmi? Barcha so'zlar ham o'chadi!`)) return;
+      if (!confirm(`"${folder?.name}" bolimini ochirasizmi? Barcha sozlar ham ochadi!`)) return;
 
       // So'zlarni o'chirish
       const wordsSnap = await getDocs(collection(db, 'folders', id, 'words'));
@@ -942,7 +942,7 @@
       }
       await deleteDoc(doc(db, 'folders', id));
 
-      showToast("Bo'lim o'chirildi 🗑");
+      showToast("Bolim ochirildi");
       await loadAdminFolders();
     };
 
@@ -965,17 +965,17 @@
 
     async function loadWordsModal(folderId) {
       const list = document.getElementById('words-list-modal');
-      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>';
+      list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>`;
 
       const snap = await getDocs(query(
         collection(db, 'folders', folderId, 'words'),
         orderBy('createdAt', 'asc')
       ));
 
-      document.getElementById('wm-meta').textContent = `${snap.size} ta so'z`;
+      document.getElementById('wm-meta').textContent = `${snap.size} ta soz`;
 
       if (snap.empty) {
-        list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">📝 Hali so'z yo'q</div>';
+        list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted)">📝 Hali so'z yo'q</div>`;
         return;
       }
 
@@ -1002,7 +1002,7 @@
       const uz = document.getElementById('aw-uz').value.trim();
       const example = document.getElementById('aw-example').value.trim();
 
-      if (!en || !uz) return showToast("Inglizcha va o'zbekcha kiriting!", true);
+      if (!en || !uz) return showToast("Inglizcha va ozbekcha kiriting!", true);
 
       const btn = document.querySelector('#words-modal .btn-confirm');
       if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
@@ -1217,7 +1217,7 @@
       const users = filtered || allUsers;
       const container = document.getElementById('all-users-list');
       if (users.length === 0) {
-        container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">👤 Topilmadi</div>';
+        container.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">👤 Topilmadi</div>`;
         return;
       }
       container.innerHTML = users.map(u => userRowHTML(u)).join('');
@@ -1236,7 +1236,7 @@
       const sorted = [...allUsers].sort((a,b) => (b.stars||0)-(a.stars||0));
       const container = document.getElementById('lb-admin-list');
       if (sorted.length === 0) {
-        container.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">Hali ma\'lumot yo\'q</div>';
+        container.innerHTML = `<div style="padding:32px;text-align:center;color:var(--text-muted)">Hali ma\'lumot yo\'q</div>`;
         return;
       }
       container.innerHTML = sorted.map((u, i) => {
@@ -1299,7 +1299,7 @@
     window.adjustVal = async (action, type) => {
       if (!selectedUid) return;
       const amount = parseInt(document.getElementById('coin-amount').value) || 0;
-      if (amount <= 0) return showToast("Miqdor 0 dan katta bo'lsin!", true);
+      if (amount <= 0) return showToast("Miqdor 0 dan katta bolsin!", true);
       const delta = action === 'add' ? amount : -amount;
       await updateDoc(doc(db, 'users', selectedUid), { [type]: increment(delta) });
       showToast(`${action==='add'?'+':'-'}${amount} ${type==='stars'?'⭐':'🪙'} berildi`);
@@ -1316,7 +1316,7 @@
       const snap = await getDocs(query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(10)));
       const list = document.getElementById('announce-list');
       if (snap.empty) {
-        list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted)">📢 Hali e\'lon yo\'q</div>';
+        list.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted)">📢 Hali e\'lon yo\'q</div>`;
         return;
       }
       list.innerHTML = '';
@@ -1350,7 +1350,7 @@
     };
 
     window.deleteAnnounce = async (id) => {
-      if (!confirm("Bu e'lonni o'chirasizmi?")) return;
+      if (!confirm("Bu elonni ochirasizmi?")) return;
       await deleteDoc(doc(db, 'announcements', id));
       showToast("O'chirildi 🗑");
       await loadAnnouncements();
@@ -1361,8 +1361,8 @@
     const pageTitles = {
       dashboard: '📊 Dashboard',
       users: '👥 Foydalanuvchilar',
-      folders: '📚 Umumiy bo\'limlar',
-      announce: '📢 E\'lonlar',
+      folders: "📚 Umumiy bolimlar",
+      announce: "📢 E'lonlar",
       leaderboard: '🏆 Leaderboard',
     };
 
@@ -1374,7 +1374,7 @@
         btn.classList.toggle('active', ['dashboard','users','folders','announce','leaderboard'][i] === page);
       });
       document.getElementById('topbar-title').textContent = pageTitles[page] || page;
-      if (page === 'folders') loadAdminFolders();
+      if (page === "folders") loadAdminFolders();
     };
 
     function updateTimestamp() {
