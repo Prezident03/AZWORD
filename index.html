@@ -68,7 +68,7 @@
   </div>
 
   <script type="module">
-    import { auth } from './firebase.js';
+    import { auth, db } from './firebase.js';
     import {
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
@@ -77,10 +77,32 @@
       updateProfile,
       onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    async function saveUserToFirestore(user) {
+      try {
+        const ref = doc(db, 'users', user.uid);
+        const snap = await getDoc(ref);
+        if (!snap.exists()) {
+          await setDoc(ref, {
+            uid: user.uid,
+            displayName: user.displayName || '',
+            email: user.email || '',
+            photoURL: user.photoURL || '',
+            stars: 0, coins: 0, weeklyStars: 0,
+            blocked: false,
+            createdAt: serverTimestamp(),
+            lastSeen: serverTimestamp()
+          });
+        } else {
+          await setDoc(ref, { lastSeen: serverTimestamp() }, { merge: true });
+        }
+      } catch(e) { console.error('saveUser:', e); }
+    }
 
     // Agar kirgan bo'lsa dashboard ga o'tkazamiz
-    onAuthStateChanged(auth, (user) => {
-      if (user) window.location.href = 'dashboard.html';
+    onAuthStateChanged(auth, async (user) => {
+      if (user) { await saveUserToFirestore(user); window.location.href = 'dashboard.html'; }
     });
 
     window.switchTab = (tab) => {
@@ -117,6 +139,7 @@
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
         await updateProfile(cred.user, { displayName: name });
+        await saveUserToFirestore({ ...cred.user, displayName: name });
         window.location.href = 'dashboard.html';
       } catch (e) {
         if (e.code === 'auth/email-already-in-use') showError("Bu email allaqachon ro'yxatdan o'tgan");
