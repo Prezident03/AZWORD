@@ -283,51 +283,6 @@
 
     .hint-text { font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; }
 
-    /* 🔊 Audio button */
-    .speak-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 14px;
-      padding: 9px 20px;
-      background: rgba(124,58,237,0.1);
-      border: 1.5px solid rgba(124,58,237,0.3);
-      border-radius: 99px;
-      color: var(--purple-light);
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-    .speak-btn:hover { background: var(--purple-glow); border-color: var(--purple-main); }
-    .speak-btn.speaking {
-      background: var(--purple-glow);
-      border-color: var(--purple-main);
-      animation: pulse-speak 1s infinite;
-    }
-    @keyframes pulse-speak {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .undo-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 14px;
-      padding: 8px 18px;
-      background: transparent;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-    .undo-btn:hover { border-color: var(--warning); color: var(--warning); }
-
     .study-nav {
       display: flex;
       gap: 12px;
@@ -424,7 +379,7 @@
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      collection, getDocs, query, orderBy, doc, setDoc, serverTimestamp, updateDoc
+      collection, getDocs, query, orderBy, doc, setDoc, updateDoc, increment, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const STAGES = [
@@ -433,6 +388,7 @@
       { id: 3, name: "Bo'laklash",   emoji: "🧩" },
       { id: 4, name: "Moslashtirish",emoji: "🔗" },
       { id: 5, name: "Yozish",       emoji: "✍️" },
+      { id: 6, name: "Gap tuzish",   emoji: "📝" },
     ];
 
     const params = new URLSearchParams(window.location.search);
@@ -454,7 +410,6 @@
     // Piece state
     let pieces = [];
     let assembled = '';
-    let assembledPieces = [];
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = 'index.html';
@@ -516,21 +471,18 @@
       else if (currentStage === 3) renderStage3(words[currentWordIndex], card);
       else if (currentStage === 4) renderStage4(card);
       else if (currentStage === 5) renderStage5(words[currentWordIndex], card);
+      else if (currentStage === 6) renderStage6(words[currentWordIndex], card);
     }
 
     // ── STAGE 1: Tanishtirish — barcha so'zlar ──
     function renderStage1(word, card) {
-      const exStr = word.example ? word.example.replace(/\\/g, '\\\\').replace(/'/g, "\\'") : '';
       card.innerHTML = `
         <div class="word-display">${word.en}</div>
         <div class="intro-translation">${word.uz}</div>
-        <button class="speak-btn" id="speak-btn" onclick="speakWord('${word.en.replace(/'/g, "\\'")}')">
-          🔊 Tinglash
-        </button>
         ${word.example ? `
           <div class="example-wrap">
             <div class="word-example-text" id="example-text">"${word.example}"</div>
-            <button class="translate-btn" id="translate-btn" onclick="translateExample('${exStr}')">
+            <button class="translate-btn" id="translate-btn" onclick="translateExample('${word.example.replace(/'/g, "\\'")}')">
               🌐 Tarjima
             </button>
             <div class="example-translation" id="example-translation" style="display:none"></div>
@@ -538,33 +490,7 @@
         ` : ''}
       `;
       document.getElementById('next-btn').textContent = "Tushundim →";
-
-      // Avtomatik o'qib berish
-      setTimeout(() => speakWord(word.en), 600);
     }
-
-    // ── TEXT-TO-SPEECH ──
-    window.speakWord = (text) => {
-      if (!window.speechSynthesis) return;
-      window.speechSynthesis.cancel();
-
-      const btn = document.getElementById('speak-btn');
-      if (btn) { btn.classList.add('speaking'); btn.innerHTML = '🔊 ...'; }
-
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      utter.rate = 0.85;
-      utter.pitch = 1;
-
-      utter.onend = () => {
-        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
-      };
-      utter.onerror = () => {
-        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
-      };
-
-      window.speechSynthesis.speak(utter);
-    };
 
     // ── TARJIMA (Stage 1) ──
     window.translateExample = async (sentence) => {
@@ -576,11 +502,14 @@
       btn.textContent = '⏳ ...';
 
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "llama-3.3-70b-versatile",
             max_tokens: 80,
             messages: [{
               role: "user",
@@ -589,7 +518,7 @@
           })
         });
         const data = await res.json();
-        const translation = (data.content?.[0]?.text || '').trim().replace(/^["'"]|["'"]$/g, '');
+        const translation = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
         translationEl.textContent = '🇺🇿 ' + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
@@ -638,7 +567,6 @@
       const en = word.en.toLowerCase();
       pieces = splitWord(en);
       assembled = '';
-      assembledPieces = [];
 
       card.innerHTML = `
         <div class="word-sub">Bu so'zni to'g'ri yig'ing:</div>
@@ -647,7 +575,6 @@
         <div class="pieces-area" id="pieces-area">
           ${pieces.map((p, i) => `<button class="piece-btn" id="piece-${i}" onclick="addPiece(${i}, '${p}', '${en}')">${p}</button>`).join('')}
         </div>
-        <button class="undo-btn" id="undo-btn" onclick="undoPiece()" style="display:none">↩ Orqaga</button>
       `;
       document.getElementById('next-btn').disabled = true;
     }
@@ -678,21 +605,13 @@
       if (btn.classList.contains('used')) return;
       btn.classList.add('used');
       assembled += piece;
-      assembledPieces.push(idx);
       const display = document.getElementById('assembled-display');
       display.textContent = assembled;
-      display.style.color = '';
-
-      // Undo tugmasini ko'rsatish
-      const undoBtn = document.getElementById('undo-btn');
-      if (undoBtn) undoBtn.style.display = 'inline-flex';
 
       const allUsed = pieces.every((_, i) => document.getElementById(`piece-${i}`).classList.contains('used'));
       if (allUsed) {
         if (assembled === correct) {
           display.style.color = 'var(--success)';
-          display.textContent = assembled + ' ✓';
-          if (undoBtn) undoBtn.style.display = 'none';
           document.getElementById('next-btn').disabled = false;
         } else {
           display.style.color = 'var(--danger)';
@@ -700,28 +619,12 @@
           markMistake(3);
           setTimeout(() => {
             assembled = '';
-            assembledPieces = [];
             display.textContent = '_';
             display.style.color = '';
-            if (undoBtn) undoBtn.style.display = 'none';
             pieces.forEach((_, i) => document.getElementById(`piece-${i}`).classList.remove('used'));
           }, 1200);
         }
       }
-    };
-
-    window.undoPiece = () => {
-      if (assembledPieces.length === 0) return;
-      const lastIdx = assembledPieces.pop();
-      const lastPiece = pieces[lastIdx];
-      assembled = assembled.slice(0, assembled.length - lastPiece.length);
-      document.getElementById(`piece-${lastIdx}`).classList.remove('used');
-      const display = document.getElementById('assembled-display');
-      display.textContent = assembled || '_';
-      display.style.color = '';
-      const undoBtn = document.getElementById('undo-btn');
-      if (undoBtn && assembledPieces.length === 0) undoBtn.style.display = 'none';
-      document.getElementById('next-btn').disabled = true;
     };
 
     // ── STAGE 4: Moslashtirish — chap EN, o'ng UZ, har biri alohida qatorda ──
@@ -875,25 +778,87 @@
       }
     }
 
+    // ── STAGE 6: Gap tuzish (AI) — barcha so'zlar ──
+    function renderStage6(word, card) {
+      card.innerHTML = `
+        <div class="word-sub">Quyidagi so'zni ishlatib inglizcha gap tuzing:</div>
+        <div class="word-display" style="font-size:1.5rem">${word.en}</div>
+        <div class="word-sub" style="color:var(--text-dim)">(${word.uz})</div>
+        <textarea class="sentence-input" id="sentence-input" placeholder="Write a sentence using '${word.en}'..."></textarea>
+        <div class="ai-feedback" id="ai-feedback"></div>
+      `;
+      document.getElementById('next-btn').textContent = "AI tekshirsin →";
+      document.getElementById('next-btn').disabled = false;
+      document.getElementById('next-btn').onclick = () => nextAction();
+      document.getElementById('sentence-input').focus();
+    }
 
+    async function checkSentenceWithAI(word) {
+      const sentence = document.getElementById('sentence-input').value.trim();
+      if (!sentence) return showToast("Avval gap yozing!", true);
+
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.disabled = true;
+      nextBtn.innerHTML = `Tekshirilmoqda <span class="loading-dots"><span></span><span></span><span></span></span>`;
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
+          },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            max_tokens: 200,
+            messages: [{
+              role: "user",
+              content: `You are an English teacher helping Uzbek students. The student was asked to write a sentence using the word "${word.en}" (which means "${word.uz}" in Uzbek). The student wrote: "${sentence}". Please check if the word is used correctly and the sentence is grammatically correct. Respond in Uzbek language. Be encouraging. If correct: start with "✅" and briefly praise them. If incorrect: start with "❌" and kindly explain the mistake and show a correct example. Keep response under 3 sentences.`
+            }]
+          })
+        });
+
+        const data = await response.json();
+        const feedback = data.choices[0].message.content;
+
+        const fbEl = document.getElementById('ai-feedback');
+        fbEl.textContent = feedback;
+        fbEl.style.display = 'block';
+
+        if (feedback.startsWith('✅')) {
+          fbEl.className = 'ai-feedback good';
+        } else {
+          fbEl.className = 'ai-feedback bad';
+          markMistake(6);
+        }
+
+        nextBtn.textContent = "Keyingi →";
+        nextBtn.disabled = false;
+        nextBtn.onclick = () => goNext();
+
+      } catch (e) {
+        showToast("AI bilan ulanishda xato", true);
+        nextBtn.textContent = "O'tkazib yuborish →";
+        nextBtn.disabled = false;
+        nextBtn.onclick = () => goNext();
+      }
+    }
 
     // ── NAVIGATION ──
     window.nextAction = () => {
-      goNext();
+      if (currentStage === 6) {
+        const fb = document.getElementById('ai-feedback');
+        if (fb && fb.style.display !== 'none' && fb.textContent) {
+          goNext();
+        } else {
+          checkSentenceWithAI(words[currentWordIndex]);
+        }
+      } else {
+        goNext();
+      }
     };
 
     function goNext() {
-      // 2-urinish rejimi: retryTasks bo'yicha bittadan ishlash
-      if (isSecondRound && window._retryTasks) {
-        window._retryIndex++;
-        if (window._retryIndex >= window._retryTasks.length) {
-          finishStudy();
-          return;
-        }
-        renderRetryTask();
-        return;
-      }
-
       // Stage 4 (moslashtirish) bitta: keyingi bosqichga o'tamiz
       if (currentStage === 4) {
         currentStage = 5;
@@ -909,44 +874,16 @@
         currentStage++;
         currentWordIndex = 0;
 
-        if (currentStage > 5) {
+        if (currentStage > 6) {
           finishStudy();
           return;
         }
 
+        // Stage 4 ga o'tganda wordIndex = 0 (bitta matching)
         renderStage();
       } else {
         renderStage();
       }
-    }
-
-    function renderRetryTask() {
-      const task = window._retryTasks[window._retryIndex];
-      if (!task) { finishStudy(); return; }
-
-      currentStage = task.stage;
-      // words massivida ushbu so'zni topamiz
-      const wordIdx = words.indexOf(task.word);
-      currentWordIndex = wordIdx >= 0 ? wordIdx : 0;
-
-      // Agar words massivida yo'q bo'lsa qo'shamiz
-      if (wordIdx < 0) {
-        words = [...(originalWords.length ? originalWords : words)];
-        currentWordIndex = words.findIndex(w => w.id === task.word.id) || 0;
-      }
-
-      updateProgress();
-      const card = document.getElementById('study-card');
-      const nextBtn = document.getElementById('next-btn');
-      nextBtn.textContent = 'Davom etish →';
-      nextBtn.disabled = false;
-      nextBtn.onclick = () => nextAction();
-
-      if (task.stage === 1) renderStage1(task.word, card);
-      else if (task.stage === 2) renderStage2(task.word, card);
-      else if (task.stage === 3) renderStage3(task.word, card);
-      else if (task.stage === 4) renderStage4(card);
-      else if (task.stage === 5) renderStage5(task.word, card);
     }
 
     window.skipWord = () => {
@@ -963,93 +900,51 @@
     }
 
     // ── FINISH ──
-    let isSecondRound = false;
-    let originalWords = [];
-
     async function finishStudy() {
-      // 2-urinish: xato so'zlar va ularning xato bosqichlari
-      if (!isSecondRound) {
-        // Xato qilingan so'zlar va bosqichlarni topamiz
-        const retryTasks = []; // { word, stage }
-        for (const word of words) {
-          const r = results[word.id];
-          if (r && r.mistakes.length > 0) {
-            r.mistakes.forEach(stage => {
-              retryTasks.push({ word, stage });
-            });
-          }
-        }
-
-        if (retryTasks.length > 0) {
-          isSecondRound = true;
-          originalWords = [...words];
-
-          // Xato bosqichlarni tartiblab qaytadan ishlash uchun saqlash
-          window._retryTasks = retryTasks;
-          window._retryIndex = 0;
-
-          // Xato so'zlarning mistakes ni reset qilamiz (2-urinish uchun)
-          retryTasks.forEach(({ word }) => {
-            if (results[word.id]) results[word.id].mistakes = [];
-          });
-
-          showRoundBanner(retryTasks.length);
-          return;
-        }
-      }
-
-      // BUG FIX: avval sessionStorage, keyin redirect
-      const allWords = isSecondRound ? originalWords : words;
       sessionStorage.setItem('studyResults', JSON.stringify(results));
-      sessionStorage.setItem('studyWords', JSON.stringify(allWords));
+      sessionStorage.setItem('studyWords', JSON.stringify(words));
 
+      const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
+      const earnedStars = perfectWords;
+      const earnedCoins = words.length;
+
+      // 1. studyResults ga yozish
       try {
-        const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
-        const resultData = {
-          uid: currentUser.uid,
-          folderId,
-          completedAt: serverTimestamp(),
-          results,
-          totalWords: words.length,
-          perfectWords,
-          score: `${perfectWords}/${words.length}`
-        };
         await setDoc(
           doc(db, 'studyResults', `${currentUser.uid}_${folderId}_${Date.now()}`),
-          resultData
+          {
+            uid: currentUser.uid,
+            folderId,
+            completedAt: serverTimestamp(),
+            totalWords: words.length,
+            perfectWords,
+            score: `${perfectWords}/${words.length}`
+          }
         );
-      } catch (e) {
-        console.log('Natija saqlanmadi:', e);
-      }
+      } catch(e) { console.log('studyResults:', e); }
 
-      // Papka reytingini yangilash
+      // 2. Foydalanuvchiga stars va coins berish
       try {
-        const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+          stars: increment(earnedStars),
+          coins: increment(earnedCoins),
+          weeklyStars: increment(earnedStars),
+          lastSeen: serverTimestamp()
+        });
+      } catch(e) { console.log('stars/coins:', e); }
+
+      // 3. Papka reytingini yangilash
+      try {
         await updateDoc(doc(db, 'folders', folderId), {
           lastScore: `${perfectWords}/${words.length}`,
           lastStudied: serverTimestamp()
         });
-      } catch(e) { console.log(e); }
+      } catch(e) { console.log('folder:', e); }
+
+      sessionStorage.setItem('earnedStars', earnedStars);
+      sessionStorage.setItem('earnedCoins', earnedCoins);
 
       window.location.href = `results.html?id=${folderId}`;
-    }
-
-    function showRoundBanner(count) {
-      const card = document.getElementById('study-card');
-      if (card) {
-        card.innerHTML = `
-          <div style="text-align:center;padding:20px 10px;">
-            <div style="font-size:3rem;margin-bottom:16px;">🔄</div>
-            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:10px;color:var(--text-main)">2-urinish!</div>
-            <div style="color:var(--text-muted);font-size:0.9rem;">${count} ta xato bosqich qaytadan ishlanadi</div>
-          </div>
-        `;
-      }
-      document.getElementById('next-btn').disabled = true;
-      setTimeout(() => {
-        window._retryIndex = 0;
-        renderRetryTask();
-      }, 2200);
     }
 
     function showToast(msg, isError = false) {
