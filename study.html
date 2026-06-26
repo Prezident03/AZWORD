@@ -424,7 +424,7 @@
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
-      collection, getDocs, query, orderBy, doc, setDoc, serverTimestamp
+      collection, getDocs, query, orderBy, doc, setDoc, serverTimestamp, updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const STAGES = [
@@ -1018,20 +1018,14 @@
           doc(db, 'studyResults', `${currentUser.uid}_${folderId}_${Date.now()}`),
           resultData
         );
-
-        // Papka reytingini yangilash
-        const { doc: docRef, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-        const { getFirestore } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-        // db allaqachon import qilingan, updateDoc ishlatamiz
       } catch (e) {
         console.log('Natija saqlanmadi:', e);
       }
 
       // Papka reytingini yangilash
       try {
-        const { updateDoc, doc: firestoreDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
         const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
-        await updateDoc(firestoreDoc(db, 'folders', folderId), {
+        await updateDoc(doc(db, 'folders', folderId), {
           lastScore: `${perfectWords}/${words.length}`,
           lastStudied: serverTimestamp()
         });

@@ -1040,13 +1040,18 @@
 
     // ── LOAD ──
     async function loadAll() {
-      await Promise.all([loadUsers(), loadFolders()]);
-      renderDashboard();
-      renderRecentUsers();
-      renderAllUsers();
-      renderLeaderboard();
-      loadAnnouncements();
-      updateTimestamp();
+      try {
+        await Promise.all([loadUsers(), loadFolders()]);
+        renderDashboard();
+        renderRecentUsers();
+        renderAllUsers();
+        renderLeaderboard();
+        loadAnnouncements();
+        updateTimestamp();
+      } catch(e) {
+        console.error('loadAll xato:', e);
+        showToast('Ma'lumot yuklashda xato: ' + e.message, true);
+      }
     }
 
     window.refreshData = () => loadAll();
@@ -1062,7 +1067,17 @@
     async function loadFolders() {
       const snap = await getDocs(collection(db, 'folders'));
       allFolders = [];
-      snap.forEach(d => allFolders.push({ id: d.id, ...d.data() }));
+      let totalWords = 0;
+      snap.forEach(d => {
+        const data = d.data();
+        allFolders.push({ id: d.id, ...data });
+        totalWords += data.wordCount || 0;
+      });
+      // stat cards ni yangilash
+      const sw = document.getElementById('s-words');
+      const sf = document.getElementById('s-folders');
+      if (sw) sw.textContent = totalWords;
+      if (sf) sf.textContent = allFolders.length;
     }
 
     // ── DASHBOARD ──
@@ -1346,6 +1361,7 @@
     const pageTitles = {
       dashboard: '📊 Dashboard',
       users: '👥 Foydalanuvchilar',
+      folders: '📚 Umumiy bo\'limlar',
       announce: '📢 E\'lonlar',
       leaderboard: '🏆 Leaderboard',
     };
@@ -1357,7 +1373,7 @@
       document.querySelectorAll('.nav-item').forEach((btn, i) => {
         btn.classList.toggle('active', ['dashboard','users','folders','announce','leaderboard'][i] === page);
       });
-      document.getElementById('topbar-title').textContent = pageTitles[page];
+      document.getElementById('topbar-title').textContent = pageTitles[page] || page;
       if (page === 'folders') loadAdminFolders();
     };
 

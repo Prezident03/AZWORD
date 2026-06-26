@@ -403,12 +403,19 @@
       try {
         const snap = await getDocs(query(
           collection(db, 'folders'),
-          where('uid', '==', user.uid),
-          where('isAdmin', '==', false)
+          where('uid', '==', user.uid)
         ));
-        document.getElementById('stat-folders').textContent = snap.size;
+        // isAdmin ni client-side filtrlaymiz (composite index talab qilmasligi uchun)
+        let folderCount = 0;
         let totalWords = 0;
-        snap.forEach(d => totalWords += d.data().wordCount || 0);
+        snap.forEach(d => {
+          const data = d.data();
+          if (!data.isAdmin) {
+            folderCount++;
+            totalWords += data.wordCount || 0;
+          }
+        });
+        document.getElementById('stat-folders').textContent = folderCount;
         document.getElementById('stat-words').textContent = totalWords;
       } catch(e) {}
     });
