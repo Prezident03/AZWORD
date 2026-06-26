@@ -258,7 +258,7 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       doc, getDoc, collection, addDoc, getDocs, deleteDoc,
-      updateDoc, query, orderBy, serverTimestamp, increment, where
+      updateDoc, query, orderBy, serverTimestamp, increment
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const params = new URLSearchParams(window.location.search);
@@ -374,13 +374,14 @@
       aiGeneratedExample = '';
 
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
+        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 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"
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-6",
+            model: "llama-3.3-70b-versatile",
             max_tokens: 80,
             messages: [{
               role: "user",
@@ -391,14 +392,14 @@
 
         if (!res.ok) {
           const err = await res.json();
-          console.error('API error:', err);
+          console.error('Groq error:', err);
           box.style.display = 'none';
           aiGeneratedExample = '';
           return;
         }
 
         const data = await res.json();
-        const sentence = (data.content?.[0]?.text || '').trim().replace(/^["']|["']$/g, '');
+        const sentence = data.choices[0].message.content.trim().replace(/^["']|["']$/g, '');
         aiGeneratedExample = sentence;
         textEl.textContent = '"' + sentence + '"';
       } catch(e) {
@@ -409,39 +410,16 @@
     }
 
     window.addWord = async () => {
-      const en = document.getElementById('word-en').value.trim().toLowerCase();
+      const en = document.getElementById('word-en').value.trim();
       const uz = document.getElementById('word-uz').value.trim();
 
       if (!en || !uz) return showToast("Inglizcha va o'zbekcha so'zlarni kiriting!", true);
 
-      // ── GLOBAL DUPLIKAT TEKSHIRUVI (barcha bo'limlar) ──
-      const allFoldersSnap = await getDocs(query(
-        collection(db, 'folders'),
-        where('uid', '==', currentUser.uid)
-      ));
-      for (const folderDoc of allFoldersSnap.docs) {
-        const wordsSnap = await getDocs(
-          collection(db, 'folders', folderDoc.id, 'words')
-        );
-        for (const w of wordsSnap.docs) {
-          if (w.data().en.toLowerCase() === en) {
-            const folderName = folderDoc.data().name;
-            showToast(`"${en}" allaqachon "${folderName}" bo'limida bor! ❌`, true);
-            document.getElementById('add-btn').disabled = false;
-            return;
-          }
-        }
-      }
-
       const btn = document.getElementById('add-btn');
       btn.disabled = true;
 
-      // Agar AI hali ishlamagan bo'lsa, bitta urinib ko'ramiz
-      if (!aiGeneratedExample && en.length >= 2 && uz.length >= 1) {
-        await generateExample(en, uz);
-      }
-
-      await addDoc(collection(db, 'folders', folderId, 'words'), {
+      // So'zni DARHOL saqlaymiz, AI ni kutmaymiz
+      const docRef = await addDoc(collection(db, 'folders', folderId, 'words'), {
         en, uz,
         example: aiGeneratedExample || '',
         createdAt: serverTimestamp()
@@ -453,12 +431,20 @@
 
       btn.disabled = false;
       closeAddModal();
-      if (aiGeneratedExample) {
-        showToast("So'z qo'shildi! ✅");
-      } else {
-        showToast("So'z qo'shildi (misol gap yo'q) ✅");
-      }
+      showToast("So'z qo'shildi! ✅");
       await loadWords();
+
+      // AI fon da ishlaydi — tayyor bo'lsa example ni yangilaydi
+      if (!aiGeneratedExample && en.length >= 2 && uz.length >= 1) {
+        generateExample(en, uz).then(async () => {
+          if (aiGeneratedExample) {
+            await updateDoc(doc(db, 'folders', folderId, 'words', docRef.id), {
+              example: aiGeneratedExample
+            });
+            await loadWords();
+          }
+        });
+      }
     };
 
     window.deleteWord = async (wordId) => {
