@@ -806,8 +806,8 @@
         <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px;font-weight:600">➕ Yangi so'z qo'shish</div>
         <div class="add-word-form">
           <input type="text" id="aw-en" placeholder="English (apple)" autocomplete="off" />
-          <input type="text" id="aw-uz" placeholder="O'zbekcha (olma)" autocomplete="off" />
-          <input type="text" id="aw-example" class="full" placeholder="Example sentence (ixtiyoriy)" autocomplete="off" />
+          <input type="text" id="aw-uz" placeholder="O'zbekcha (olma)" autocomplete="off" onkeydown="if(event.key==='Enter') addWordToAdminFolder()" />
+          <input type="text" id="aw-example" class="full" placeholder="Example sentence (ixtiyoriy)" autocomplete="off" onkeydown="if(event.key==='Enter') addWordToAdminFolder()" />
         </div>
         <div style="display:flex;gap:8px;margin-top:10px">
           <button class="btn-confirm" onclick="addWordToAdminFolder()" style="flex:1">✅ Qo'shish</button>
@@ -824,7 +824,7 @@
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import {
       collection, getDocs, doc, getDoc, setDoc, updateDoc,
-      addDoc, deleteDoc, query, orderBy, limit, serverTimestamp, increment
+      addDoc, deleteDoc, query, where, orderBy, limit, serverTimestamp, increment
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
@@ -1004,26 +1004,30 @@
 
       if (!en || !uz) return showToast("Inglizcha va o'zbekcha kiriting!", true);
 
-      // Duplikat tekshiruvi
-      const wordsSnap = await getDocs(collection(db, 'folders', currentFolderId, 'words'));
-      const exists = [...wordsSnap.docs].find(d => d.data().en.toLowerCase() === en);
-      if (exists) return showToast(`"${en}" allaqachon bor!`, true);
+      const btn = document.querySelector('#words-modal .btn-confirm');
+      if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
 
-      await addDoc(collection(db, 'folders', currentFolderId, 'words'), {
-        en, uz, example: example || '',
-        createdAt: serverTimestamp()
-      });
+      try {
+        await addDoc(collection(db, 'folders', currentFolderId, 'words'), {
+          en, uz, example: example || '',
+          createdAt: serverTimestamp()
+        });
 
-      await updateDoc(doc(db, 'folders', currentFolderId), { wordCount: increment(1) });
+        await updateDoc(doc(db, 'folders', currentFolderId), { wordCount: increment(1) });
 
-      document.getElementById('aw-en').value = '';
-      document.getElementById('aw-uz').value = '';
-      document.getElementById('aw-example').value = '';
-      document.getElementById('aw-en').focus();
+        document.getElementById('aw-en').value = '';
+        document.getElementById('aw-uz').value = '';
+        document.getElementById('aw-example').value = '';
+        document.getElementById('aw-en').focus();
 
-      showToast(`"${en}" qo'shildi ✅`);
-      await loadWordsModal(currentFolderId);
-      await loadAdminFolders();
+        showToast(`"${en}" qo'shildi ✅`);
+        await loadWordsModal(currentFolderId);
+        await loadAdminFolders();
+      } catch(e) {
+        showToast('Xato: ' + e.message, true);
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '✅ Qo'shish'; }
+      }
     };
 
     window.deleteAdminWord = async (folderId, wordId) => {
