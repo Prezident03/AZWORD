@@ -474,6 +474,61 @@
     .wm-body { flex: 1; overflow-y: auto; }
     .wm-footer { padding: 14px 22px; border-top: 1px solid var(--border); }
 
+    .wm-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--bg-deep);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 12px;
+    }
+    .wm-tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      transition: all 0.2s;
+    }
+    .wm-tab.active { background: var(--purple-main); color: #fff; }
+
+    .file-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .file-drop-zone:hover { border-color: var(--purple-main); color: var(--purple-light); }
+    .file-drop-zone.dragging { border-color: var(--purple-main); background: var(--purple-glow); }
+    .file-drop-zone input[type="file"] { display: none; }
+
+    .upload-preview {
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+    }
+    .upload-preview-item {
+      display: flex;
+      gap: 10px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .upload-preview-item:last-child { border-bottom: none; }
+    .upi-en { font-weight: 600; min-width: 80px; color: var(--text-main); }
+    .upi-uz { color: var(--text-muted); }
+
     .word-row {
       display: flex;
       align-items: center;
@@ -803,21 +858,67 @@
         <div id="words-list-modal"></div>
       </div>
       <div class="wm-footer">
-        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px;font-weight:600">➕ Yangi so'z qo'shish</div>
-        <div class="add-word-form">
-          <input type="text" id="aw-en" placeholder="English (apple)" autocomplete="off" />
-          <input type="text" id="aw-uz" placeholder="O'zbekcha (olma)" autocomplete="off" onkeydown="if(event.key==='Enter') addWordToAdminFolder()" />
-          <input type="text" id="aw-example" class="full" placeholder="Example sentence (ixtiyoriy)" autocomplete="off" onkeydown="if(event.key==='Enter') addWordToAdminFolder()" />
+        <!-- Tabs -->
+        <div class="wm-tabs">
+          <button class="wm-tab active" id="wmt-manual" onclick="switchWmTab('manual')">✏️ Qolda</button>
+          <button class="wm-tab" id="wmt-file" onclick="switchWmTab('file')">📂 Fayl</button>
         </div>
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn-confirm" onclick="addWordToAdminFolder()" style="flex:1">✅ Qo'shish</button>
-          <button class="btn-cancel" onclick="closeWordsModal()">Yopish</button>
+
+        <!-- Manual tab -->
+        <div id="wm-manual-tab">
+          <div class="add-word-form">
+            <input type="text" id="aw-en" placeholder="English (apple)" autocomplete="off" />
+            <input type="text" id="aw-uz" placeholder="Uzbekcha (olma)" autocomplete="off" onkeydown="if(event.key==='Enter') addWordToAdminFolder()" />
+            <input type="text" id="aw-example" class="full" placeholder="Example sentence (optional)" autocomplete="off" onkeydown="if(event.key==='Enter') addWordToAdminFolder()" />
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn-confirm" onclick="addWordToAdminFolder()" style="flex:1">✅ Qoshish</button>
+            <button class="btn-cancel" onclick="closeWordsModal()">Yopish</button>
+          </div>
+        </div>
+
+        <!-- File tab -->
+        <div id="wm-file-tab" style="display:none">
+          <div class="file-drop-zone" id="admin-drop-zone" onclick="document.getElementById('admin-file-input').click()">
+            <input type="file" id="admin-file-input" accept=".txt,.csv,.xlsx,.xls,.docx" onchange="handleAdminFile(this)" />
+            <div style="font-size:1.5rem;margin-bottom:6px">📂</div>
+            <div>Faylni shu yerga tashlang yoki bosing</div>
+            <div style="font-size:0.75rem;margin-top:4px;color:var(--text-dim)">TXT, CSV, XLSX, DOCX</div>
+          </div>
+          <div id="admin-upload-preview" class="upload-preview" style="display:none"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn-confirm" id="admin-save-btn" onclick="saveAdminFileWords()" style="flex:1;display:none">
+              ✅ Saqlash
+            </button>
+            <button class="btn-cancel" onclick="closeWordsModal()">Yopish</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="toast" id="toast"></div>
+  <script>
+    // Drag & drop for admin file upload
+    document.addEventListener('DOMContentLoaded', () => {
+      const zone = document.getElementById('admin-drop-zone');
+      if (!zone) return;
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragging'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('dragging'));
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('dragging');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+          const input = document.getElementById('admin-file-input');
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          input.files = dt.files;
+          handleAdminFile(input);
+        }
+      });
+    });
+  </script>
 
   <script type="module">
     import { auth, db } from './firebase.js';
@@ -960,7 +1061,156 @@
       document.getElementById('aw-en').value = '';
       document.getElementById('aw-uz').value = '';
       document.getElementById('aw-example').value = '';
+      document.getElementById('admin-upload-preview').style.display = 'none';
+      document.getElementById('admin-upload-preview').innerHTML = '';
+      document.getElementById('admin-save-btn').style.display = 'none';
+      document.getElementById('admin-file-input').value = '';
+      switchWmTab('manual');
       currentFolderId = null;
+    };
+
+    // Tab switching
+    window.switchWmTab = (tab) => {
+      document.getElementById('wm-manual-tab').style.display = tab === 'manual' ? 'block' : 'none';
+      document.getElementById('wm-file-tab').style.display = tab === 'file' ? 'block' : 'none';
+      document.getElementById('wmt-manual').classList.toggle('active', tab === 'manual');
+      document.getElementById('wmt-file').classList.toggle('active', tab === 'file');
+    };
+
+    // File parser
+    let adminParsedWords = [];
+
+    window.handleAdminFile = async (input) => {
+      const file = input.files[0];
+      if (!file) return;
+
+      const preview = document.getElementById('admin-upload-preview');
+      const saveBtn = document.getElementById('admin-save-btn');
+      preview.innerHTML = '<div style="padding:10px;color:var(--text-muted)">⏳ Yuklanmoqda...</div>';
+      preview.style.display = 'block';
+      adminParsedWords = [];
+
+      try {
+        let words = [];
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (ext === 'txt' || ext === 'csv') {
+          const text = await file.text();
+          words = parseTextWords(text);
+        } else if (ext === 'xlsx' || ext === 'xls') {
+          words = await parseExcelWords(file);
+        } else if (ext === 'docx') {
+          words = await parseDocxWords(file);
+        }
+
+        if (words.length === 0) {
+          preview.innerHTML = '<div style="padding:10px;color:var(--danger)">❌ So'z topilmadi. Format: EN - UZ</div>';
+          saveBtn.style.display = 'none';
+          return;
+        }
+
+        adminParsedWords = words;
+        preview.innerHTML = words.slice(0, 20).map((w, i) =>
+          `<div class="upload-preview-item">
+            <span style="color:var(--text-dim);min-width:20px">${i+1}</span>
+            <span class="upi-en">${w.en}</span>
+            <span class="upi-uz">${w.uz}</span>
+          </div>`
+        ).join('') + (words.length > 20 ? `<div style="padding:6px 8px;color:var(--text-dim)">... va yana ${words.length - 20} ta</div>` : '');
+
+        saveBtn.style.display = 'flex';
+        saveBtn.textContent = `✅ ${words.length} ta so'zni saqlash`;
+
+      } catch(e) {
+        preview.innerHTML = `<div style="padding:10px;color:var(--danger)">❌ Xato: ${e.message}</div>`;
+      }
+    };
+
+    function parseTextWords(text) {
+      const lines = text.split('
+').map(l => l.trim()).filter(Boolean);
+      const words = [];
+      for (const line of lines) {
+        const parts = line.split(/[-,;|	]+/);
+        if (parts.length >= 2) {
+          const en = parts[0].trim().toLowerCase();
+          const uz = parts[1].trim();
+          if (en && uz) words.push({ en, uz, example: '' });
+        }
+      }
+      return words;
+    }
+
+    async function parseExcelWords(file) {
+      const XLSX = await import('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+      const ab = await file.arrayBuffer();
+      const wb = XLSX.read(ab, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+      const words = [];
+      for (const row of data) {
+        if (!row[0] || !row[1]) continue;
+        const en = String(row[0]).trim().toLowerCase();
+        const uz = String(row[1]).trim();
+        const example = row[2] ? String(row[2]).trim() : '';
+        if (en && uz) words.push({ en, uz, example });
+      }
+      return words;
+    }
+
+    async function parseDocxWords(file) {
+      // DOCX - har bir satr EN - UZ formatda
+      const ab = await file.arrayBuffer();
+      const decoder = new TextDecoder('utf-8');
+      // Simple text extraction - XML ichidan w:t teglarini olamiz
+      const text = decoder.decode(ab);
+      const matches = text.match(/<w:t[^>]*>([^<]+)<\/w:t>/g) || [];
+      const rawText = matches.map(m => m.replace(/<[^>]+>/g, '')).join(' ');
+      return parseTextWords(rawText);
+    }
+
+    window.saveAdminFileWords = async () => {
+      if (!adminParsedWords.length || !currentFolderId) return;
+
+      const btn = document.getElementById('admin-save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saqlanmoqda...';
+
+      try {
+        // Mavjud so'zlarni tekshiramiz
+        const existingSnap = await getDocs(collection(db, 'folders', currentFolderId, 'words'));
+        const existingSet = new Set();
+        existingSnap.forEach(d => existingSet.add(d.data().en.toLowerCase()));
+
+        const newWords = adminParsedWords.filter(w => !existingSet.has(w.en.toLowerCase()));
+        const skipped = adminParsedWords.length - newWords.length;
+
+        let saved = 0;
+        for (const word of newWords) {
+          await addDoc(collection(db, 'folders', currentFolderId, 'words'), {
+            en: word.en,
+            uz: word.uz,
+            example: word.example || '',
+            createdAt: serverTimestamp()
+          });
+          saved++;
+        }
+
+        if (saved > 0) {
+          await updateDoc(doc(db, 'folders', currentFolderId), {
+            wordCount: increment(saved)
+          });
+        }
+
+        showToast(`${saved} ta so'z qoshildi${skipped > 0 ? `, ${skipped} ta takroriy` : ''}`);
+        closeWordsModal();
+        await loadAdminFolders();
+
+      } catch(e) {
+        showToast('Xato: ' + e.message, true);
+        btn.disabled = false;
+        btn.textContent = 'Saqlash';
+      }
     };
 
     async function loadWordsModal(folderId) {
