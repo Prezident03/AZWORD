@@ -1104,7 +1104,7 @@
         }
 
         if (words.length === 0) {
-          preview.innerHTML = '<div style="padding:10px;color:var(--danger)">❌ So'z topilmadi. Format: EN - UZ</div>';
+          preview.innerHTML = `<div style="padding:10px;color:var(--danger)">Soz topilmadi. Format: EN - UZ</div>`;
           saveBtn.style.display = 'none';
           return;
         }
@@ -1119,7 +1119,7 @@
         ).join('') + (words.length > 20 ? `<div style="padding:6px 8px;color:var(--text-dim)">... va yana ${words.length - 20} ta</div>` : '');
 
         saveBtn.style.display = 'flex';
-        saveBtn.textContent = `✅ ${words.length} ta so'zni saqlash`;
+        saveBtn.textContent = "Saqlash (" + words.length + " ta)";
 
       } catch(e) {
         preview.innerHTML = `<div style="padding:10px;color:var(--danger)">❌ Xato: ${e.message}</div>`;
@@ -1202,7 +1202,8 @@
           });
         }
 
-        showToast(`${saved} ta so'z qoshildi${skipped > 0 ? `, ${skipped} ta takroriy` : ''}`);
+        const msg = saved + " ta soz qoshildi" + (skipped > 0 ? ", " + skipped + " ta takroriy" : "");
+        showToast(msg);
         closeWordsModal();
         await loadAdminFolders();
 
