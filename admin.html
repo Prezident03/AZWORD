@@ -379,6 +379,134 @@
     }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+    /* Folders page */
+    .folders-toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .folders-toolbar input {
+      flex: 1;
+      min-width: 160px;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 13px;
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .folders-toolbar input:focus { border-color: var(--purple-main); }
+
+    .admin-folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+      padding: 20px;
+    }
+
+    .admin-folder-card {
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      transition: border-color 0.2s, transform 0.15s;
+      cursor: pointer;
+    }
+    .admin-folder-card:hover { border-color: var(--purple-main); transform: translateY(-2px); }
+
+    .afc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .afc-emoji { font-size: 1.8rem; }
+    .afc-actions { display: flex; gap: 5px; }
+
+    .afc-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; margin-bottom: 4px; }
+    .afc-meta { font-size: 0.78rem; color: var(--text-muted); }
+    .afc-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: var(--purple-light);
+    }
+
+    /* Words modal */
+    .words-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .words-modal.open { display: flex; }
+    .words-modal-inner {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 680px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .wm-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+    }
+    .wm-header h3 { font-size: 1.05rem; font-weight: 700; }
+    .wm-body { flex: 1; overflow-y: auto; }
+    .wm-footer { padding: 14px 22px; border-top: 1px solid var(--border); }
+
+    .word-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 22px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+    .word-row:last-child { border-bottom: none; }
+    .word-row:hover { background: var(--bg-hover); }
+    .wr-num { color: var(--text-dim); font-size: 0.75rem; min-width: 22px; }
+    .wr-en { font-family: 'Space Grotesk', sans-serif; font-weight: 600; min-width: 100px; }
+    .wr-uz { color: var(--text-muted); flex: 1; }
+    .wr-example { font-size: 0.75rem; color: var(--text-dim); font-style: italic; flex: 1; }
+
+    .add-word-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .add-word-form input {
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .add-word-form input:focus { border-color: var(--purple-main); }
+    .add-word-form input.full { grid-column: 1 / -1; }
+
     @media (max-width: 768px) {
       .sidebar { transform: translateX(-100%); }
       .admin-main { margin-left: 0; }
@@ -409,6 +537,9 @@
       </button>
 
       <div class="nav-section-label">Kontent</div>
+      <button class="nav-item" onclick="showPage('folders')">
+        <span class="nav-icon">📚</span> Umumiy bo'limlar
+      </button>
       <button class="nav-item" onclick="showPage('announce')">
         <span class="nav-icon">📢</span> E'lonlar
       </button>
@@ -577,6 +708,25 @@
         </div>
       </div>
 
+      <!-- ── PAGE: FOLDERS ── -->
+      <div id="page-folders" style="display:none">
+        <div class="section-card">
+          <div class="section-header">
+            <h3>📚 Umumiy bo'limlar</h3>
+            <button class="btn-add" onclick="openNewFolderModal()" style="padding:8px 16px;font-size:0.85rem;">
+              ＋ Yangi bo'lim
+            </button>
+          </div>
+          <div class="folders-toolbar">
+            <input type="text" id="folder-search" placeholder="🔍 Bo'lim nomi..." oninput="filterAdminFolders()" />
+            <span id="folder-count" style="color:var(--text-muted);font-size:0.85rem;white-space:nowrap"></span>
+          </div>
+          <div class="admin-folder-grid" id="admin-folders-grid">
+            <div style="padding:32px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- ── PAGE: LEADERBOARD ── -->
       <div id="page-leaderboard" style="display:none">
         <div class="section-card">
@@ -620,6 +770,53 @@
     </div>
   </div>
 
+  <!-- New Folder Modal -->
+  <div class="modal-overlay" id="new-folder-modal">
+    <div class="modal">
+      <h3>📚 Yangi umumiy bo'lim</h3>
+      <div class="form-group">
+        <label>Bo'lim nomi</label>
+        <input type="text" id="nf-name" placeholder="Masalan: IELTS Vocabulary" />
+      </div>
+      <div class="form-group">
+        <label>Emoji</label>
+        <input type="text" id="nf-emoji" placeholder="📚" maxlength="2" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeNewFolderModal()">Bekor</button>
+        <button class="btn-confirm" onclick="createAdminFolder()">Yaratish</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Words Modal -->
+  <div class="words-modal" id="words-modal">
+    <div class="words-modal-inner">
+      <div class="wm-header">
+        <div>
+          <h3 id="wm-title">Bo'lim so'zlari</h3>
+          <div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px" id="wm-meta"></div>
+        </div>
+        <button class="act-btn" onclick="closeWordsModal()" style="width:36px;height:36px;font-size:1.1rem">✕</button>
+      </div>
+      <div class="wm-body">
+        <div id="words-list-modal"></div>
+      </div>
+      <div class="wm-footer">
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px;font-weight:600">➕ Yangi so'z qo'shish</div>
+        <div class="add-word-form">
+          <input type="text" id="aw-en" placeholder="English (apple)" autocomplete="off" />
+          <input type="text" id="aw-uz" placeholder="O'zbekcha (olma)" autocomplete="off" />
+          <input type="text" id="aw-example" class="full" placeholder="Example sentence (ixtiyoriy)" autocomplete="off" />
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-confirm" onclick="addWordToAdminFolder()" style="flex:1">✅ Qo'shish</button>
+          <button class="btn-cancel" onclick="closeWordsModal()">Yopish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script type="module">
@@ -644,6 +841,197 @@
     window.logout = async () => {
       await signOut(auth);
       window.location.href = 'index.html';
+    };
+
+    // ── ADMIN FOLDERS ──
+    let adminFolders = [];
+    let currentFolderId = null;
+
+    async function loadAdminFolders() {
+      const grid = document.getElementById('admin-folders-grid');
+      grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>';
+
+      const snap = await getDocs(query(
+        collection(db, 'folders'),
+        where('isAdmin', '==', true)
+      ));
+
+      adminFolders = [];
+      snap.forEach(d => adminFolders.push({ id: d.id, ...d.data() }));
+      adminFolders.sort((a, b) => (b.wordCount||0) - (a.wordCount||0));
+
+      document.getElementById('folder-count').textContent = `${adminFolders.length} ta bo'lim`;
+      renderAdminFolders(adminFolders);
+    }
+
+    function renderAdminFolders(folders) {
+      const grid = document.getElementById('admin-folders-grid');
+      if (folders.length === 0) {
+        grid.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-muted)">📁 Hali umumiy bo'lim yo'q</div>';
+        return;
+      }
+      grid.innerHTML = '';
+      folders.forEach(f => {
+        const card = document.createElement('div');
+        card.className = 'admin-folder-card';
+        card.innerHTML = `
+          <div class="afc-top">
+            <span class="afc-emoji">${f.emoji || '📁'}</span>
+            <div class="afc-actions">
+              <button class="act-btn" onclick="event.stopPropagation();openWordsModal('${f.id}')" title="So'zlarni ko'rish">📝</button>
+              <button class="act-btn red" onclick="event.stopPropagation();deleteAdminFolder('${f.id}')" title="O'chirish">🗑</button>
+            </div>
+          </div>
+          <div class="afc-name">${f.name}</div>
+          <div class="afc-meta">${f.wordCount || 0} ta so'z</div>
+          <div class="afc-badge">🌐 Umumiy</div>
+        `;
+        card.addEventListener('click', () => openWordsModal(f.id));
+        grid.appendChild(card);
+      });
+    }
+
+    window.filterAdminFolders = () => {
+      const q = document.getElementById('folder-search').value.toLowerCase();
+      renderAdminFolders(adminFolders.filter(f => f.name.toLowerCase().includes(q)));
+    };
+
+    // New folder modal
+    window.openNewFolderModal = () => {
+      document.getElementById('new-folder-modal').classList.add('open');
+      setTimeout(() => document.getElementById('nf-name').focus(), 100);
+    };
+    window.closeNewFolderModal = () => {
+      document.getElementById('new-folder-modal').classList.remove('open');
+      document.getElementById('nf-name').value = '';
+      document.getElementById('nf-emoji').value = '';
+    };
+
+    window.createAdminFolder = async () => {
+      const name = document.getElementById('nf-name').value.trim();
+      const emoji = document.getElementById('nf-emoji').value.trim() || '📚';
+      if (!name) return showToast("Bo'lim nomi kiriting!", true);
+
+      // Duplikat tekshiruvi
+      const exists = adminFolders.find(f => f.name.toLowerCase() === name.toLowerCase());
+      if (exists) return showToast(`"${name}" allaqachon mavjud!`, true);
+
+      await addDoc(collection(db, 'folders'), {
+        name, emoji,
+        uid: 'admin',
+        isAdmin: true,
+        wordCount: 0,
+        progress: 0,
+        lastScore: null,
+        createdAt: serverTimestamp()
+      });
+
+      showToast(`"${name}" bo'limi yaratildi! 🎉`);
+      closeNewFolderModal();
+      await loadAdminFolders();
+    };
+
+    window.deleteAdminFolder = async (id) => {
+      const folder = adminFolders.find(f => f.id === id);
+      if (!confirm(`"${folder?.name}" bo'limini o'chirasizmi? Barcha so'zlar ham o'chadi!`)) return;
+
+      // So'zlarni o'chirish
+      const wordsSnap = await getDocs(collection(db, 'folders', id, 'words'));
+      for (const w of wordsSnap.docs) {
+        await deleteDoc(doc(db, 'folders', id, 'words', w.id));
+      }
+      await deleteDoc(doc(db, 'folders', id));
+
+      showToast("Bo'lim o'chirildi 🗑");
+      await loadAdminFolders();
+    };
+
+    // Words modal
+    window.openWordsModal = async (folderId) => {
+      currentFolderId = folderId;
+      const folder = adminFolders.find(f => f.id === folderId);
+      document.getElementById('wm-title').textContent = `${folder?.emoji || '📁'} ${folder?.name || 'Bo'lim'}`;
+      document.getElementById('words-modal').classList.add('open');
+      await loadWordsModal(folderId);
+    };
+
+    window.closeWordsModal = () => {
+      document.getElementById('words-modal').classList.remove('open');
+      document.getElementById('aw-en').value = '';
+      document.getElementById('aw-uz').value = '';
+      document.getElementById('aw-example').value = '';
+      currentFolderId = null;
+    };
+
+    async function loadWordsModal(folderId) {
+      const list = document.getElementById('words-list-modal');
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">⏳ Yuklanmoqda...</div>';
+
+      const snap = await getDocs(query(
+        collection(db, 'folders', folderId, 'words'),
+        orderBy('createdAt', 'asc')
+      ));
+
+      document.getElementById('wm-meta').textContent = `${snap.size} ta so'z`;
+
+      if (snap.empty) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">📝 Hali so'z yo'q</div>';
+        return;
+      }
+
+      list.innerHTML = '';
+      let i = 1;
+      snap.forEach(d => {
+        const w = d.data();
+        const row = document.createElement('div');
+        row.className = 'word-row';
+        row.innerHTML = `
+          <span class="wr-num">${i++}</span>
+          <span class="wr-en">${w.en}</span>
+          <span class="wr-uz">${w.uz}</span>
+          <span class="wr-example">${w.example ? '"'+w.example+'"' : ''}</span>
+          <button class="act-btn red" onclick="deleteAdminWord('${folderId}','${d.id}')" title="O'chirish">🗑</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    window.addWordToAdminFolder = async () => {
+      if (!currentFolderId) return;
+      const en = document.getElementById('aw-en').value.trim().toLowerCase();
+      const uz = document.getElementById('aw-uz').value.trim();
+      const example = document.getElementById('aw-example').value.trim();
+
+      if (!en || !uz) return showToast("Inglizcha va o'zbekcha kiriting!", true);
+
+      // Duplikat tekshiruvi
+      const wordsSnap = await getDocs(collection(db, 'folders', currentFolderId, 'words'));
+      const exists = [...wordsSnap.docs].find(d => d.data().en.toLowerCase() === en);
+      if (exists) return showToast(`"${en}" allaqachon bor!`, true);
+
+      await addDoc(collection(db, 'folders', currentFolderId, 'words'), {
+        en, uz, example: example || '',
+        createdAt: serverTimestamp()
+      });
+
+      await updateDoc(doc(db, 'folders', currentFolderId), { wordCount: increment(1) });
+
+      document.getElementById('aw-en').value = '';
+      document.getElementById('aw-uz').value = '';
+      document.getElementById('aw-example').value = '';
+      document.getElementById('aw-en').focus();
+
+      showToast(`"${en}" qo'shildi ✅`);
+      await loadWordsModal(currentFolderId);
+      await loadAdminFolders();
+    };
+
+    window.deleteAdminWord = async (folderId, wordId) => {
+      await deleteDoc(doc(db, 'folders', folderId, 'words', wordId));
+      await updateDoc(doc(db, 'folders', folderId), { wordCount: increment(-1) });
+      showToast("O'chirildi 🗑");
+      await loadWordsModal(folderId);
+      await loadAdminFolders();
     };
 
     // ── LOAD ──
@@ -950,7 +1338,7 @@
     };
 
     // ── PAGE SWITCH ──
-    const pages = ['dashboard', 'users', 'announce', 'leaderboard'];
+    const pages = ['dashboard', 'users', 'folders', 'announce', 'leaderboard'];
     const pageTitles = {
       dashboard: '📊 Dashboard',
       users: '👥 Foydalanuvchilar',
@@ -963,9 +1351,10 @@
         document.getElementById(`page-${p}`).style.display = p === page ? 'block' : 'none';
       });
       document.querySelectorAll('.nav-item').forEach((btn, i) => {
-        btn.classList.toggle('active', ['dashboard','users','announce','leaderboard'][i] === page);
+        btn.classList.toggle('active', ['dashboard','users','folders','announce','leaderboard'][i] === page);
       });
       document.getElementById('topbar-title').textContent = pageTitles[page];
+      if (page === 'folders') loadAdminFolders();
     };
 
     function updateTimestamp() {
