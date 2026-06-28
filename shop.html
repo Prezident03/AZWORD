@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AzWord Shop</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* Shop styles */
+    .shop-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 0.875rem; cursor: pointer;
+      border: none; background: none; padding: 0; margin-bottom: 28px;
+      font-family: 'Inter', sans-serif; transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-main); }
+
+    .shop-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 32px; flex-wrap: wrap; gap: 14px;
+    }
+    .shop-header h1 { font-size: 1.6rem; font-weight: 700; }
+
+    .coin-balance {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(52,211,153,0.1); border: 1.5px solid rgba(52,211,153,0.3);
+      border-radius: 12px; padding: 10px 18px;
+    }
+    .coin-balance .amount {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem; font-weight: 700; color: #34d399;
+    }
+    .coin-balance .label { font-size: 0.8rem; color: var(--text-muted); }
+
+    /* Category tabs */
+    .shop-tabs {
+      display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .shop-tab {
+      padding: 8px 18px; border-radius: 99px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted); font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .shop-tab:hover { border-color: var(--purple-main); color: var(--purple-light); }
+    .shop-tab.active { background: var(--purple-main); border-color: var(--purple-main); color: #fff; }
+
+    /* Items grid */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+
+    .shop-item {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      text-align: center;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .shop-item:hover {
+      border-color: var(--purple-main);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px var(--purple-glow);
+    }
+    .shop-item.owned {
+      border-color: rgba(52,211,153,0.4);
+      background: rgba(52,211,153,0.04);
+    }
+    .shop-item.equipped {
+      border-color: #fbbf24;
+      background: rgba(251,191,36,0.05);
+    }
+
+    .item-emoji { font-size: 2.8rem; line-height: 1; }
+    .item-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700;
+    }
+    .item-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
+
+    .item-price {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: #34d399;
+    }
+
+    .item-badge {
+      position: absolute; top: 12px; right: 12px;
+      font-size: 0.65rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 99px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .item-badge.new { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+    .item-badge.hot { background: rgba(251,191,36,0.15); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+
+    .btn-buy {
+      width: 100%; padding: 10px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif; transition: opacity 0.2s;
+      margin-top: 4px;
+    }
+    .btn-buy:hover { opacity: 0.88; }
+    .btn-buy:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-equip {
+      width: 100%; padding: 10px;
+      background: transparent; color: var(--success);
+      border: 1.5px solid rgba(52,211,153,0.4); border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif; transition: all 0.2s;
+      margin-top: 4px;
+    }
+    .btn-equip:hover { background: rgba(52,211,153,0.08); }
+
+    .btn-equipped {
+      width: 100%; padding: 10px;
+      background: rgba(251,191,36,0.1); color: #fbbf24;
+      border: 1.5px solid rgba(251,191,36,0.4); border-radius: 10px;
+      font-size: 0.875rem; font-weight: 600; cursor: default;
+      font-family: 'Inter', sans-serif; margin-top: 4px;
+    }
+
+    /* Purchase history */
+    .history-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px; background: var(--bg-card);
+      border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px;
+      font-size: 0.875rem;
+    }
+    .history-emoji { font-size: 1.4rem; }
+    .history-info { flex: 1; }
+    .history-name { font-weight: 600; }
+    .history-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .history-price { color: var(--danger); font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+
+    /* Empty */
+    .shop-empty { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+    .shop-empty .emoji { font-size: 2.5rem; margin-bottom: 12px; }
+
+    /* Confirm modal */
+    .confirm-item-preview {
+      text-align: center; padding: 16px;
+      background: var(--bg-deep); border-radius: 12px; margin-bottom: 16px;
+    }
+    .confirm-item-preview .big-emoji { font-size: 3rem; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">AzWord</div>
+  <div class="nav-user">
+    <div class="nav-badges">
+      <div class="nav-badge star"><span class="badge-icon">⭐</span><span class="badge-val" id="nav-stars">0</span></div>
+      <div class="nav-badge coin"><span class="badge-icon">🪙</span><span class="badge-val" id="nav-coins">0</span></div>
+    </div>
+    <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer">A</div>
+  </div>
+</nav>
+
+<div class="shop-wrap">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
+
+  <div class="shop-header">
+    <div>
+      <h1>🛒 Shop</h1>
+      <p style="color:var(--text-muted);font-size:0.875rem;margin-top:4px">Tangalaringizni sarflang va maxsus narsalar oling</p>
+    </div>
+    <div class="coin-balance">
+      <span style="font-size:1.4rem">🪙</span>
+      <div>
+        <div class="amount" id="balance-coins">0</div>
+        <div class="label">tangangiz bor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="shop-tabs">
+    <button class="shop-tab active" onclick="filterCategory('all')">Hammasi</button>
+    <button class="shop-tab" onclick="filterCategory('badge')">🏅 Badge</button>
+    <button class="shop-tab" onclick="filterCategory('avatar')">👤 Avatar</button>
+    <button class="shop-tab" onclick="filterCategory('theme')">🎨 Tema</button>
+    <button class="shop-tab" onclick="filterCategory('boost')">⚡ Boost</button>
+  </div>
+
+  <!-- Items -->
+  <div class="shop-grid" id="shop-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Yuklanmoqda...</div>
+  </div>
+
+  <!-- Purchase history -->
+  <div class="section-label">📋 Xaridlar tarixi</div>
+  <div id="history-list">
+    <div style="text-align:center;padding:24px;color:var(--text-muted)">Yuklanmoqda...</div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div class="modal-overlay" id="buy-modal">
+  <div class="modal">
+    <h3>Xaridni tasdiqlang</h3>
+    <div class="confirm-item-preview">
+      <div class="big-emoji" id="confirm-emoji">🏅</div>
+      <div style="font-weight:700;font-size:1.05rem" id="confirm-name">Item</div>
+      <div style="color:var(--text-muted);font-size:0.85rem;margin-top:4px" id="confirm-desc"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:16px">
+      <span style="color:var(--text-muted)">Narxi:</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#34d399" id="confirm-price">🪙 0</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:4px">
+      <span style="color:var(--text-muted)">Balansingiz:</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399" id="confirm-balance">🪙 0</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBuyModal()">Bekor</button>
+      <button class="btn-confirm" onclick="confirmBuy()">Sotib olish</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, getDocs, doc, getDoc, setDoc, addDoc,
+  query, orderBy, limit, serverTimestamp, increment, updateDoc, where
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null;
+let userCoins = 0;
+let allItems = [];
+let ownedItems = new Set();
+let equippedItems = {};
+let pendingItem = null;
+
+onAuthStateChanged(auth, async user => {
+  if (!user) return location.href = 'index.html';
+  currentUser = user;
+
+  // Avatar
+  try {
+    const ud = await getDoc(doc(db,'users',user.uid));
+    if (ud.exists()) {
+      const d = ud.data();
+      userCoins = d.coins || 0;
+      document.getElementById('nav-coins').textContent = userCoins;
+      document.getElementById('nav-stars').textContent = d.stars || 0;
+      document.getElementById('balance-coins').textContent = userCoins;
+      ownedItems = new Set(d.ownedItems || []);
+      equippedItems = d.equippedItems || {};
+      if (d.photoBase64) {
+        document.getElementById('nav-avatar').innerHTML = `<img src="${d.photoBase64}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`;
+      } else {
+        document.getElementById('nav-avatar').textContent = (user.displayName||user.email||'A').charAt(0).toUpperCase();
+      }
+    }
+  } catch(e) {}
+
+  await loadShopItems();
+  await loadHistory();
+});
+
+async function loadShopItems() {
+  const snap = await getDocs(query(collection(db,'shop'), orderBy('price','asc')));
+  allItems = [];
+  snap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
+  renderItems(allItems);
+}
+
+function renderItems(items) {
+  const grid = document.getElementById('shop-grid');
+  if (!items.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1" class="shop-empty"><div class="emoji">🛒</div><p>Bu kategoriyada mahsulot yoq</p></div>`;
+    return;
+  }
+  grid.innerHTML = '';
+  items.forEach(item => {
+    const owned = ownedItems.has(item.id);
+    const equipped = equippedItems[item.category] === item.id;
+    const canAfford = userCoins >= item.price;
+
+    const div = document.createElement('div');
+    div.className = `shop-item ${equipped ? 'equipped' : owned ? 'owned' : ''}`;
+
+    let actionBtn = '';
+    if (equipped) {
+      actionBtn = `<div class="btn-equipped">✓ Taqilgan</div>`;
+    } else if (owned) {
+      actionBtn = `<button class="btn-equip" onclick="equipItem('${item.id}','${item.category}')">Taqish</button>`;
+    } else {
+      actionBtn = `<button class="btn-buy" ${canAfford?'':'disabled'} onclick="openBuyModal('${item.id}')">${canAfford?'Sotib olish':'Tanga yetarli emas'}</button>`;
+    }
+
+    div.innerHTML = `
+      ${item.isNew ? '<span class="item-badge new">Yangi</span>' : ''}
+      ${item.isHot ? '<span class="item-badge hot">🔥 Hot</span>' : ''}
+      <div class="item-emoji">${item.emoji || '🎁'}</div>
+      <div class="item-name">${item.name}</div>
+      <div class="item-desc">${item.description || ''}</div>
+      <div class="item-price">🪙 ${item.price}</div>
+      ${actionBtn}
+    `;
+    grid.appendChild(div);
+  });
+}
+
+window.filterCategory = cat => {
+  document.querySelectorAll('.shop-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['all','badge','avatar','theme','boost'][i] === cat);
+  });
+  const filtered = cat === 'all' ? allItems : allItems.filter(i => i.category === cat);
+  renderItems(filtered);
+};
+
+// Buy modal
+window.openBuyModal = id => {
+  const item = allItems.find(i => i.id === id);
+  if (!item) return;
+  pendingItem = item;
+  document.getElementById('confirm-emoji').textContent = item.emoji || '🎁';
+  document.getElementById('confirm-name').textContent = item.name;
+  document.getElementById('confirm-desc').textContent = item.description || '';
+  document.getElementById('confirm-price').textContent = `🪙 ${item.price}`;
+  document.getElementById('confirm-balance').textContent = `🪙 ${userCoins}`;
+  document.getElementById('buy-modal').classList.add('open');
+};
+
+window.closeBuyModal = () => {
+  document.getElementById('buy-modal').classList.remove('open');
+  pendingItem = null;
+};
+
+window.confirmBuy = async () => {
+  if (!pendingItem || !currentUser) return;
+  if (userCoins < pendingItem.price) { toast('Tanga yetarli emas', true); return; }
+
+  const btn = document.querySelector('#buy-modal .btn-confirm');
+  btn.disabled = true; btn.textContent = 'Saqlanmoqda...';
+
+  try {
+    // Coin ayirish
+    await updateDoc(doc(db,'users',currentUser.uid), {
+      coins: increment(-pendingItem.price),
+      ownedItems: [...ownedItems, pendingItem.id]
+    });
+
+    // Xarid tarixi
+    await addDoc(collection(db,'users',currentUser.uid,'purchases'), {
+      itemId: pendingItem.id,
+      itemName: pendingItem.name,
+      itemEmoji: pendingItem.emoji || '🎁',
+      price: pendingItem.price,
+      purchasedAt: serverTimestamp()
+    });
+
+    userCoins -= pendingItem.price;
+    ownedItems.add(pendingItem.id);
+    document.getElementById('nav-coins').textContent = userCoins;
+    document.getElementById('balance-coins').textContent = userCoins;
+
+    toast(`${pendingItem.name} sotib olindi! 🎉`);
+    closeBuyModal();
+    renderItems(allItems);
+    await loadHistory();
+  } catch(e) {
+    toast('Xato: ' + e.message, true);
+  }
+  btn.disabled = false; btn.textContent = 'Sotib olish';
+};
+
+// Equip item
+window.equipItem = async (itemId, category) => {
+  try {
+    equippedItems[category] = itemId;
+    await updateDoc(doc(db,'users',currentUser.uid), { equippedItems });
+    toast('Taqildi!');
+    renderItems(allItems);
+  } catch(e) {
+    toast('Xato: ' + e.message, true);
+  }
+};
+
+// History
+async function loadHistory() {
+  const snap = await getDocs(query(
+    collection(db,'users',currentUser.uid,'purchases'),
+    orderBy('purchasedAt','desc'), limit(10)
+  ));
+  const list = document.getElementById('history-list');
+  if (snap.empty) {
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted)">Hali xarid qilinmagan</div>';
+    return;
+  }
+  list.innerHTML = '';
+  snap.forEach(d => {
+    const dat = d.data();
+    const date = dat.purchasedAt?.toDate?.()?.toLocaleDateString('uz') || '';
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `
+      <div class="history-emoji">${dat.itemEmoji||'🎁'}</div>
+      <div class="history-info">
+        <div class="history-name">${dat.itemName}</div>
+        <div class="history-date">${date}</div>
+      </div>
+      <div class="history-price">-🪙 ${dat.price}</div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function toast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr?' error':'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+document.getElementById('buy-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('buy-modal')) closeBuyModal();
+});
+</script>
+</body>
+</html>

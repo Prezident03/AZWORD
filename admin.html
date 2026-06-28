@@ -147,6 +147,7 @@
     <button class="nav-item" onclick="showPage('announce')"><span class="nav-icon">📢</span> Elonglar</button>
     <button class="nav-item" onclick="showPage('leaderboard')"><span class="nav-icon">🏆</span> Leaderboard</button>
     <div class="sb-label">Tizim</div>
+    <button class="nav-item" onclick="showPage('shop')"><span class="nav-icon">🛒</span> Shop</button>
     <button class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Sozlamalar</button>
     <button class="nav-item" onclick="window.location.href='dashboard.html'"><span class="nav-icon">🏠</span> Saytga qaytish</button>
   </nav>
@@ -299,6 +300,19 @@
             </tr></thead>
             <tbody id="ai-words-tbody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div id="page-shop" style="display:none">
+      <div class="sec" style="margin-bottom:18px">
+        <div class="sec-head">
+          <h3>🛒 Shop mahsulotlari</h3>
+          <button class="btn-add" onclick="openShopItemModal()" style="padding:8px 16px;font-size:0.85rem">+ Yangi mahsulot</button>
+        </div>
+        <div style="padding:20px">
+          <div id="shop-admin-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
         </div>
       </div>
     </div>
@@ -459,6 +473,49 @@
   </div>
 </div>
 
+<!-- Shop Item Modal -->
+<div class="modal-overlay" id="shop-item-modal">
+  <div class="modal">
+    <h3 id="shop-modal-title">Yangi mahsulot</h3>
+    <input type="hidden" id="shop-item-id"/>
+    <div class="form-group">
+      <label>Nomi</label>
+      <input type="text" id="si-name" placeholder="VIP Badge"/>
+    </div>
+    <div class="form-group">
+      <label>Emoji</label>
+      <input type="text" id="si-emoji" placeholder="🏅" maxlength="2"/>
+    </div>
+    <div class="form-group">
+      <label>Tavsif</label>
+      <input type="text" id="si-desc" placeholder="Maxsus foydalanuvchi badge"/>
+    </div>
+    <div class="form-group">
+      <label>Kategoriya</label>
+      <select id="si-cat" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none">
+        <option value="badge">Badge</option>
+        <option value="avatar">Avatar</option>
+        <option value="theme">Tema</option>
+        <option value="boost">Boost</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Narxi (coin)</label>
+      <input type="number" id="si-price" placeholder="500" min="1"/>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="si-new"/> Yangi
+        <input type="checkbox" id="si-hot" style="margin-left:10px"/> Hot
+      </label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeShopItemModal()">Bekor</button>
+      <button class="btn-confirm" onclick="saveShopItem()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -585,6 +642,88 @@ window.publishWords = async () => {
     document.getElementById('ai-topic').value='';
   } catch(e) { toast('Xato: '+e.message,true); }
   if (btn) { btn.disabled=false; btn.textContent='Publish'; }
+};
+
+// SHOP ADMIN
+async function loadShopAdmin() {
+  const grid = document.getElementById('shop-admin-grid');
+  grid.innerHTML = '<div style="padding:20px;color:var(--text-muted)">Yuklanmoqda...</div>';
+  const snap = await getDocs(collection(db,'shop'));
+  const items = [];
+  snap.forEach(d => items.push({id:d.id,...d.data()}));
+  items.sort((a,b) => (a.price||0)-(b.price||0));
+  if (!items.length) {
+    grid.innerHTML = '<div style="padding:20px;color:var(--text-muted)">Mahsulot yoq. Yangi qoshing!</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg-deep);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;position:relative';
+    card.innerHTML = `
+      <div style="position:absolute;top:10px;right:10px;display:flex;gap:5px">
+        <button class="abtn" onclick="editShopItem('${item.id}')" title="Tahrirlash">✏️</button>
+        <button class="abtn red" onclick="deleteShopItem('${item.id}')" title="Ochirish">🗑</button>
+      </div>
+      <div style="font-size:2rem;margin-bottom:8px">${item.emoji||'🎁'}</div>
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${item.name}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">${item.description||''}</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399">🪙 ${item.price}</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px">${item.category||''} ${item.isNew?'• Yangi':''} ${item.isHot?'• Hot':''}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.openShopItemModal = (item=null) => {
+  document.getElementById('shop-modal-title').textContent = item ? 'Tahrirlash' : 'Yangi mahsulot';
+  document.getElementById('shop-item-id').value = item?.id || '';
+  document.getElementById('si-name').value = item?.name || '';
+  document.getElementById('si-emoji').value = item?.emoji || '';
+  document.getElementById('si-desc').value = item?.description || '';
+  document.getElementById('si-cat').value = item?.category || 'badge';
+  document.getElementById('si-price').value = item?.price || '';
+  document.getElementById('si-new').checked = item?.isNew || false;
+  document.getElementById('si-hot').checked = item?.isHot || false;
+  document.getElementById('shop-item-modal').classList.add('open');
+  setTimeout(() => document.getElementById('si-name').focus(), 100);
+};
+
+window.closeShopItemModal = () => {
+  document.getElementById('shop-item-modal').classList.remove('open');
+};
+
+window.editShopItem = async id => {
+  const snap = await getDoc(doc(db,'shop',id));
+  if (snap.exists()) openShopItemModal({id,...snap.data()});
+};
+
+window.saveShopItem = async () => {
+  const id = document.getElementById('shop-item-id').value;
+  const name = document.getElementById('si-name').value.trim();
+  const emoji = document.getElementById('si-emoji').value.trim() || '🎁';
+  const description = document.getElementById('si-desc').value.trim();
+  const category = document.getElementById('si-cat').value;
+  const price = parseInt(document.getElementById('si-price').value) || 0;
+  const isNew = document.getElementById('si-new').checked;
+  const isHot = document.getElementById('si-hot').checked;
+  if (!name || !price) { toast('Nom va narx kiriting', true); return; }
+  const data = { name, emoji, description, category, price, isNew, isHot };
+  if (id) {
+    await updateDoc(doc(db,'shop',id), data);
+  } else {
+    await addDoc(collection(db,'shop'), data);
+  }
+  toast('Saqlandi');
+  closeShopItemModal();
+  await loadShopAdmin();
+};
+
+window.deleteShopItem = async id => {
+  if (!confirm('Mahsulotni ochirasizmi?')) return;
+  await deleteDoc(doc(db,'shop',id));
+  toast('Ochirildi');
+  await loadShopAdmin();
 };
 
 // SETTINGS
@@ -1051,9 +1190,10 @@ const PAGE_TITLES = {
   aigenerator: 'AI Word Generator',
   announce: 'Elonglar',
   leaderboard: 'Leaderboard',
+  shop: 'Shop boshqaruvi',
   settings: 'Sozlamalar'
 };
-const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboard','settings'];
+const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboard','shop','settings'];
 
 window.showPage = page => {
   PAGES.forEach(p => { document.getElementById('page-'+p).style.display = p===page?'block':'none'; });
