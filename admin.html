@@ -124,6 +124,10 @@
     .cbtn.sub:hover{background:rgba(248,113,113,0.08)}
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:999}
     .modal-overlay.open{display:flex}
+    /* Settings toggle */
+    #maintenance-toggle:checked + #toggle-track { background: var(--danger); }
+    #maintenance-toggle:checked ~ #toggle-thumb { transform: translateX(20px); }
+
     @media(max-width:768px){.sidebar{transform:translateX(-100%)}.admin-main{margin-left:0}.charts-grid{grid-template-columns:1fr}.tbl-head,.tbl-row{grid-template-columns:2fr 1fr 1fr 1fr}}
   </style>
 </head>
@@ -139,10 +143,10 @@
     <button class="nav-item" onclick="showPage('users')"><span class="nav-icon">👥</span> Foydalanuvchilar <span class="nb" id="nb-users">0</span></button>
     <div class="sb-label">Kontent</div>
     <button class="nav-item" onclick="showPage('folders')"><span class="nav-icon">📚</span> Umumiy bolimlar</button>
-    <button class="nav-item" onclick="showPage('aigenerator')"><span class="nav-icon">🤖</span> AI Generator</button>
     <button class="nav-item" onclick="showPage('announce')"><span class="nav-icon">📢</span> Elonglar</button>
     <button class="nav-item" onclick="showPage('leaderboard')"><span class="nav-icon">🏆</span> Leaderboard</button>
     <div class="sb-label">Tizim</div>
+    <button class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Sozlamalar</button>
     <button class="nav-item" onclick="window.location.href='dashboard.html'"><span class="nav-icon">🏠</span> Saytga qaytish</button>
   </nav>
   <div class="sb-foot">
@@ -210,82 +214,6 @@
       </div>
     </div>
 
-    <!-- AI GENERATOR -->
-    <div id="page-aigenerator" style="display:none">
-      <div class="sec" style="margin-bottom:20px">
-        <div class="sec-head"><h3>🤖 AI Word Generator</h3></div>
-        <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:14px;align-items:end">
-          <div>
-            <label style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">Mavzu (Topic)</label>
-            <input type="text" id="ai-topic" placeholder="Medical, Business, Nature..." style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none"/>
-          </div>
-          <div>
-            <label style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">Daraja (Level)</label>
-            <select id="ai-level" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none">
-              <option value="A1">A1 - Boshlangich</option>
-              <option value="A2">A2 - Elementary</option>
-              <option value="B1">B1 - Intermediate</option>
-              <option value="B2" selected>B2 - Upper-Intermediate</option>
-              <option value="C1">C1 - Advanced</option>
-              <option value="C2">C2 - Mastery</option>
-            </select>
-          </div>
-          <div>
-            <label style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">Son</label>
-            <select id="ai-count" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none">
-              <option value="20">20 ta</option>
-              <option value="50">50 ta</option>
-              <option value="100" selected>100 ta</option>
-            </select>
-          </div>
-          <button class="btn-add" id="ai-gen-btn" onclick="generateWords()" style="padding:11px 24px;white-space:nowrap">
-            ✨ Generate
-          </button>
-        </div>
-
-        <!-- Progress -->
-        <div id="ai-progress" style="display:none;padding:0 20px 20px">
-          <div style="background:var(--bg-deep);border-radius:10px;overflow:hidden;height:6px;margin-bottom:8px">
-            <div id="ai-progress-bar" style="height:100%;background:linear-gradient(90deg,var(--purple-main),var(--purple-light));width:0%;transition:width 0.3s"></div>
-          </div>
-          <div id="ai-progress-text" style="font-size:0.82rem;color:var(--text-muted);text-align:center"></div>
-        </div>
-      </div>
-
-      <!-- Preview -->
-      <div class="sec" id="ai-preview-sec" style="display:none">
-        <div class="sec-head">
-          <h3>📋 Natija: <span id="ai-preview-count">0</span> ta soz</h3>
-          <div style="display:flex;gap:10px">
-            <div>
-              <label style="font-size:0.78rem;color:var(--text-muted)">Bolimni tanlang:</label>
-              <select id="ai-target-folder" style="margin-left:8px;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none"></select>
-            </div>
-            <button class="btn-add" onclick="publishWords()" style="padding:8px 18px">
-              📤 Publish
-            </button>
-          </div>
-        </div>
-
-        <!-- Table -->
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:0.85rem" id="ai-words-table">
-            <thead>
-              <tr style="border-bottom:1px solid var(--border)">
-                <th style="padding:10px 16px;text-align:left;font-size:0.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase;white-space:nowrap">#</th>
-                <th style="padding:10px 16px;text-align:left;font-size:0.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase">English</th>
-                <th style="padding:10px 16px;text-align:left;font-size:0.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase">Uzbekcha</th>
-                <th style="padding:10px 16px;text-align:left;font-size:0.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase">Example</th>
-                <th style="padding:10px 16px;text-align:left;font-size:0.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase">Level</th>
-                <th style="padding:10px 16px;text-align:center;font-size:0.72rem;font-weight:700;color:var(--text-dim);text-transform:uppercase">Olib tashlash</th>
-              </tr>
-            </thead>
-            <tbody id="ai-words-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
     <!-- ANNOUNCE -->
     <div id="page-announce" style="display:none">
       <div class="sec">
@@ -314,6 +242,75 @@
         <div class="tbl-head" style="grid-template-columns:60px 2fr 1fr 1fr 1fr 1fr"><span>#</span><span>Foydalanuvchi</span><span>Stars</span><span>Coins</span><span>Haftalik</span><span>Amal</span></div>
         <div id="lb-list"></div>
       </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="page-settings" style="display:none">
+
+      <!-- Umumiy sozlamalar -->
+      <div class="sec" style="margin-bottom:18px">
+        <div class="sec-head"><h3>🏷️ Umumiy sozlamalar</h3></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div>
+            <label style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">Ilova nomi</label>
+            <input type="text" id="set-appname" placeholder="AzWord" style="width:100%;max-width:320px;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">Tavsif</label>
+            <input type="text" id="set-desc" placeholder="Ingliz sozlarini oson ozlashtirib boring" style="width:100%;max-width:480px;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;font-weight:600">Banner xabari (dashboard tepasida chiqadi)</label>
+            <input type="text" id="set-banner" placeholder="Yangi IELTS bolimi chiqdi!" style="width:100%;max-width:480px;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none"/>
+          </div>
+          <button class="btn-confirm" onclick="saveGeneralSettings()" style="width:fit-content;padding:10px 24px">Saqlash</button>
+        </div>
+      </div>
+
+      <!-- Maintenance mode -->
+      <div class="sec" style="margin-bottom:18px">
+        <div class="sec-head">
+          <h3>🔧 Maintenance Mode</h3>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <span style="font-size:0.85rem;color:var(--text-muted)">Yoqish</span>
+            <div style="position:relative;width:44px;height:24px" onclick="toggleMaintenance()">
+              <input type="checkbox" id="maintenance-toggle" style="opacity:0;width:0;height:0;position:absolute"/>
+              <div id="toggle-track" style="position:absolute;inset:0;background:var(--border);border-radius:99px;transition:0.3s"></div>
+              <div id="toggle-thumb" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:0.3s"></div>
+            </div>
+          </label>
+        </div>
+        <div style="padding:16px 20px">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px">Maintenance mode yoqilganda foydalanuvchilar saytga kira olmaydi. Faqat admin kirishi mumkin.</div>
+          <div id="maintenance-status" style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:0.85rem;font-weight:600;background:rgba(52,211,153,0.1);color:var(--success)">
+            🟢 Sayt ishlayapti
+          </div>
+        </div>
+      </div>
+
+      <!-- Adminlar -->
+      <div class="sec" style="margin-bottom:18px">
+        <div class="sec-head"><h3>👑 Adminlar</h3></div>
+        <div style="padding:20px">
+          <div id="admins-list" style="margin-bottom:14px"></div>
+          <div style="display:flex;gap:10px;max-width:400px">
+            <input type="email" id="new-admin-email" placeholder="admin@email.com" style="flex:1;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.875rem;outline:none"/>
+            <button class="btn-confirm" onclick="addAdmin()" style="padding:9px 18px;white-space:nowrap">+ Qoshish</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistika reset -->
+      <div class="sec">
+        <div class="sec-head"><h3>⚠️ Xavfli zona</h3></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:4px">Bu amallar qaytarib bo'lmaydi. Ehtiyot bo'ling!</div>
+          <button class="btn-cancel" onclick="resetAllWeekly()" style="width:fit-content;border-color:rgba(251,191,36,0.4);color:#fbbf24;padding:9px 18px">
+            🔄 Barcha haftalik starlarni reset qilish
+          </button>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -425,6 +422,98 @@ onAuthStateChanged(auth, async user => {
 });
 
 window.doLogout = async () => { await signOut(auth); location.href = 'index.html'; };
+
+// SETTINGS
+async function loadSettings() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'main'));
+    const data = snap.exists() ? snap.data() : {};
+
+    document.getElementById('set-appname').value = data.appName || 'AzWord';
+    document.getElementById('set-desc').value = data.description || '';
+    document.getElementById('set-banner').value = data.banner || '';
+
+    const isMaintenance = data.maintenance || false;
+    setMaintenanceUI(isMaintenance);
+
+    loadAdminsList(data.admins || ['abdurasul1406z@gmail.com']);
+  } catch(e) {
+    toast('Sozlamalar yuklanmadi', true);
+  }
+}
+
+function setMaintenanceUI(on) {
+  const track = document.getElementById('toggle-track');
+  const thumb = document.getElementById('toggle-thumb');
+  const status = document.getElementById('maintenance-status');
+  const chk = document.getElementById('maintenance-toggle');
+  if (!track) return;
+  chk.checked = on;
+  track.style.background = on ? 'var(--danger)' : 'var(--border)';
+  thumb.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
+  status.style.background = on ? 'rgba(248,113,113,0.1)' : 'rgba(52,211,153,0.1)';
+  status.style.color = on ? 'var(--danger)' : 'var(--success)';
+  status.textContent = on ? 'Sayt yopiq (Maintenance)' : 'Sayt ishlayapti';
+}
+
+window.toggleMaintenance = async () => {
+  const chk = document.getElementById('maintenance-toggle');
+  const newVal = !chk.checked;
+  if (newVal && !confirm('Saytni vaqtincha yopasizmi?')) return;
+  await setDoc(doc(db,'settings','main'), { maintenance: newVal }, { merge: true });
+  setMaintenanceUI(newVal);
+  toast(newVal ? 'Maintenance mode yoqildi' : 'Sayt qayta ochildi');
+};
+
+window.saveGeneralSettings = async () => {
+  const appName = document.getElementById('set-appname').value.trim() || 'AzWord';
+  const description = document.getElementById('set-desc').value.trim();
+  const banner = document.getElementById('set-banner').value.trim();
+  await setDoc(doc(db,'settings','main'), { appName, description, banner }, { merge: true });
+  toast('Saqlandi');
+};
+
+function loadAdminsList(admins) {
+  const el = document.getElementById('admins-list');
+  if (!el) return;
+  el.innerHTML = admins.map(email => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-deep);border-radius:8px;margin-bottom:6px;font-size:0.875rem">
+      <span>👑 ${email}</span>
+      ${email !== 'abdurasul1406z@gmail.com' ? `<button class="abtn red" onclick="removeAdmin('${email}')">🗑</button>` : '<span style="font-size:0.72rem;color:var(--text-dim)">Super admin</span>'}
+    </div>
+  `).join('');
+}
+
+window.addAdmin = async () => {
+  const email = document.getElementById('new-admin-email').value.trim();
+  if (!email) return toast('Email kiriting', true);
+  const snap = await getDoc(doc(db,'settings','main'));
+  const admins = snap.exists() ? (snap.data().admins || []) : ['abdurasul1406z@gmail.com'];
+  if (admins.includes(email)) return toast('Bu email allaqachon admin', true);
+  admins.push(email);
+  await setDoc(doc(db,'settings','main'), { admins }, { merge: true });
+  document.getElementById('new-admin-email').value = '';
+  loadAdminsList(admins);
+  toast('Admin qoshildi');
+};
+
+window.removeAdmin = async email => {
+  if (!confirm('Bu adminni olib tashlamoqchimisiz?')) return;
+  const snap = await getDoc(doc(db,'settings','main'));
+  const admins = (snap.data()?.admins || []).filter(e => e !== email);
+  await setDoc(doc(db,'settings','main'), { admins }, { merge: true });
+  loadAdminsList(admins);
+  toast('Admin olib tashlandi');
+};
+
+window.resetAllWeekly = async () => {
+  if (!confirm('Barcha foydalanuvchilarning haftalik starlarini nolga tushirasizmi?')) return;
+  const snap = await getDocs(collection(db,'users'));
+  for (const d of snap.docs) {
+    await updateDoc(doc(db,'users',d.id), { weeklyStars: 0 });
+  }
+  toast('Barcha haftalik starlar reset qilindi');
+};
 
 // LOAD
 async function loadAll() {
@@ -790,216 +879,21 @@ window.delAnn = async id => {
   toast('Ochirildi'); await loadAnns();
 };
 
-// AI GENERATOR
-let aiWords = [];
-
-async function loadFoldersForAI() {
-  const sel = document.getElementById('ai-target-folder');
-  if (!sel) return;
-  const snap = await getDocs(query(collection(db,'folders'),where('isAdmin','==',true)));
-  sel.innerHTML = '';
-  snap.forEach(d => {
-    const opt = document.createElement('option');
-    opt.value = d.id;
-    opt.textContent = (d.data().emoji||'') + ' ' + d.data().name;
-    sel.appendChild(opt);
-  });
-}
-
-window.generateWords = async () => {
-  const topic = document.getElementById('ai-topic').value.trim();
-  const level = document.getElementById('ai-level').value;
-  const count = document.getElementById('ai-count').value;
-
-  if (!topic) { toast('Mavzu kiriting', true); return; }
-
-  const btn = document.getElementById('ai-gen-btn');
-  btn.disabled = true;
-  btn.textContent = 'Generatsiya...';
-
-  const progress = document.getElementById('ai-progress');
-  const progressBar = document.getElementById('ai-progress-bar');
-  const progressText = document.getElementById('ai-progress-text');
-  const previewSec = document.getElementById('ai-preview-sec');
-
-  progress.style.display = 'block';
-  previewSec.style.display = 'none';
-  aiWords = [];
-
-  progressBar.style.width = '10%';
-  progressText.textContent = "AI generatsiya qilmoqda...";
-
-  try {
-    const prompt = `Generate exactly ${count} English vocabulary words about the topic "${topic}" at level ${level}.
-Return ONLY a valid JSON array, no other text, no markdown, no explanation.
-Each object must have these fields:
-- "en": English word (lowercase)
-- "uz": Uzbek translation
-- "example": One simple English example sentence using the word
-- "difficulty": "${level}"
-- "category": "${topic}"
-
-Example format:
-[{"en":"cardiac","uz":"yurak","example":"The cardiac surgeon saved his life.","difficulty":"B2","category":"Medical"}]
-
-Return exactly ${count} words as a JSON array:`;
-
-    progressBar.style.width = '30%';
-
-    // Groq API - CORS muammosi yoq, bepul va tez
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer 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"
-      },
-      body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        max_tokens: 8000,
-        temperature: 0.7,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-
-    progressBar.style.width = '70%';
-    progressText.textContent = 'Javob tahlil qilinmoqda...';
-
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'API xato');
-    }
-
-    const data = await response.json();
-    const text = data.choices[0].message.content.trim();
-
-    // JSON parse
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch(e) {
-      const match = text.match(/\[[\s\S]*\]/);
-      if (match) {
-        parsed = JSON.parse(match[0]);
-      } else {
-        throw new Error('JSON parse xato');
-      }
-    }
-
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      throw new Error('Natija yoq');
-    }
-
-    aiWords = parsed;
-    progressBar.style.width = '100%';
-    progressText.textContent = parsed.length + ' ta soz tayyor!';
-
-    setTimeout(() => {
-      progress.style.display = 'none';
-      renderAIPreview(parsed);
-      previewSec.style.display = 'block';
-    }, 800);
-
-  } catch(e) {
-    toast('Xato: ' + e.message, true);
-    progressText.textContent = 'Xato yuz berdi';
-    progressBar.style.width = '0%';
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'Generate';
-};
-
-function renderAIPreview(words) {
-  document.getElementById('ai-preview-count').textContent = words.length;
-  const tbody = document.getElementById('ai-words-tbody');
-  tbody.innerHTML = '';
-  words.forEach((w, i) => {
-    const tr = document.createElement('tr');
-    tr.style.borderBottom = '1px solid var(--border)';
-    tr.id = 'ai-row-' + i;
-    tr.innerHTML = `
-      <td style="padding:10px 16px;color:var(--text-dim)">${i+1}</td>
-      <td style="padding:10px 16px;font-family:'Space Grotesk',sans-serif;font-weight:600">${w.en}</td>
-      <td style="padding:10px 16px;color:var(--text-muted)">${w.uz}</td>
-      <td style="padding:10px 16px;color:var(--text-dim);font-style:italic;font-size:0.8rem;max-width:200px">${w.example||''}</td>
-      <td style="padding:10px 16px"><span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:var(--purple-light);border-radius:99px;padding:2px 8px;font-size:0.72rem;font-weight:700">${w.difficulty||''}</span></td>
-      <td style="padding:10px 16px;text-align:center">
-        <button class="abtn red" onclick="removeAIWord(${i})" title="Olib tashlash">🗑</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-window.removeAIWord = idx => {
-  aiWords.splice(idx, 1);
-  renderAIPreview(aiWords);
-};
-
-window.publishWords = async () => {
-  if (!aiWords.length) { toast('Soz yoq', true); return; }
-  const folderId = document.getElementById('ai-target-folder').value;
-  if (!folderId) { toast('Bolim tanlang', true); return; }
-
-  const btn = document.querySelector('#ai-preview-sec .btn-add');
-  if (btn) { btn.disabled = true; btn.textContent = 'Saqlanmoqda...'; }
-
-  try {
-    // Mavjud sozlarni tekshiramiz
-    const snap = await getDocs(collection(db,'folders',folderId,'words'));
-    const existing = new Set();
-    snap.forEach(d => existing.add(d.data().en.toLowerCase()));
-
-    const newWords = aiWords.filter(w => !existing.has(w.en.toLowerCase()));
-    const skipped = aiWords.length - newWords.length;
-
-    for (const w of newWords) {
-      await addDoc(collection(db,'folders',folderId,'words'), {
-        en: w.en.toLowerCase(),
-        uz: w.uz,
-        example: w.example || '',
-        difficulty: w.difficulty || '',
-        category: w.category || '',
-        createdAt: serverTimestamp()
-      });
-    }
-
-    if (newWords.length > 0) {
-      await updateDoc(doc(db,'folders',folderId), { wordCount: increment(newWords.length) });
-    }
-
-    const msg = newWords.length + ' ta soz saqlandi' + (skipped > 0 ? ', ' + skipped + ' ta takror' : '');
-    toast(msg);
-
-    // Reset
-    aiWords = [];
-    document.getElementById('ai-preview-sec').style.display = 'none';
-    document.getElementById('ai-topic').value = '';
-
-  } catch(e) {
-    toast('Xato: ' + e.message, true);
-  }
-
-  if (btn) { btn.disabled = false; btn.textContent = 'Publish'; }
-};
-
 // TABS & PAGES
 const PAGE_TITLES = {
   dashboard: 'Dashboard',
   users: 'Foydalanuvchilar',
   folders: 'Umumiy bolimlar',
-  aigenerator: 'AI Word Generator',
   announce: 'Elonglar',
   leaderboard: 'Leaderboard'
 };
-const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboard'];
+const PAGES = ['dashboard','users','folders','announce','leaderboard'];
 
 window.showPage = page => {
   PAGES.forEach(p => { document.getElementById('page-'+p).style.display = p===page?'block':'none'; });
   document.querySelectorAll('.nav-item').forEach((b,i)=>{ b.classList.toggle('active', PAGES[i]===page); });
   document.getElementById('topbar-title').textContent = PAGE_TITLES[page] || page;
   if (page==='folders') loadAdminFolders();
-  if (page==='aigenerator') loadFoldersForAI();
   if (page==='announce') loadAnns();
 };
 
