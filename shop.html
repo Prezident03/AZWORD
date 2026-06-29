@@ -142,6 +142,131 @@
     .history-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
     .history-price { color: var(--danger); font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
 
+    /* Premium AI card */
+    .ai-premium-card {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,132,252,0.1));
+      border: 2px solid rgba(124,58,237,0.5);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-premium-card::before {
+      content: "";
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(124,58,237,0.15), transparent 70%);
+      pointer-events: none;
+    }
+    .ai-premium-icon {
+      font-size: 4rem;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 20px rgba(124,58,237,0.5));
+    }
+    .ai-premium-info { flex: 1; }
+    .ai-premium-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(251,191,36,0.15);
+      border: 1px solid rgba(251,191,36,0.4);
+      color: #fbbf24;
+      border-radius: 99px;
+      padding: 3px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .ai-premium-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #9d5cf6, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .ai-premium-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+    .ai-premium-features {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .ai-feature {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+    .ai-feature span { color: var(--success); }
+    .ai-premium-buy {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ai-price-tag {
+      display: flex;
+      flex-direction: column;
+    }
+    .ai-price-main {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #34d399;
+      line-height: 1;
+    }
+    .ai-price-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+    .btn-buy-premium {
+      padding: 12px 28px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+    }
+    .btn-buy-premium:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(124,58,237,0.5); }
+    .btn-buy-premium:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .ai-owned-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: rgba(52,211,153,0.1);
+      border: 1.5px solid rgba(52,211,153,0.3);
+      border-radius: 12px;
+      color: var(--success);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .ai-uses-left {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--success);
+    }
+
     /* Empty */
     .shop-empty { text-align: center; padding: 48px 24px; color: var(--text-muted); }
     .shop-empty .emoji { font-size: 2.5rem; margin-bottom: 12px; }
@@ -193,6 +318,12 @@
     <button class="shop-tab" onclick="filterCategory('boost')">⚡ Boost</button>
   </div>
 
+  <!-- AI Premium Card -->
+  <div id="ai-premium-section" style="margin-bottom:28px">
+    <div class="section-label">⚡ Premium xizmatlar</div>
+    <div id="ai-premium-card-wrap"></div>
+  </div>
+
   <!-- Items -->
   <div class="shop-grid" id="shop-grid">
     <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Yuklanmoqda...</div>
@@ -202,6 +333,30 @@
   <div class="section-label">📋 Xaridlar tarixi</div>
   <div id="history-list">
     <div style="text-align:center;padding:24px;color:var(--text-muted)">Yuklanmoqda...</div>
+  </div>
+</div>
+
+<!-- AI Buy Modal -->
+<div class="modal-overlay" id="ai-buy-modal">
+  <div class="modal">
+    <h3>🤖 AI Word Generator</h3>
+    <div style="background:var(--bg-deep);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+      <div style="font-size:3rem;margin-bottom:8px">🤖</div>
+      <div style="font-weight:700;margin-bottom:4px">AI Word Generator</div>
+      <div style="color:var(--text-muted);font-size:0.85rem">20 marta ishlatish huquqi</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:8px">
+      <span style="color:var(--text-muted)">Narxi:</span>
+      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif">🪙 100 coin</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:16px">
+      <span style="color:var(--text-muted)">Balansingiz:</span>
+      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif" id="ai-confirm-balance">🪙 0</span>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAIBuyModal()">Bekor</button>
+      <button class="btn-confirm" onclick="buyAIGenerator()">Sotib olish</button>
+    </div>
   </div>
 </div>
 
@@ -261,6 +416,7 @@ onAuthStateChanged(auth, async user => {
       document.getElementById('balance-coins').textContent = userCoins;
       ownedItems = new Set(d.ownedItems || []);
       equippedItems = d.equippedItems || {};
+      window._aiUses = d.aiGeneratorUses || 0;
       if (d.photoBase64) {
         document.getElementById('nav-avatar').innerHTML = `<img src="${d.photoBase64}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`;
       } else {
@@ -273,11 +429,80 @@ onAuthStateChanged(auth, async user => {
   await loadHistory();
 });
 
+const AI_GEN_ITEM_ID = 'ai-generator-premium';
+const AI_GEN_PRICE = 100;
+const AI_GEN_USES = 20;
+
 async function loadShopItems() {
   const snap = await getDocs(query(collection(db,'shop'), orderBy('price','asc')));
   allItems = [];
   snap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
   renderItems(allItems);
+  renderAICard();
+}
+
+function renderAICard() {
+  const wrap = document.getElementById('ai-premium-card-wrap');
+  if (!wrap) return;
+
+  const owned = ownedItems.has(AI_GEN_ITEM_ID);
+  // aiGeneratorUses ni userdan olamiz
+  const uses = window._aiUses || 0;
+  const canAfford = userCoins >= AI_GEN_PRICE;
+
+  let actionHtml = '';
+  if (owned && uses > 0) {
+    actionHtml = `
+      <div class="ai-owned-badge">
+        <span>✅ Faol</span>
+        <span class="ai-uses-left">${uses} marta</span>
+        <span style="font-size:0.78rem;color:var(--text-muted)">qoldi</span>
+      </div>
+      <button class="btn-buy-premium" onclick="openAIBuyModal()" style="background:transparent;border:1.5px solid rgba(124,58,237,0.4);color:var(--purple-light);box-shadow:none">
+        + Yana sotib olish
+      </button>`;
+  } else if (owned && uses === 0) {
+    actionHtml = `
+      <div class="ai-owned-badge" style="background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.3);color:var(--danger)">
+        ⚠️ Marta tugadi
+      </div>
+      <button class="btn-buy-premium" onclick="openAIBuyModal()">
+        🪙 100 — Yana sotib olish
+      </button>`;
+  } else {
+    actionHtml = `
+      <div class="ai-price-tag">
+        <div class="ai-price-main">🪙 100</div>
+        <div class="ai-price-sub">20 marta ishlatish</div>
+      </div>
+      <button class="btn-buy-premium" ${canAfford?'':'disabled'} onclick="openAIBuyModal()">
+        ${canAfford ? 'Sotib olish' : 'Tanga yetarli emas'}
+      </button>`;
+  }
+
+  wrap.innerHTML = `
+    <div class="ai-premium-card">
+      <div class="ai-premium-icon">🤖</div>
+      <div class="ai-premium-info">
+        <div class="ai-premium-badge">🔥 Premium xizmat — Yangi!</div>
+        <div class="ai-premium-title">AI Word Generator</div>
+        <div class="ai-premium-desc">
+          Istalgan mavzuda ingliz lugat so'zlarini AI yordamida avtomatik yarating.
+          Tarjimasi, misol gaplari va daraja darajasi bilan birga!
+        </div>
+        <div class="ai-premium-features">
+          <div class="ai-feature"><span>✓</span> Istalgan mavzu</div>
+          <div class="ai-feature"><span>✓</span> 10-50 ta so'z</div>
+          <div class="ai-feature"><span>✓</span> Tarjima + misol gap</div>
+          <div class="ai-feature"><span>✓</span> A1-C2 daraja</div>
+          <div class="ai-feature"><span>✓</span> Bir zumda tayyor</div>
+        </div>
+        <div class="ai-premium-buy">
+          ${actionHtml}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderItems(items) {
@@ -316,6 +541,45 @@ function renderItems(items) {
     grid.appendChild(div);
   });
 }
+
+// AI Generator buy
+window.openAIBuyModal = () => {
+  document.getElementById('ai-confirm-balance').textContent = `🪙 ${userCoins}`;
+  document.getElementById('ai-buy-modal').classList.add('open');
+};
+window.closeAIBuyModal = () => {
+  document.getElementById('ai-buy-modal').classList.remove('open');
+};
+window.buyAIGenerator = async () => {
+  if (userCoins < AI_GEN_PRICE) { toast('Tanga yetarli emas', true); return; }
+  const btn = document.querySelector('#ai-buy-modal .btn-confirm');
+  if (btn) { btn.disabled=true; btn.textContent='...'; }
+  try {
+    const newUses = (window._aiUses || 0) + AI_GEN_USES;
+    await updateDoc(doc(db,'users',currentUser.uid), {
+      coins: increment(-AI_GEN_PRICE),
+      aiGeneratorUses: newUses,
+      ownedItems: [...ownedItems, AI_GEN_ITEM_ID]
+    });
+    await addDoc(collection(db,'users',currentUser.uid,'purchases'), {
+      itemId: AI_GEN_ITEM_ID,
+      itemName: 'AI Word Generator (20 marta)',
+      itemEmoji: '🤖',
+      price: AI_GEN_PRICE,
+      purchasedAt: serverTimestamp()
+    });
+    userCoins -= AI_GEN_PRICE;
+    window._aiUses = newUses;
+    ownedItems.add(AI_GEN_ITEM_ID);
+    document.getElementById('nav-coins').textContent = userCoins;
+    document.getElementById('balance-coins').textContent = userCoins;
+    toast('AI Generator sotib olindi! 🤖🎉');
+    closeAIBuyModal();
+    renderAICard();
+    await loadHistory();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+  if (btn) { btn.disabled=false; btn.textContent='Sotib olish'; }
+};
 
 window.filterCategory = cat => {
   document.querySelectorAll('.shop-tab').forEach((t,i) => {
@@ -432,6 +696,9 @@ function toast(msg, isErr=false) {
 
 document.getElementById('buy-modal').addEventListener('click', e => {
   if (e.target === document.getElementById('buy-modal')) closeBuyModal();
+});
+document.getElementById('ai-buy-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('ai-buy-modal')) closeAIBuyModal();
 });
 </script>
 </body>
