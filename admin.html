@@ -707,16 +707,25 @@ window.saveShopItem = async () => {
   const price = parseInt(document.getElementById('si-price').value) || 0;
   const isNew = document.getElementById('si-new').checked;
   const isHot = document.getElementById('si-hot').checked;
-  if (!name || !price) { toast('Nom va narx kiriting', true); return; }
-  const data = { name, emoji, description, category, price, isNew, isHot };
-  if (id) {
-    await updateDoc(doc(db,'shop',id), data);
-  } else {
-    await addDoc(collection(db,'shop'), data);
+  if (!name) { toast('Nom kiriting', true); return; }
+  if (!price) { toast('Narx kiriting', true); return; }
+  const btn = document.querySelector('#shop-item-modal .btn-confirm');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+  try {
+    const data = { name, emoji, description, category, price, isNew, isHot };
+    if (id) {
+      await updateDoc(doc(db,'shop',id), data);
+    } else {
+      await addDoc(collection(db,'shop'), data);
+    }
+    toast('Saqlandi');
+    closeShopItemModal();
+    await loadShopAdmin();
+  } catch(e) {
+    toast('Xato: ' + e.message, true);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Saqlash'; }
   }
-  toast('Saqlandi');
-  closeShopItemModal();
-  await loadShopAdmin();
 };
 
 window.deleteShopItem = async id => {
