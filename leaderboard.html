@@ -310,7 +310,14 @@
     });
 
     async function loadAllUsers() {
-      const snap = await getDocs(collection(db, 'users'));
+      let snap;
+      try {
+        snap = await getDocs(collection(db, 'users'));
+      } catch(e) {
+        console.error('loadAllUsers xato:', e);
+        document.getElementById('lb-list').innerHTML = `<div class="lb-empty"><div class="emoji">⚠️</div><p>Xato: ${e.message}</p></div>`;
+        return;
+      }
       allUsers = [];
       const currentWeekKey = getWeekKey();
 
