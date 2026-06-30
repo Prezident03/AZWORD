@@ -434,9 +434,14 @@ const AI_GEN_PRICE = 100;
 const AI_GEN_USES = 20;
 
 async function loadShopItems() {
-  const snap = await getDocs(query(collection(db,'shop'), orderBy('price','asc')));
-  allItems = [];
-  snap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
+  try {
+    const snap = await getDocs(query(collection(db,'shop'), orderBy('price','asc')));
+    allItems = [];
+    snap.forEach(d => allItems.push({ id: d.id, ...d.data() }));
+  } catch(e) {
+    console.error('loadShopItems error:', e);
+    allItems = [];
+  }
   renderItems(allItems);
   renderAICard();
 }
@@ -659,11 +664,18 @@ window.equipItem = async (itemId, category) => {
 
 // History
 async function loadHistory() {
-  const snap = await getDocs(query(
-    collection(db,'users',currentUser.uid,'purchases'),
-    orderBy('purchasedAt','desc'), limit(10)
-  ));
   const list = document.getElementById('history-list');
+  let snap;
+  try {
+    snap = await getDocs(query(
+      collection(db,'users',currentUser.uid,'purchases'),
+      orderBy('purchasedAt','desc'), limit(10)
+    ));
+  } catch(e) {
+    console.error('loadHistory error:', e);
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted)">Hali xarid qilinmagan</div>';
+    return;
+  }
   if (snap.empty) {
     list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted)">Hali xarid qilinmagan</div>';
     return;
