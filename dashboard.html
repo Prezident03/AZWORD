@@ -111,6 +111,62 @@
     }
     .announce-close:hover { color: var(--text-muted); }
 
+    /* Quick actions grid */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .qa-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 16px 10px;
+      background: var(--bg-card);
+      border: 1.5px solid rgba(251,191,36,0.35);
+      color: #fbbf24;
+      border-radius: 14px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+    .qa-btn:hover { background: rgba(251,191,36,0.06); transform: translateY(-2px); }
+    .qa-btn .qa-icon { font-size: 1.4rem; line-height: 1; }
+    .qa-btn .qa-label { font-size: 0.78rem; font-weight: 600; text-align: center; }
+
+    .qa-btn.qa-shop { border-color: rgba(52,211,153,0.4); color: #34d399; }
+    .qa-btn.qa-shop:hover { background: rgba(52,211,153,0.06); }
+
+    .qa-btn.qa-ach { border-color: rgba(251,191,36,0.4); color: #fbbf24; }
+
+    .qa-btn.qa-add-mobile {
+      border-color: var(--purple-main);
+      color: var(--purple-light);
+      background: var(--purple-glow);
+      display: none;
+    }
+    .qa-btn.qa-add-mobile:hover { background: rgba(124,58,237,0.18); }
+
+    /* Mobile: header btn yashirin, quick-actions add ko'rinadi */
+    @media (max-width: 640px) {
+      .quick-actions { grid-template-columns: repeat(3, 1fr); }
+      #header-add-btn { display: none; }
+      .qa-btn.qa-add-mobile { display: flex; }
+      .qa-btn .qa-icon { font-size: 1.25rem; }
+      .qa-btn .qa-label { font-size: 0.7rem; }
+      .qa-btn { padding: 13px 6px; }
+      .dash-header h1 { font-size: 1.4rem; }
+      .announce-item-banner { font-size: 0.82rem; padding: 10px 14px; }
+    }
+
+    @media (max-width: 420px) {
+      .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    }
+
     .score-badge {
       display: inline-flex;
       align-items: center;
@@ -173,20 +229,28 @@
 
     <div class="dash-header">
       <h1>Salom, <span id="greeting-name">...</span> 👋</h1>
-      <div style="display:flex;gap:10px;">
-        <button class="btn-leaderboard" onclick="window.location.href='leaderboard.html'">
-          🏆 Leaderboard
-        </button>
-        <button class="btn-leaderboard" onclick="window.location.href='shop.html'" style="border-color:rgba(52,211,153,0.4);color:#34d399">
-          🛒 Shop
-        </button>
-        <button class="btn-leaderboard" onclick="window.location.href='achievements.html'" style="border-color:rgba(251,191,36,0.4);color:#fbbf24">
-          🏅 Mukofotlar
-        </button>
-        <button class="btn-add" onclick="openModal()">
-          <span>＋</span> Yangi bo'lim
-        </button>
-      </div>
+      <button class="btn-add" id="header-add-btn" onclick="openModal()">
+        <span>＋</span> Yangi bo'lim
+      </button>
+    </div>
+
+    <div class="quick-actions">
+      <button class="qa-btn" onclick="window.location.href='leaderboard.html'">
+        <span class="qa-icon">🏆</span>
+        <span class="qa-label">Leaderboard</span>
+      </button>
+      <button class="qa-btn qa-shop" onclick="window.location.href='shop.html'">
+        <span class="qa-icon">🛒</span>
+        <span class="qa-label">Shop</span>
+      </button>
+      <button class="qa-btn qa-ach" onclick="window.location.href='achievements.html'">
+        <span class="qa-icon">🏅</span>
+        <span class="qa-label">Mukofotlar</span>
+      </button>
+      <button class="qa-btn qa-add-mobile" onclick="openModal()">
+        <span class="qa-icon">＋</span>
+        <span class="qa-label">Yangi bo'lim</span>
+      </button>
     </div>
 
     <!-- E'lonlar banneri -->
