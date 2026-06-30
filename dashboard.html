@@ -31,6 +31,13 @@
       border: 1.5px solid rgba(52,211,153,0.3);
       color: #34d399;
     }
+
+    .nav-badge.streak {
+      background: rgba(251,146,60,0.12);
+      border: 1.5px solid rgba(251,146,60,0.35);
+      color: #fb923c;
+    }
+    .nav-badge.streak.zero { opacity: 0.5; }
     .nav-badge .badge-val {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 0.9rem;
@@ -152,6 +159,12 @@
     .qa-btn.qa-add-mobile:hover { background: rgba(124,58,237,0.18); }
 
     /* Mobile: header btn yashirin, quick-actions add ko'rinadi */
+    @media (max-width: 480px) {
+      .nav-badges { gap: 5px; }
+      .nav-badge { padding: 4px 8px; font-size: 0.75rem; }
+      .nav-badge .badge-icon { font-size: 0.85rem; }
+    }
+
     @media (max-width: 640px) {
       .quick-actions { grid-template-columns: repeat(3, 1fr); }
       #header-add-btn { display: none; }
@@ -190,6 +203,10 @@
 
       <!-- Coin & Star badges -->
       <div class="nav-badges">
+        <div class="nav-badge streak" id="nav-streak-badge" title="Kunlik streak">
+          <span class="badge-icon">🔥</span>
+          <span class="badge-val" id="nav-streak">0</span>
+        </div>
         <div class="nav-badge star" title="Yulduzchalar (reyting)">
           <span class="badge-icon">⭐</span>
           <span class="badge-val" id="nav-stars">0</span>
@@ -390,6 +407,14 @@
           const data = userDoc.data();
           document.getElementById('nav-stars').textContent = data.stars || 0;
           document.getElementById('nav-coins').textContent = data.coins || 0;
+
+          const streak = data.streakDays || 0;
+          document.getElementById('nav-streak').textContent = streak;
+          const streakBadge = document.getElementById('nav-streak-badge');
+          if (streakBadge) {
+            streakBadge.classList.toggle('zero', streak === 0);
+            streakBadge.title = streak > 0 ? `${streak} kunlik streak!` : "Streak yo'q hali";
+          }
         }
       } catch(e) {}
     }
