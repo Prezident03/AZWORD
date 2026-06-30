@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AzWord Mukofotlar</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .ach-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 0.875rem; cursor: pointer;
+      border: none; background: none; padding: 0; margin-bottom: 28px;
+      font-family: "Inter", sans-serif; transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--text-main); }
+
+    .ach-header { margin-bottom: 28px; }
+    .ach-header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
+    .ach-header p { color: var(--text-muted); font-size: 0.875rem; }
+
+    /* Progress overview */
+    .ach-overview {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 26px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .ach-ring-wrap { position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+    .ach-ring-text {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .ach-ring-num {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--purple-light);
+    }
+    .ach-ring-sub { font-size: 0.6rem; color: var(--text-muted); }
+
+    .ach-overview-info { flex: 1; min-width: 200px; }
+    .ach-overview-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .ach-overview-desc { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* Tabs */
+    .ach-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+    .ach-tab {
+      padding: 8px 18px; border-radius: 99px; border: 1.5px solid var(--border);
+      background: transparent; color: var(--text-muted); font-size: 0.85rem;
+      font-weight: 600; cursor: pointer; font-family: "Inter", sans-serif;
+      transition: all 0.2s;
+    }
+    .ach-tab:hover { border-color: var(--purple-main); color: var(--purple-light); }
+    .ach-tab.active { background: var(--purple-main); border-color: var(--purple-main); color: #fff; }
+
+    /* Grid */
+    .ach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .ach-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: border-color 0.2s, transform 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+    .ach-card:hover { transform: translateY(-2px); }
+
+    .ach-card.unlocked {
+      border-color: rgba(251,191,36,0.4);
+      background: linear-gradient(135deg, rgba(251,191,36,0.06), var(--bg-card) 60%);
+    }
+    .ach-card.locked { opacity: 0.55; }
+
+    .ach-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      flex-shrink: 0;
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+    }
+    .ach-card.unlocked .ach-icon-wrap {
+      background: rgba(251,191,36,0.12);
+      border-color: rgba(251,191,36,0.4);
+    }
+    .ach-card.locked .ach-icon-wrap { filter: grayscale(1); }
+
+    .ach-info { flex: 1; min-width: 0; }
+    .ach-name {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700; font-size: 0.95rem; margin-bottom: 4px;
+    }
+    .ach-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 8px; }
+
+    .ach-progress-bar {
+      height: 6px;
+      background: var(--bg-deep);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .ach-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--purple-main), var(--purple-light));
+      border-radius: 99px;
+      transition: width 0.4s;
+    }
+    .ach-card.unlocked .ach-progress-fill { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+
+    .ach-progress-text { font-size: 0.72rem; color: var(--text-dim); }
+
+    .ach-unlocked-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(251,191,36,0.15);
+      border: 1px solid rgba(251,191,36,0.4);
+      color: #fbbf24;
+      border-radius: 99px;
+      padding: 2px 9px;
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+
+    .ach-reward {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.75rem; color: #34d399; font-weight: 600; margin-top: 4px;
+    }
+
+    .ach-empty { text-align: center; padding: 48px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo">AzWord</div>
+  <div class="nav-user">
+    <div class="nav-badges">
+      <div class="nav-badge star"><span class="badge-icon">⭐</span><span class="badge-val" id="nav-stars">0</span></div>
+      <div class="nav-badge coin"><span class="badge-icon">🪙</span><span class="badge-val" id="nav-coins">0</span></div>
+    </div>
+    <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer">A</div>
+  </div>
+</nav>
+
+<div class="ach-wrap">
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
+
+  <div class="ach-header">
+    <h1>🏅 Mukofotlar</h1>
+    <p>O'rganish safaringizdagi yutuqlaringiz</p>
+  </div>
+
+  <div class="ach-overview">
+    <div class="ach-ring-wrap">
+      <svg width="84" height="84" viewBox="0 0 84 84">
+        <circle cx="42" cy="42" r="36" fill="none" stroke="#2e2845" stroke-width="8"/>
+        <circle id="ach-ring-circle" cx="42" cy="42" r="36" fill="none" stroke="#fbbf24" stroke-width="8"
+          stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"
+          transform="rotate(-90 42 42)" style="transition: stroke-dashoffset 0.6s ease"/>
+      </svg>
+      <div class="ach-ring-text">
+        <div class="ach-ring-num" id="ach-unlocked-count">0</div>
+        <div class="ach-ring-sub" id="ach-total-count">/ 0</div>
+      </div>
+    </div>
+    <div class="ach-overview-info">
+      <div class="ach-overview-title">Yutuqlaringiz</div>
+      <div class="ach-overview-desc" id="ach-overview-text">Yuklanmoqda...</div>
+    </div>
+  </div>
+
+  <div class="ach-tabs">
+    <button class="ach-tab active" onclick="filterAch('all')">Hammasi</button>
+    <button class="ach-tab" onclick="filterAch('unlocked')">✅ Olingan</button>
+    <button class="ach-tab" onclick="filterAch('locked')">🔒 Qolgan</button>
+  </div>
+
+  <div class="ach-grid" id="ach-grid">
+    <div class="ach-empty">Yuklanmoqda...</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, getDocs, doc, getDoc, setDoc, query, where, increment, updateDoc, addDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null;
+let allAchievements = [];
+let unlockedIds = new Set();
+let userStats = {};
+
+onAuthStateChanged(auth, async user => {
+  if (!user) return location.href = 'index.html';
+  currentUser = user;
+
+  try {
+    const ud = await getDoc(doc(db,'users',user.uid));
+    if (ud.exists()) {
+      const d = ud.data();
+      document.getElementById('nav-stars').textContent = d.stars || 0;
+      document.getElementById('nav-coins').textContent = d.coins || 0;
+      unlockedIds = new Set(d.achievements || []);
+      userStats = d;
+      if (d.photoBase64) {
+        document.getElementById('nav-avatar').innerHTML = `<img src="${d.photoBase64}" style="width:42px;height:42px;border-radius:50%;object-fit:cover">`;
+      } else {
+        document.getElementById('nav-avatar').textContent = (user.displayName||user.email||'A').charAt(0).toUpperCase();
+      }
+    }
+  } catch(e) {}
+
+  await computeUserProgress();
+  await loadAchievements();
+  await checkAndUnlockAchievements();
+});
+
+async function computeUserProgress() {
+  // Foydalanuvchining barcha bolimlaridan jami sozlar sonini hisoblaymiz
+  const snap = await getDocs(query(collection(db,'folders'), where('uid','==',currentUser.uid)));
+  let totalWords = 0;
+  snap.forEach(d => totalWords += d.data().wordCount || 0);
+  userStats.totalWordsAdded = totalWords;
+}
+
+async function loadAchievements() {
+  const snap = await getDocs(collection(db,'achievements'));
+  allAchievements = [];
+  snap.forEach(d => allAchievements.push({ id: d.id, ...d.data() }));
+  allAchievements.sort((a,b) => (a.threshold||0) - (b.threshold||0));
+  renderGrid('all');
+}
+
+function getProgressValue(ach) {
+  const type = ach.type;
+  if (type === 'words') return userStats.totalWordsAdded || 0;
+  if (type === 'stars') return userStats.stars || 0;
+  if (type === 'coins') return userStats.coins || 0;
+  if (type === 'streak') return userStats.streakDays || 0;
+  if (type === 'rank') return userStats.bestRank || 999;
+  return 0;
+}
+
+function isUnlockedByProgress(ach) {
+  const val = getProgressValue(ach);
+  if (ach.type === 'rank') return val <= (ach.threshold || 999) && val > 0;
+  return val >= (ach.threshold || 0);
+}
+
+async function checkAndUnlockAchievements() {
+  const newlyUnlocked = [];
+  for (const ach of allAchievements) {
+    if (!unlockedIds.has(ach.id) && isUnlockedByProgress(ach)) {
+      newlyUnlocked.push(ach);
+    }
+  }
+  if (newlyUnlocked.length === 0) return;
+
+  for (const ach of newlyUnlocked) {
+    unlockedIds.add(ach.id);
+  }
+
+  const starReward = newlyUnlocked.reduce((s,a) => s + (a.starReward||0), 0);
+  const coinReward = newlyUnlocked.reduce((s,a) => s + (a.coinReward||0), 0);
+
+  await updateDoc(doc(db,'users',currentUser.uid), {
+    achievements: [...unlockedIds],
+    stars: increment(starReward),
+    coins: increment(coinReward)
+  });
+
+  if (starReward) document.getElementById('nav-stars').textContent = (userStats.stars||0) + starReward;
+  if (coinReward) document.getElementById('nav-coins').textContent = (userStats.coins||0) + coinReward;
+
+  toast(`🎉 ${newlyUnlocked.length} ta yangi mukofot ochildi!`);
+  renderGrid('all');
+}
+
+window.filterAch = tab => {
+  document.querySelectorAll('.ach-tab').forEach((t,i) => {
+    t.classList.toggle('active', ['all','unlocked','locked'][i] === tab);
+  });
+  renderGrid(tab);
+};
+
+function renderGrid(tab) {
+  const grid = document.getElementById('ach-grid');
+  let items = allAchievements;
+  if (tab === 'unlocked') items = items.filter(a => unlockedIds.has(a.id));
+  if (tab === 'locked') items = items.filter(a => !unlockedIds.has(a.id));
+
+  const unlockedCount = allAchievements.filter(a => unlockedIds.has(a.id)).length;
+  document.getElementById('ach-unlocked-count').textContent = unlockedCount;
+  document.getElementById('ach-total-count').textContent = '/ ' + allAchievements.length;
+  document.getElementById('ach-overview-text').textContent =
+    unlockedCount + ' ta / ' + allAchievements.length + ' ta mukofot ochildi';
+
+  const pct = allAchievements.length ? unlockedCount / allAchievements.length : 0;
+  const circumference = 226;
+  const offset = circumference - pct * circumference;
+  document.getElementById('ach-ring-circle').style.strokeDashoffset = offset;
+
+  if (!items.length) {
+    grid.innerHTML = '<div class="ach-empty">Bu yerda hech narsa yoq</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  items.forEach(ach => {
+    const unlocked = unlockedIds.has(ach.id);
+    const current = getProgressValue(ach);
+    const target = ach.threshold || 1;
+    const pctVal = ach.type === 'rank'
+      ? (unlocked ? 100 : 0)
+      : Math.min(100, Math.round((current/target)*100));
+
+    const card = document.createElement('div');
+    card.className = 'ach-card ' + (unlocked ? 'unlocked' : 'locked');
+    card.innerHTML = `
+      ${unlocked ? '<span class="ach-unlocked-badge">✓ Olindi</span>' : ''}
+      <div class="ach-icon-wrap">${ach.emoji || '🏅'}</div>
+      <div class="ach-info">
+        <div class="ach-name">${ach.name}</div>
+        <div class="ach-desc">${ach.description || ''}</div>
+        ${!unlocked ? `
+          <div class="ach-progress-bar"><div class="ach-progress-fill" style="width:${pctVal}%"></div></div>
+          <div class="ach-progress-text">${ach.type === 'rank' ? (unlocked?'Bajarildi':'Hali yoq') : current + ' / ' + target}</div>
+        ` : ''}
+        ${(ach.starReward || ach.coinReward) ? `
+          <div class="ach-reward">
+            ${ach.starReward ? '⭐ +'+ach.starReward+' ' : ''}${ach.coinReward ? '🪙 +'+ach.coinReward : ''}
+          </div>
+        ` : ''}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function toast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr?' error':'');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

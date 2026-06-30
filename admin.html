@@ -147,6 +147,7 @@
     <button class="nav-item" onclick="showPage('announce')"><span class="nav-icon">📢</span> Elonglar</button>
     <button class="nav-item" onclick="showPage('leaderboard')"><span class="nav-icon">🏆</span> Leaderboard</button>
     <div class="sb-label">Tizim</div>
+    <button class="nav-item" onclick="showPage('achievements')"><span class="nav-icon">🏅</span> Mukofotlar</button>
     <button class="nav-item" onclick="showPage('shop')"><span class="nav-icon">🛒</span> Shop</button>
     <button class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Sozlamalar</button>
     <button class="nav-item" onclick="window.location.href='dashboard.html'"><span class="nav-icon">🏠</span> Saytga qaytish</button>
@@ -300,6 +301,19 @@
             </tr></thead>
             <tbody id="ai-words-tbody"></tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div id="page-achievements" style="display:none">
+      <div class="sec" style="margin-bottom:18px">
+        <div class="sec-head">
+          <h3>🏅 Mukofotlar</h3>
+          <button class="btn-add" onclick="openAchModal()" style="padding:8px 16px;font-size:0.85rem">+ Yangi mukofot</button>
+        </div>
+        <div style="padding:20px">
+          <div id="ach-admin-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px"></div>
         </div>
       </div>
     </div>
@@ -512,6 +526,54 @@
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeShopItemModal()">Bekor</button>
       <button class="btn-confirm" onclick="saveShopItem()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Achievement Modal -->
+<div class="modal-overlay" id="ach-modal">
+  <div class="modal">
+    <h3 id="ach-modal-title">Yangi mukofot</h3>
+    <input type="hidden" id="ach-id"/>
+    <div class="form-group">
+      <label>Nomi</label>
+      <input type="text" id="ach-name" placeholder="100 ta soz"/>
+    </div>
+    <div class="form-group">
+      <label>Emoji</label>
+      <input type="text" id="ach-emoji" placeholder="🏅" maxlength="4"/>
+    </div>
+    <div class="form-group">
+      <label>Tavsif</label>
+      <input type="text" id="ach-desc" placeholder="100 ta soz qoshing"/>
+    </div>
+    <div class="form-group">
+      <label>Turi (Type)</label>
+      <select id="ach-type" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.9rem;outline:none">
+        <option value="words">So'zlar soni</option>
+        <option value="stars">Yulduzlar soni</option>
+        <option value="coins">Tangalar soni</option>
+        <option value="streak">Ketma-ket kunlar</option>
+        <option value="rank">Reyting orni (1=eng yaxshi)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Maqsad qiymati (Threshold)</label>
+      <input type="number" id="ach-threshold" placeholder="100" min="1"/>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group">
+        <label>Star mukofoti</label>
+        <input type="number" id="ach-star-reward" placeholder="10" min="0"/>
+      </div>
+      <div class="form-group">
+        <label>Coin mukofoti</label>
+        <input type="number" id="ach-coin-reward" placeholder="20" min="0"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAchModal()">Bekor</button>
+      <button class="btn-confirm" onclick="saveAch()">Saqlash</button>
     </div>
   </div>
 </div>
@@ -733,6 +795,90 @@ window.deleteShopItem = async id => {
   await deleteDoc(doc(db,'shop',id));
   toast('Ochirildi');
   await loadShopAdmin();
+};
+
+// ACHIEVEMENTS ADMIN
+async function loadAchAdmin() {
+  const grid = document.getElementById('ach-admin-grid');
+  grid.innerHTML = '<div style="padding:20px;color:var(--text-muted)">Yuklanmoqda...</div>';
+  const snap = await getDocs(collection(db,'achievements'));
+  const items = [];
+  snap.forEach(d => items.push({id:d.id,...d.data()}));
+  items.sort((a,b) => (a.threshold||0)-(b.threshold||0));
+  if (!items.length) {
+    grid.innerHTML = '<div style="padding:20px;color:var(--text-muted)">Mukofot yoq. Yangi qoshing!</div>';
+    return;
+  }
+  grid.innerHTML = '';
+  const typeLabels = { words:'Sozlar', stars:'Yulduzlar', coins:'Tangalar', streak:'Streak', rank:'Reyting' };
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--bg-deep);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;position:relative';
+    card.innerHTML = `
+      <div style="position:absolute;top:10px;right:10px;display:flex;gap:5px">
+        <button class="abtn" onclick="editAch('${item.id}')" title="Tahrirlash">✏️</button>
+        <button class="abtn red" onclick="deleteAch('${item.id}')" title="Ochirish">🗑</button>
+      </div>
+      <div style="font-size:2rem;margin-bottom:8px">${item.emoji||'🏅'}</div>
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${item.name}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">${item.description||''}</div>
+      <div style="font-size:0.75rem;color:var(--purple-light);margin-bottom:4px">${typeLabels[item.type]||item.type} >= ${item.threshold}</div>
+      <div style="font-size:0.78rem;color:#34d399">⭐ ${item.starReward||0} 🪙 ${item.coinReward||0}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.openAchModal = (item=null) => {
+  document.getElementById('ach-modal-title').textContent = item ? 'Tahrirlash' : 'Yangi mukofot';
+  document.getElementById('ach-id').value = item?.id || '';
+  document.getElementById('ach-name').value = item?.name || '';
+  document.getElementById('ach-emoji').value = item?.emoji || '';
+  document.getElementById('ach-desc').value = item?.description || '';
+  document.getElementById('ach-type').value = item?.type || 'words';
+  document.getElementById('ach-threshold').value = item?.threshold || '';
+  document.getElementById('ach-star-reward').value = item?.starReward || '';
+  document.getElementById('ach-coin-reward').value = item?.coinReward || '';
+  document.getElementById('ach-modal').classList.add('open');
+  setTimeout(() => document.getElementById('ach-name').focus(), 100);
+};
+
+window.closeAchModal = () => { document.getElementById('ach-modal').classList.remove('open'); };
+
+window.editAch = async id => {
+  const snap = await getDoc(doc(db,'achievements',id));
+  if (snap.exists()) openAchModal({id,...snap.data()});
+};
+
+window.saveAch = async () => {
+  const id = document.getElementById('ach-id').value;
+  const name = document.getElementById('ach-name').value.trim();
+  const emoji = document.getElementById('ach-emoji').value.trim() || '🏅';
+  const description = document.getElementById('ach-desc').value.trim();
+  const type = document.getElementById('ach-type').value;
+  const threshold = parseInt(document.getElementById('ach-threshold').value) || 0;
+  const starReward = parseInt(document.getElementById('ach-star-reward').value) || 0;
+  const coinReward = parseInt(document.getElementById('ach-coin-reward').value) || 0;
+  if (!name) { toast('Nom kiriting', true); return; }
+  if (!threshold) { toast('Maqsad qiymati kiriting', true); return; }
+  const btn = document.querySelector('#ach-modal .btn-confirm');
+  if (btn) { btn.disabled=true; btn.textContent='...'; }
+  try {
+    const data = { name, emoji, description, type, threshold, starReward, coinReward };
+    if (id) { await updateDoc(doc(db,'achievements',id), data); }
+    else { await addDoc(collection(db,'achievements'), data); }
+    toast('Saqlandi');
+    closeAchModal();
+    await loadAchAdmin();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+  finally { if (btn) { btn.disabled=false; btn.textContent='Saqlash'; } }
+};
+
+window.deleteAch = async id => {
+  if (!confirm('Mukofotni ochirasizmi?')) return;
+  await deleteDoc(doc(db,'achievements',id));
+  toast('Ochirildi');
+  await loadAchAdmin();
 };
 
 // SETTINGS
@@ -1199,10 +1345,11 @@ const PAGE_TITLES = {
   aigenerator: 'AI Word Generator',
   announce: 'Elonglar',
   leaderboard: 'Leaderboard',
+  achievements: 'Mukofotlar boshqaruvi',
   shop: 'Shop boshqaruvi',
   settings: 'Sozlamalar'
 };
-const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboard','shop','settings'];
+const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboard','achievements','shop','settings'];
 
 window.showPage = page => {
   PAGES.forEach(p => { document.getElementById('page-'+p).style.display = p===page?'block':'none'; });
