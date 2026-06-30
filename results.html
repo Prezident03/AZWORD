@@ -265,6 +265,59 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 
+      // ── DAILY STREAK ──
+      try {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        const udata = userSnap.exists() ? userSnap.data() : {};
+
+        const today = new Date();
+        const todayKey = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+
+        const lastDate = udata.lastStudyDate || null;
+        let currentStreak = udata.streakDays || 0;
+
+        if (lastDate !== todayKey) {
+          // Kechagi sana bilan solishtiramiz
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+          const yesterdayKey = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
+
+          if (lastDate === yesterdayKey) {
+            // Ketma-ket kun — streak +1
+            currentStreak += 1;
+          } else if (lastDate === null) {
+            // Birinchi marta
+            currentStreak = 1;
+          } else {
+            // Uzilgan — qaytadan 1 dan
+            currentStreak = 1;
+          }
+
+          await updateDoc(userRef, {
+            streakDays: currentStreak,
+            lastStudyDate: todayKey,
+            longestStreak: Math.max(currentStreak, udata.longestStreak || 0)
+          });
+
+          // Streak banner ko'rsatish (faqat yangi kun bo'lsa)
+          if (currentStreak > 1) {
+            const streakBanner = document.createElement('div');
+            streakBanner.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(251,146,60,0.1);border:1.5px solid rgba(251,146,60,0.3);border-radius:14px;padding:14px 20px;margin:0 auto 20px;max-width:400px';
+            streakBanner.innerHTML = `
+              <span style="font-size:1.6rem">🔥</span>
+              <div>
+                <div style="font-weight:700;font-size:1.1rem;color:#fb923c">${currentStreak} kunlik streak!</div>
+                <div style="font-size:0.78rem;color:var(--text-muted)">Ajoyib, davom eting!</div>
+              </div>
+            `;
+            document.querySelector('.results-hero').appendChild(streakBanner);
+          }
+        }
+      } catch(e) {
+        console.error('Streak xato:', e);
+      }
+
       try {
         // Mukammal so'zlarni topamiz
         const perfectWordsList = words.filter(w => results[w.id] && results[w.id].mistakes.length === 0);
