@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AzWord Streak</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    body { background: var(--bg-deep); }
+
+    .streak-hero {
+      background: linear-gradient(135deg, #fb923c, #f97316);
+      padding: 24px 24px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .streak-hero::before {
+      content: "";
+      position: absolute;
+      top: -40%; right: -10%;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+      pointer-events: none;
+    }
+    .streak-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 700px;
+      margin: 0 auto 20px;
+    }
+    .streak-close {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .streak-close:hover { background: rgba(255,255,255,0.25); }
+    .streak-top-title { color: #fff; font-weight: 700; font-size: 1.1rem; font-family: "Space Grotesk", sans-serif; }
+
+    .streak-content {
+      max-width: 700px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .streak-badge-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 99px;
+      margin-bottom: 14px;
+    }
+
+    .streak-num {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 4.5rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .streak-label { color: rgba(255,255,255,0.95); font-size: 1.2rem; font-weight: 600; margin-top: 4px; }
+
+    .streak-flame-wrap {
+      width: 140px; height: 140px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: auto;
+    }
+
+    /* Main content */
+    .streak-main { max-width: 700px; margin: 0 auto; padding: 28px 24px; }
+
+    .month-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .month-nav h2 { font-size: 1.3rem; font-weight: 700; }
+    .month-nav-btns { display: flex; gap: 8px; }
+    .month-nav-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .month-nav-btn:hover { border-color: var(--purple-main); color: var(--purple-light); }
+
+    /* Stats row */
+    .streak-stats-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .streak-stat-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .streak-stat-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .streak-stat-icon.orange { background: rgba(251,146,60,0.15); }
+    .streak-stat-icon.blue { background: rgba(96,165,250,0.15); }
+    .streak-stat-num {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.5rem; font-weight: 700; line-height: 1;
+    }
+    .streak-stat-label { font-size: 0.78rem; color: var(--text-muted); margin-top: 3px; }
+
+    /* Calendar */
+    .calendar-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .calendar-weekdays span {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      position: relative;
+    }
+    .cal-day.empty { visibility: hidden; }
+    .cal-day.practiced {
+      background: linear-gradient(135deg, #fb923c, #f97316);
+      color: #fff;
+    }
+    .cal-day.today {
+      border: 2px solid var(--purple-main);
+      color: var(--purple-light);
+    }
+    .cal-day.today.practiced { border-color: #fff; }
+    .cal-day.future { color: var(--text-dim); opacity: 0.4; }
+
+    /* Goal */
+    .goal-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 20px 22px;
+      margin-bottom: 24px;
+    }
+    .goal-title { font-weight: 700; font-size: 1.05rem; margin-bottom: 16px; }
+    .goal-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .goal-tag {
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+    .goal-tag.active { border-color: #fb923c; color: #fb923c; }
+    .goal-progress-track {
+      flex: 1;
+      height: 10px;
+      background: var(--bg-deep);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .goal-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #fb923c, #f97316);
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+
+    /* Motivation */
+    .motivation-box {
+      text-align: center;
+      padding: 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 480px) {
+      .streak-num { font-size: 3.4rem; }
+      .streak-flame-wrap { width: 100px; height: 100px; }
+      .streak-content { gap: 14px; }
+      .streak-stats-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="streak-hero">
+  <div class="streak-top-bar">
+    <button class="streak-close" onclick="window.location.href='dashboard.html'">✕</button>
+    <div class="streak-top-title">Streak</div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="streak-content">
+    <div>
+      <div class="streak-badge-tag" id="streak-society-badge" style="display:none">⭐ Streak jamiyati</div>
+      <div class="streak-num" id="streak-number">0</div>
+      <div class="streak-label">kunlik streak!</div>
+    </div>
+    <div class="streak-flame-wrap">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <path d="M50 10 C 30 35, 20 50, 25 68 C 28 80, 38 90, 50 90 C 62 90, 72 80, 75 68 C 80 50, 70 35, 50 10 Z"
+              fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M50 35 C 42 48, 38 58, 42 68 C 44 74, 47 78, 50 78 C 53 78, 56 74, 58 68 C 62 58, 58 48, 50 35 Z"
+              fill="#fde047"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<div class="streak-main">
+
+  <div class="streak-stats-row">
+    <div class="streak-stat-card">
+      <div class="streak-stat-icon orange">✅</div>
+      <div>
+        <div class="streak-stat-num" id="stat-days-practiced">0</div>
+        <div class="streak-stat-label">Bu oy mashq qilingan kunlar</div>
+      </div>
+    </div>
+    <div class="streak-stat-card">
+      <div class="streak-stat-icon blue">🏆</div>
+      <div>
+        <div class="streak-stat-num" id="stat-longest">0</div>
+        <div class="streak-stat-label">Eng uzun streak</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="month-nav">
+    <h2 id="cal-month-label">Yuklanmoqda...</h2>
+    <div class="month-nav-btns">
+      <button class="month-nav-btn" onclick="changeMonth(-1)">‹</button>
+      <button class="month-nav-btn" onclick="changeMonth(1)">›</button>
+    </div>
+  </div>
+
+  <div class="calendar-card">
+    <div class="calendar-weekdays">
+      <span>Ya</span><span>Du</span><span>Se</span><span>Ch</span><span>Pa</span><span>Ju</span><span>Sh</span>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  </div>
+
+  <div class="goal-card">
+    <div class="goal-title">🎯 Streak maqsadi</div>
+    <div class="goal-bar-wrap">
+      <div class="goal-tag" id="goal-tag-start">0</div>
+      <div class="goal-progress-track"><div class="goal-progress-fill" id="goal-fill" style="width:0%"></div></div>
+      <div class="goal-tag active" id="goal-tag-end">10</div>
+    </div>
+  </div>
+
+  <div class="motivation-box" id="motivation-text">
+    Har kuni o'rganishda davom eting va streak'ingizni saqlang! 🔥
+  </div>
+
+</div>
+
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentDate = new Date();
+let studyDates = new Set(); // 'YYYY-MM-DD' studied days
+let userData = {};
+
+const MONTH_NAMES_UZ = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+
+onAuthStateChanged(auth, async user => {
+  if (!user) return location.href = 'index.html';
+
+  try {
+    const ud = await getDoc(doc(db,'users',user.uid));
+    if (ud.exists()) {
+      userData = ud.data();
+      const streak = userData.streakDays || 0;
+      const longest = userData.longestStreak || streak;
+
+      document.getElementById('streak-number').textContent = streak;
+      document.getElementById('stat-longest').textContent = longest;
+
+      if (streak >= 7) {
+        document.getElementById('streak-society-badge').style.display = 'inline-block';
+      }
+
+      // studyDates - hozircha faqat lastStudyDate bor (Firestore da tarix saqlanmagan)
+      // Kelajakda alohida studyLog collection qo'shilsa, shu yerdan oladi
+      if (userData.lastStudyDate) {
+        studyDates.add(userData.lastStudyDate);
+      }
+      // Streak asosida orqaga qarab kunlarni hisoblaymiz (taxminiy)
+      if (streak > 0 && userData.lastStudyDate) {
+        const last = new Date(userData.lastStudyDate);
+        for (let i = 0; i < streak; i++) {
+          const d = new Date(last);
+          d.setDate(last.getDate() - i);
+          studyDates.add(formatDateKey(d));
+        }
+      }
+
+      updateGoal(streak);
+      updateMotivation(streak);
+    }
+  } catch(e) {
+    console.error('Streak load xato:', e);
+  }
+
+  renderCalendar();
+});
+
+function formatDateKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+window.changeMonth = delta => {
+  currentDate.setMonth(currentDate.getMonth() + delta);
+  renderCalendar();
+};
+
+function renderCalendar() {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+
+  document.getElementById('cal-month-label').textContent = `${MONTH_NAMES_UZ[month]} ${year}`;
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  // getDay(): 0=Yakshanba -> bizga kerak: 0=Yakshanba boshlanadi (Su Mo Tu...)
+  let startWeekday = firstDay.getDay();
+
+  const grid = document.getElementById('calendar-grid');
+  grid.innerHTML = '';
+
+  const today = new Date();
+  const todayKey = formatDateKey(today);
+
+  let daysPracticedThisMonth = 0;
+
+  for (let i = 0; i < startWeekday; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(year, month, day);
+    const key = formatDateKey(d);
+    const isPracticed = studyDates.has(key);
+    const isToday = key === todayKey;
+    const isFuture = d > today;
+
+    if (isPracticed) daysPracticedThisMonth++;
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (isPracticed ? ' practiced' : '') + (isToday ? ' today' : '') + (isFuture ? ' future' : '');
+    cell.textContent = day;
+    grid.appendChild(cell);
+  }
+
+  document.getElementById('stat-days-practiced').textContent = daysPracticedThisMonth;
+}
+
+function updateGoal(streak) {
+  const goals = [7, 10, 30, 50, 100, 200, 365];
+  let nextGoal = goals.find(g => g > streak) || (streak + 50);
+  let prevGoal = 0;
+  for (const g of goals) {
+    if (g <= streak) prevGoal = g; else break;
+  }
+  if (streak === 0) { prevGoal = 0; nextGoal = 7; }
+
+  document.getElementById('goal-tag-start').textContent = prevGoal;
+  document.getElementById('goal-tag-end').textContent = nextGoal;
+
+  const range = nextGoal - prevGoal;
+  const progress = range > 0 ? ((streak - prevGoal) / range) * 100 : 0;
+  document.getElementById('goal-fill').style.width = Math.max(2, Math.min(100, progress)) + '%';
+}
+
+function updateMotivation(streak) {
+  const el = document.getElementById('motivation-text');
+  if (streak === 0) {
+    el.textContent = "Bugun mashq qiling va streak'ingizni boshlang! 🔥";
+  } else if (streak < 7) {
+    el.textContent = `${streak} kun! Davom eting, 7 kunga ${7-streak} kun qoldi! 💪`;
+  } else if (streak < 30) {
+    el.textContent = `Ajoyib! ${streak} kunlik streak'ingiz bor. 30 kunga yetkazing! 🚀`;
+  } else if (streak < 100) {
+    el.textContent = `Zo'rsiz! ${streak} kun ketma-ket. Bu chinakam sodiqlik! 🏆`;
+  } else {
+    el.textContent = `${streak} kun! Siz haqiqiy AzWord chempionisiz! 👑`;
+  }
+}
+</script>
+</body>
+</html>
