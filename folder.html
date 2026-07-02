@@ -184,6 +184,15 @@
       40% { transform: translateY(-5px); opacity: 1; }
     }
 
+    @media (max-width: 640px) {
+      .folder-header { flex-direction: column; align-items: flex-start; gap: 14px; }
+      .header-actions { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .btn-study { grid-column: 1 / -1; }
+      .btn-ai-gen { grid-column: 1 / -1; }
+      .word-item { padding: 12px 14px; }
+      .word-num { display: none; }
+    }
+
     /* AI Generator button */
     .btn-ai-gen {
       display: flex;
@@ -508,25 +517,14 @@
       aiGeneratedExample = '';
 
       try {
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const prompt = `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). The sentence should be easy to understand for beginners. Reply ONLY with the sentence, nothing else. No quotes, no explanation.`;
+        const res = await fetch("/api/generate", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            max_tokens: 80,
-            messages: [{
-              role: "user",
-              content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). The sentence should be easy to understand for beginners. Reply ONLY with the sentence, nothing else. No quotes, no explanation.`
-            }]
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
         });
 
         if (!res.ok) {
-          const err = await res.json();
-          console.error('Groq error:', err);
           box.style.display = 'none';
           aiGeneratedExample = '';
           return;
@@ -677,23 +675,23 @@
         const prompt = `Generate exactly ${count} English vocabulary words about "${topic}" at level ${level}. Return ONLY a JSON array. Each object: {"en":"word","uz":"uzbek translation","example":"one simple sentence"}. No markdown, no explanation.`;
 
         bar.style.width = '40%';
-        const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        const res = await fetch("/api/generate", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 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"
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            max_tokens: 4000,
-            messages: [{ role: "user", content: prompt }]
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt })
         });
 
         bar.style.width = '75%';
         status.textContent = 'Natija tahlil qilinmoqda...';
 
         const data = await res.json();
+
+        // API xato qaytargan bo'lsa
+        if (!res.ok || !data.choices || !data.choices[0]) {
+          const errMsg = data?.error?.message || 'API javob bermadi';
+          throw new Error(errMsg);
+        }
+
         const text = data.choices[0].message.content.trim();
 
         let parsed;
@@ -701,6 +699,10 @@
         catch(e) {
           const m = text.match(/\[[\s\S]*\]/);
           parsed = m ? JSON.parse(m[0]) : [];
+        }
+        
+        if (!parsed || parsed.length === 0) {
+          throw new Error("AI so'z generatsiya qila olmadi. Mavzuni o'zgartiring.");
         }
 
         bar.style.width = '100%';
@@ -720,10 +722,16 @@
         document.getElementById('ag-save-btn').textContent = parsed.length + ' ta soz qoshish';
 
       } catch(e) {
-        status.textContent = 'Xato: ' + e.message;
+        status.textContent = 'Xato: ' + (e.message || 'Qayta urinib ko\'ring');
         bar.style.background = 'var(--danger)';
+        setTimeout(() => {
+          document.getElementById('ai-gen-step1').style.display = 'block';
+          document.getElementById('ai-gen-step2').style.display = 'none';
+          bar.style.background = '';
+          bar.style.width = '0%';
+        }, 2500);
+        genBtn.disabled = false;
       }
-      genBtn.disabled = false;
     };
 
     window.saveAIWords = async () => {

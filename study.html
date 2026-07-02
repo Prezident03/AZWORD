@@ -311,6 +311,20 @@
       50% { opacity: 0.6; }
     }
 
+    @media (max-width: 640px) {
+      .study-wrap { padding: 12px; }
+      .progress-area { padding: 0 0 14px; }
+      .study-card { padding: 22px 16px; min-height: 240px; }
+      .word-display { font-size: 2rem; }
+      .choice-grid { grid-template-columns: 1fr; gap: 8px; }
+      .nav-actions { gap: 8px; }
+      .nav-actions button { padding: 12px 16px; font-size: 0.85rem; }
+      .pieces-area { gap: 6px; }
+      .piece-btn { padding: 8px 12px; font-size: 0.9rem; }
+      .stage-badge { font-size: 0.78rem; padding: 5px 12px; }
+      .type-input { font-size: 0.95rem; padding: 12px; }
+    }
+
     .undo-btn {
       display: inline-flex;
       align-items: center;
@@ -576,20 +590,13 @@
       btn.textContent = '⏳ ...';
 
       try {
-        const res = await fetch("https://api.anthropic.com/v1/messages", {
+        const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-6",
-            max_tokens: 80,
-            messages: [{
-              role: "user",
-              content: `Translate this English sentence to Uzbek. Reply ONLY with the translation, nothing else:\n"${sentence}"`
-            }]
-          })
+          body: JSON.stringify({ prompt: `Translate this English sentence to Uzbek. Reply ONLY with the translation, nothing else:\n"${sentence}"` })
         });
         const data = await res.json();
-        const translation = (data.content?.[0]?.text || '').trim().replace(/^["'"]|["'"]$/g, '');
+        const translation = (data.choices?.[0]?.message?.content || '').trim().replace(/^["'"]|["'"]$/g, '');
         translationEl.textContent = '🇺🇿 ' + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
