@@ -230,7 +230,7 @@
   <script type="module">
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { doc, getDoc, setDoc, increment, collection, getDocs, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { doc, getDoc, setDoc, increment, collection, getDocs, updateDoc, addDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -316,6 +316,39 @@
         }
       } catch(e) {
         console.error('Streak xato:', e);
+      }
+
+      // ── MASHQ STATISTIKASINI SAQLASH ──
+      try {
+        const totalWords = words.length;
+        const correctWords = words.filter(w => results[w.id] && results[w.id].mistakes.length === 0).length;
+        const accuracy = totalWords > 0 ? Math.round((correctWords / totalWords) * 100) : 0;
+
+        // studyLog ga yozamiz
+        await addDoc(collection(db, 'users', user.uid, 'studyLog'), {
+          folderId: params.get('id') || '',
+          totalWords,
+          correctWords,
+          accuracy,
+          studiedAt: serverTimestamp(),
+          dateKey: new Date().toISOString().slice(0, 10)
+        });
+
+        // Eng qiyin so'zlarni belgilaymiz (3+ xato)
+        for (const word of words) {
+          const r = results[word.id];
+          if (r && r.mistakes.length >= 2) {
+            const wordRef = doc(db, 'folders', params.get('id') || '', 'words', word.id);
+            try {
+              await updateDoc(wordRef, {
+                mistakeCount: increment(r.mistakes.length),
+                lastMistakeAt: serverTimestamp()
+              });
+            } catch(e) {}
+          }
+        }
+      } catch(e) {
+        console.error('Statistika saqlashda xato:', e);
       }
 
       try {
