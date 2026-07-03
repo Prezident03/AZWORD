@@ -186,6 +186,46 @@
       .quick-actions { grid-template-columns: repeat(2, 1fr); }
     }
 
+    /* Notification banner */
+    .notif-banner {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background: rgba(96,165,250,0.08);
+      border: 1.5px solid rgba(96,165,250,0.25);
+      border-radius: 14px;
+      margin-bottom: 20px;
+      font-size: 0.875rem;
+    }
+    .notif-banner .nb-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .notif-banner .nb-text { flex: 1; color: var(--text-muted); line-height: 1.4; }
+    .notif-banner .nb-text strong { color: var(--text-main); }
+    .notif-banner .nb-btn {
+      padding: 8px 16px;
+      background: #60a5fa;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: "Inter", sans-serif;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .notif-banner .nb-btn:hover { opacity: 0.88; }
+    .notif-banner .nb-close {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
     .score-badge {
       display: inline-flex;
       align-items: center;
@@ -283,6 +323,26 @@
     <!-- E'lonlar banneri -->
     <div class="announce-banner" id="announce-banner"></div>
 
+    <!-- Notification banner -->
+    <div id="notif-banner" class="notif-banner" style="display:none">
+      <span class="nb-icon">🔔</span>
+      <div class="nb-text">
+        <strong>Kunlik eslatma</strong><br>
+        Har kuni soat 19:00 da "Mashq vaqti!" xabari olasiz
+      </div>
+      <button class="nb-btn" onclick="enableNotifications()">Yoqish</button>
+      <button class="nb-close" onclick="dismissNotifBanner()">✕</button>
+    </div>
+
+    <div id="notif-enabled-banner" class="notif-banner" style="display:none;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.06)">
+      <span class="nb-icon">✅</span>
+      <div class="nb-text">
+        <strong>Eslatma yoqilgan!</strong><br>
+        Har kuni soat 19:00 da xabar olasiz
+      </div>
+      <button class="nb-close" onclick="disableNotifications()">O'chirish</button>
+    </div>
+
     <div id="admin-section" style="display:none">
       <div class="section-label">📚 Umumiy bo'limlar</div>
       <div class="folder-grid" id="admin-folders">
@@ -372,10 +432,93 @@
         }, { merge: true });
       } catch(e) {}
 
+      // Bugungi kirish sanasini saqlaymiz
+      localStorage.setItem('last-study-date', new Date().toISOString().slice(0, 10));
       await loadUserStats(user.uid);
       await loadFolders();
       await loadAnnouncements();
+      checkNotificationStatus();
     });
+
+    // ── DAILY REMINDER ──
+    function checkNotificationStatus() {
+      if (!("Notification" in window)) return; // brauzer qollab-quvvatlamasa
+
+      const dismissed = localStorage.getItem('notif-dismissed');
+      const enabled = localStorage.getItem('notif-enabled');
+
+      if (enabled === 'true' && Notification.permission === 'granted') {
+        document.getElementById('notif-enabled-banner').style.display = 'flex';
+        scheduleReminder();
+      } else if (dismissed !== 'true' && Notification.permission !== 'denied') {
+        document.getElementById('notif-banner').style.display = 'flex';
+      }
+    }
+
+    window.enableNotifications = async () => {
+      if (!("Notification" in window)) {
+        showToast("Brauzeringiz notification qollab-quvvatlamaydi", true);
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        localStorage.setItem('notif-enabled', 'true');
+        localStorage.removeItem('notif-dismissed');
+        document.getElementById('notif-banner').style.display = 'none';
+        document.getElementById('notif-enabled-banner').style.display = 'flex';
+        showToast("Eslatma yoqildi! 🔔");
+        scheduleReminder();
+      } else {
+        showToast("Ruxsat berilmadi", true);
+        dismissNotifBanner();
+      }
+    };
+
+    window.dismissNotifBanner = () => {
+      localStorage.setItem('notif-dismissed', 'true');
+      document.getElementById('notif-banner').style.display = 'none';
+    };
+
+    window.disableNotifications = () => {
+      localStorage.removeItem('notif-enabled');
+      localStorage.setItem('notif-dismissed', 'true');
+      document.getElementById('notif-enabled-banner').style.display = 'none';
+      showToast("Eslatma o'chirildi");
+    };
+
+    function scheduleReminder() {
+      if (Notification.permission !== 'granted') return;
+
+      const now = new Date();
+      const target = new Date();
+      target.setHours(19, 0, 0, 0); // har kuni soat 19:00
+
+      // Agar soat 19 o'tib ketgan bo'lsa — ertaga
+      if (now > target) target.setDate(target.getDate() + 1);
+
+      const delay = target - now;
+
+      // Eski timeout ni tozalaymiz
+      if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
+
+      window._reminderTimeout = setTimeout(() => {
+        // Bugun mashq qilganmi tekshiramiz
+        const today = new Date().toISOString().slice(0, 10);
+        const lastStudy = localStorage.getItem('last-study-date');
+
+        if (lastStudy !== today) {
+          new Notification("AzWord — Mashq vaqti! 🔥", {
+            body: "Bugun hali mashq qilmadingiz. Streak'ingizni saqlang!",
+            icon: "/favicon.ico",
+            badge: "/favicon.ico",
+            tag: "azword-reminder",
+          });
+        }
+
+        // Keyingi kun uchun ham rejalashtir
+        scheduleReminder();
+      }, delay);
+    }
 
     async function loadAnnouncements() {
       try {
