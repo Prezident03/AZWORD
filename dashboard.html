@@ -489,9 +489,12 @@
     function scheduleReminder() {
       if (Notification.permission !== 'granted') return;
 
+      const savedTime = localStorage.getItem('notif-time') || '19:00';
+      const [hours, minutes] = savedTime.split(':').map(Number);
+
       const now = new Date();
       const target = new Date();
-      target.setHours(19, 0, 0, 0); // har kuni soat 19:00
+      target.setHours(hours, minutes, 0, 0);
 
       // Agar soat 19 o'tib ketgan bo'lsa — ertaga
       if (now > target) target.setDate(target.getDate() + 1);

@@ -268,6 +268,74 @@
       text-align: center;
     }
     .reset-success.show { display: block; }
+
+    /* Notification settings */
+    .notif-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+    .notif-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .notif-toggle-label { font-size: 0.9rem; color: var(--text-muted); }
+    .toggle-switch {
+      position: relative;
+      width: 44px; height: 24px;
+      cursor: pointer;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: var(--border);
+      border-radius: 99px;
+      transition: 0.3s;
+    }
+    .toggle-thumb {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 20px; height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--purple-main); }
+    .toggle-switch input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+    .time-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .time-picker-row label { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
+    .time-input {
+      background: var(--bg-deep);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      font-family: "Inter", sans-serif;
+      outline: none;
+      width: 110px;
+    }
+    .time-input:focus { border-color: var(--purple-main); }
+    .notif-status {
+      font-size: 0.78rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .notif-status.on { background: rgba(52,211,153,0.08); color: var(--success); }
+    .notif-status.off { background: rgba(139,127,184,0.08); color: var(--text-dim); }
+    .notif-status.denied { background: rgba(248,113,113,0.08); color: var(--danger); }
   </style>
 </head>
 <body>
@@ -346,6 +414,28 @@
 
         <div class="reset-success" id="reset-success">
           ✅ Emailingizga parolni tiklash havolasi yuborildi!
+        </div>
+
+        <div class="divider-line"></div>
+
+        <div class="notif-section-title">🔔 Eslatma sozlamalari</div>
+
+        <div id="notif-status-box" class="notif-status off">
+          Yuklanmoqda...
+        </div>
+
+        <div class="notif-toggle-row">
+          <span class="notif-toggle-label">Kunlik eslatma</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="notif-toggle" onchange="toggleNotification(this.checked)"/>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+
+        <div class="time-picker-row" id="time-picker-row" style="display:none">
+          <label>Eslatma vaqti</label>
+          <input type="time" id="notif-time" class="time-input" value="19:00" onchange="saveNotifTime(this.value)"/>
         </div>
 
         <div class="divider-line"></div>
@@ -500,6 +590,82 @@
       await signOut(auth);
       window.location.href = 'index.html';
     };
+
+    // ── NOTIFICATION SOZLAMALARI ──
+    function initNotifUI() {
+      const statusBox = document.getElementById('notif-status-box');
+      const toggle = document.getElementById('notif-toggle');
+      const timeRow = document.getElementById('time-picker-row');
+      const timeInput = document.getElementById('notif-time');
+
+      if (!("Notification" in window)) {
+        statusBox.className = 'notif-status denied';
+        statusBox.textContent = 'Brauzeringiz notification qollab-quvvatlamaydi';
+        return;
+      }
+
+      const enabled = localStorage.getItem('notif-enabled') === 'true';
+      const savedTime = localStorage.getItem('notif-time') || '19:00';
+      timeInput.value = savedTime;
+
+      if (Notification.permission === 'denied') {
+        statusBox.className = 'notif-status denied';
+        statusBox.textContent = 'Brauzer ruxsati rad etilgan. Brauzer sozlamalaridan yoqing.';
+        toggle.disabled = true;
+        return;
+      }
+
+      if (enabled && Notification.permission === 'granted') {
+        statusBox.className = 'notif-status on';
+        statusBox.textContent = `Eslatma yoqilgan — har kuni soat ${savedTime} da`;
+        toggle.checked = true;
+        timeRow.style.display = 'flex';
+      } else {
+        statusBox.className = 'notif-status off';
+        statusBox.textContent = 'Eslatma o'chirilgan';
+        toggle.checked = false;
+        timeRow.style.display = 'none';
+      }
+    }
+
+    window.toggleNotification = async checked => {
+      const statusBox = document.getElementById('notif-status-box');
+      const timeRow = document.getElementById('time-picker-row');
+      const savedTime = localStorage.getItem('notif-time') || '19:00';
+
+      if (checked) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          localStorage.setItem('notif-enabled', 'true');
+          statusBox.className = 'notif-status on';
+          statusBox.textContent = `Eslatma yoqilgan — har kuni soat ${savedTime} da`;
+          timeRow.style.display = 'flex';
+          showToast('Eslatma yoqildi! 🔔');
+        } else {
+          document.getElementById('notif-toggle').checked = false;
+          statusBox.className = 'notif-status denied';
+          statusBox.textContent = 'Ruxsat berilmadi';
+          showToast('Ruxsat berilmadi', true);
+        }
+      } else {
+        localStorage.removeItem('notif-enabled');
+        localStorage.setItem('notif-dismissed', 'true');
+        statusBox.className = 'notif-status off';
+        statusBox.textContent = 'Eslatma o'chirilgan';
+        timeRow.style.display = 'none';
+        showToast('Eslatma o'chirildi');
+      }
+    };
+
+    window.saveNotifTime = time => {
+      localStorage.setItem('notif-time', time);
+      const statusBox = document.getElementById('notif-status-box');
+      statusBox.textContent = `Eslatma yoqilgan — har kuni soat ${time} da`;
+      showToast(`Vaqt saqlandi: ${time} ✅`);
+    };
+
+    // Auth tayyor bo'lgandan keyin chaqiramiz
+    setTimeout(initNotifUI, 500);
 
     function showToast(msg, isError = false) {
       const t = document.getElementById('toast');
