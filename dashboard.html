@@ -279,7 +279,22 @@
 
         <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div>
         <button class="profile-btn-item" onclick="window.location.href='profile.html'">👤 Profil</button>
-        <button class="profile-btn-item" id="notif-menu-btn" onclick="toggleNotifFromMenu()">🔔 Eslatma</button>
+        <div id="notif-menu-wrap" style="padding:8px 12px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:0.85rem;color:var(--text-muted)">🔔 Eslatma</span>
+            <label style="position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0">
+              <input type="checkbox" id="notif-menu-toggle" onchange="toggleNotifFromMenu(this.checked)" style="opacity:0;width:0;height:0;position:absolute"/>
+              <div id="notif-track" style="position:absolute;inset:0;background:var(--border);border-radius:99px;transition:0.25s"></div>
+              <div id="notif-thumb" style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:0.25s"></div>
+            </label>
+          </div>
+          <div id="notif-time-row" style="display:none;align-items:center;justify-content:space-between;gap:8px">
+            <span style="font-size:0.78rem;color:var(--text-dim)">Vaqt:</span>
+            <input type="time" id="notif-time-input" value="19:00"
+              style="background:var(--bg-deep);border:1.5px solid var(--border);border-radius:7px;padding:4px 8px;color:var(--text-main);font-size:0.8rem;font-family:'Inter',sans-serif;outline:none;width:90px"
+              onchange="saveNotifTime(this.value)"/>
+          </div>
+        </div>
         <div id="admin-btn-wrap" style="display:none">
           <button class="profile-btn-item" style="color:var(--danger)" onclick="window.location.href='admin.html'">⚙️ Admin panel</button>
         </div>
@@ -443,10 +458,11 @@
 
     // ── DAILY REMINDER ──
     function updateNotifMenuBtn() {
-      const btn = document.getElementById('notif-menu-btn');
-      if (!btn) return;
       const enabled = localStorage.getItem('notif-enabled') === 'true' && Notification.permission === 'granted';
-      btn.textContent = enabled ? '🔔 Eslatma ✓' : '🔔 Eslatma';
+      const savedTime = localStorage.getItem('notif-time') || '19:00';
+      const timeInput = document.getElementById('notif-time-input');
+      if (timeInput) timeInput.value = savedTime;
+      setNotifMenuUI(enabled);
     }
 
     function checkNotificationStatus() {
@@ -483,36 +499,54 @@
       }
     };
 
-    window.toggleNotifFromMenu = async () => {
+    window.toggleNotifFromMenu = async checked => {
       if (!("Notification" in window)) {
         showToast("Brauzeringiz notification qollab-quvvatlamaydi", true);
+        setNotifMenuUI(false);
         return;
       }
-      const enabled = localStorage.getItem('notif-enabled') === 'true';
-      const btn = document.getElementById('notif-menu-btn');
-
-      if (enabled) {
-        localStorage.removeItem('notif-enabled');
-        localStorage.setItem('notif-dismissed', 'true');
-        if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
-        document.getElementById('notif-enabled-banner').style.display = 'none';
-        if (btn) btn.textContent = '🔔 Eslatma';
-        showToast("Eslatma ochirildi");
-      } else {
+      if (checked) {
         const permission = await Notification.requestPermission();
         if (permission === 'granted') {
           localStorage.setItem('notif-enabled', 'true');
           localStorage.removeItem('notif-dismissed');
           document.getElementById('notif-banner').style.display = 'none';
           document.getElementById('notif-enabled-banner').style.display = 'flex';
-          if (btn) btn.textContent = '🔔 Eslatma ✓';
+          setNotifMenuUI(true);
           showToast("Eslatma yoqildi! 🔔");
           scheduleReminder();
         } else {
           showToast("Ruxsat berilmadi", true);
+          setNotifMenuUI(false);
         }
+      } else {
+        localStorage.removeItem('notif-enabled');
+        localStorage.setItem('notif-dismissed', 'true');
+        if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
+        document.getElementById('notif-enabled-banner').style.display = 'none';
+        setNotifMenuUI(false);
+        showToast("Eslatma ochirildi");
       }
     };
+
+    window.saveNotifTime = time => {
+      localStorage.setItem('notif-time', time);
+      if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
+      scheduleReminder();
+      showToast("Vaqt saqlandi: " + time + " ✅");
+    };
+
+    function setNotifMenuUI(on) {
+      const toggle = document.getElementById('notif-menu-toggle');
+      const track = document.getElementById('notif-track');
+      const thumb = document.getElementById('notif-thumb');
+      const timeRow = document.getElementById('notif-time-row');
+      if (!toggle) return;
+      toggle.checked = on;
+      if (track) track.style.background = on ? 'var(--purple-main)' : 'var(--border)';
+      if (thumb) thumb.style.transform = on ? 'translateX(16px)' : 'translateX(0)';
+      if (timeRow) timeRow.style.display = on ? 'flex' : 'none';
+    }
 
     window.dismissNotifBanner = () => {
       localStorage.setItem('notif-dismissed', 'true');
