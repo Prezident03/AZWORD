@@ -279,6 +279,7 @@
 
         <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div>
         <button class="profile-btn-item" onclick="window.location.href='profile.html'">👤 Profil</button>
+        <button class="profile-btn-item" id="notif-menu-btn" onclick="toggleNotifFromMenu()">🔔 Eslatma</button>
         <div id="admin-btn-wrap" style="display:none">
           <button class="profile-btn-item" style="color:var(--danger)" onclick="window.location.href='admin.html'">⚙️ Admin panel</button>
         </div>
@@ -441,6 +442,13 @@
     });
 
     // ── DAILY REMINDER ──
+    function updateNotifMenuBtn() {
+      const btn = document.getElementById('notif-menu-btn');
+      if (!btn) return;
+      const enabled = localStorage.getItem('notif-enabled') === 'true' && Notification.permission === 'granted';
+      btn.textContent = enabled ? '🔔 Eslatma ✓' : '🔔 Eslatma';
+    }
+
     function checkNotificationStatus() {
       if (!("Notification" in window)) return; // brauzer qollab-quvvatlamasa
 
@@ -450,6 +458,7 @@
       if (enabled === 'true' && Notification.permission === 'granted') {
         document.getElementById('notif-enabled-banner').style.display = 'flex';
         scheduleReminder();
+        updateNotifMenuBtn();
       } else if (dismissed !== 'true' && Notification.permission !== 'denied') {
         document.getElementById('notif-banner').style.display = 'flex';
       }
@@ -471,6 +480,37 @@
       } else {
         showToast("Ruxsat berilmadi", true);
         dismissNotifBanner();
+      }
+    };
+
+    window.toggleNotifFromMenu = async () => {
+      if (!("Notification" in window)) {
+        showToast("Brauzeringiz notification qollab-quvvatlamaydi", true);
+        return;
+      }
+      const enabled = localStorage.getItem('notif-enabled') === 'true';
+      const btn = document.getElementById('notif-menu-btn');
+
+      if (enabled) {
+        localStorage.removeItem('notif-enabled');
+        localStorage.setItem('notif-dismissed', 'true');
+        if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
+        document.getElementById('notif-enabled-banner').style.display = 'none';
+        if (btn) btn.textContent = '🔔 Eslatma';
+        showToast("Eslatma ochirildi");
+      } else {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          localStorage.setItem('notif-enabled', 'true');
+          localStorage.removeItem('notif-dismissed');
+          document.getElementById('notif-banner').style.display = 'none';
+          document.getElementById('notif-enabled-banner').style.display = 'flex';
+          if (btn) btn.textContent = '🔔 Eslatma ✓';
+          showToast("Eslatma yoqildi! 🔔");
+          scheduleReminder();
+        } else {
+          showToast("Ruxsat berilmadi", true);
+        }
       }
     };
 
