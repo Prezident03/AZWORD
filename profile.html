@@ -512,7 +512,7 @@
 
     window.saveName = async () => {
       const newName = document.getElementById('input-name').value.trim();
-      if (!newName) return showToast("Ism bo'sh bo'lmasin!", true);
+        if (!newName) return showToast("Ism bosh bolmasin!", true);
 
       const btn = document.getElementById('btn-save');
       btn.disabled = true;
@@ -622,7 +622,7 @@
         timeRow.style.display = 'flex';
       } else {
         statusBox.className = 'notif-status off';
-        statusBox.textContent = 'Eslatma o'chirilgan';
+        statusBox.textContent = "Eslatma ochirilgan";
         toggle.checked = false;
         timeRow.style.display = 'none';
       }
@@ -651,9 +651,9 @@
         localStorage.removeItem('notif-enabled');
         localStorage.setItem('notif-dismissed', 'true');
         statusBox.className = 'notif-status off';
-        statusBox.textContent = 'Eslatma o'chirilgan';
+        statusBox.textContent = "Eslatma ochirilgan";
         timeRow.style.display = 'none';
-        showToast('Eslatma o'chirildi');
+        showToast("Eslatma ochirildi");
       }
     };
 
