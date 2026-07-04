@@ -558,6 +558,26 @@
     }
 
     // ── TEXT-TO-SPEECH ──
+    // Ovozlar ro'yxati
+    let gbVoice = null;
+    function loadVoices() {
+      const voices = window.speechSynthesis.getVoices();
+      gbVoice = voices.find(v =>
+        v.lang === 'en-GB' ||
+        v.name.includes('British') ||
+        v.name.includes('Daniel') ||
+        v.name.includes('Kate') ||
+        v.name.includes('Serena') ||
+        v.name.includes('Arthur') ||
+        v.name.includes('Oliver')
+      ) || voices.find(v => v.lang.startsWith('en-GB'))
+        || voices.find(v => v.lang.startsWith('en'));
+    }
+    loadVoices();
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
     window.speakWord = (text) => {
       if (!window.speechSynthesis) return;
       window.speechSynthesis.cancel();
@@ -566,9 +586,10 @@
       if (btn) { btn.classList.add('speaking'); btn.innerHTML = '🔊 ...'; }
 
       const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = 'en-US';
-      utter.rate = 0.85;
+      utter.lang = 'en-GB';
+      utter.rate = 0.82;
       utter.pitch = 1;
+      if (gbVoice) utter.voice = gbVoice;
 
       utter.onend = () => {
         if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
