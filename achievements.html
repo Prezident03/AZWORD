@@ -140,7 +140,24 @@
       font-size: 0.75rem; color: #34d399; font-weight: 600; margin-top: 4px;
     }
 
-    .ach-empty { text-align: center; padding: 48px; color: var(--text-muted); }
+    .ach-empty {
+      text-align: center; padding: 48px 24px; color: var(--text-muted);
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+    }
+    .ach-empty svg { opacity: 0.65; }
+
+    @media (max-width: 640px) {
+      .ach-wrap { padding: 20px 16px; }
+      .ach-header h1 { font-size: 1.3rem; }
+      .ach-overview { flex-direction: row; gap: 16px; padding: 16px; }
+      .ach-ring-wrap { width: 70px; height: 70px; }
+      .ach-ring-num { font-size: 1.1rem; }
+      .ach-grid { grid-template-columns: 1fr; gap: 12px; }
+      .ach-card { padding: 16px; }
+      .ach-icon-wrap { width: 46px; height: 46px; font-size: 1.4rem; }
+      .ach-tabs { gap: 6px; }
+      .ach-tab { padding: 7px 14px; font-size: 0.8rem; }
+    }
   </style>
 </head>
 <body>
@@ -319,7 +336,14 @@ function renderGrid(tab) {
   document.getElementById('ach-ring-circle').style.strokeDashoffset = offset;
 
   if (!items.length) {
-    grid.innerHTML = '<div class="ach-empty">Bu yerda hech narsa yoq</div>';
+    grid.innerHTML = `<div class="ach-empty">
+      <svg width="110" height="110" viewBox="0 0 110 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="55" cy="55" r="40" fill="#2e2845" stroke="#4a3f6b" stroke-width="2"/>
+        <polygon points="55,28 62,46 82,46 67,57 73,75 55,64 37,75 43,57 28,46 48,46" fill="#3d3160" stroke="#6b5b9e" stroke-width="1.5"/>
+        <polygon points="55,35 60,48 74,48 63,56 67,69 55,61 43,69 47,56 36,48 50,48" fill="#7c3aed" opacity="0.5"/>
+      </svg>
+      <p>Bu yerda hech narsa yoq</p>
+    </div>`;
     return;
   }
 
