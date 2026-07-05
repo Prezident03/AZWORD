@@ -399,6 +399,65 @@
 
   <div class="toast" id="toast"></div>
 
+  <script>
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let _ctx = null;
+  function getCtx() { if (!_ctx) _ctx = new AudioCtx(); return _ctx; }
+  window.playSound = function(type) {
+    try {
+      const ctx = getCtx();
+      if (type === 'correct') {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(880, ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
+        g.gain.setValueAtTime(0.3, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+        o.start(); o.stop(ctx.currentTime + 0.3);
+      } else if (type === 'wrong') {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(300, ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
+        g.gain.setValueAtTime(0.2, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+        o.start(); o.stop(ctx.currentTime + 0.2);
+      } else if (type === 'coin') {
+        [0, 0.08].forEach((d, i) => {
+          const o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.setValueAtTime(i===0?1047:1319, ctx.currentTime+d);
+          g.gain.setValueAtTime(0.25, ctx.currentTime+d);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+d+0.25);
+          o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.25);
+        });
+      } else if (type === 'victory') {
+        [523,659,784,1047].forEach((f,i) => {
+          const o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = 'sine';
+          o.frequency.setValueAtTime(f, ctx.currentTime+i*0.12);
+          g.gain.setValueAtTime(0.25, ctx.currentTime+i*0.12);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+i*0.12+0.3);
+          o.start(ctx.currentTime+i*0.12); o.stop(ctx.currentTime+i*0.12+0.3);
+        });
+      } else if (type === 'achievement') {
+        [784,988,1175,1568].forEach((f,i) => {
+          const o = ctx.createOscillator(), g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.type = i<3?'sine':'triangle';
+          o.frequency.setValueAtTime(f, ctx.currentTime+i*0.1);
+          g.gain.setValueAtTime(0.2, ctx.currentTime+i*0.1);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+i*0.1+0.5);
+          o.start(ctx.currentTime+i*0.1); o.stop(ctx.currentTime+i*0.1+0.5);
+        });
+      }
+    } catch(e) {}
+  };
+</script>
   <script type="module">
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
