@@ -319,9 +319,21 @@
 
     // Score display
     document.getElementById('score-num').textContent = `${perfectWords}/${totalWords}`;
+    document.getElementById('score-num').classList.add('score-pop');
+    setTimeout(() => playSound('victory'), 500);
     setTimeout(() => playSound('victory'), 500);
 
     // Reward: faqat birinchi marta mukammal o'zlashtirilgan so'zlar uchun
+
+    function floatReward(type, amount, x, y) {
+      const el = document.createElement('div');
+      el.className = 'float-reward ' + type;
+      el.textContent = '+' + amount + (type === 'coin' ? ' coin' : ' star');
+      el.style.cssText = 'left:' + (x||window.innerWidth/2-40) + 'px;top:' + (y||window.innerHeight/2) + 'px';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1300);
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 

@@ -619,6 +619,7 @@
     function renderStage() {
       updateProgress();
       const card = document.getElementById('study-card');
+      card.classList.remove('card-animate'); void card.offsetWidth; card.classList.add('card-animate');
       const nextBtn = document.getElementById('next-btn');
       nextBtn.textContent = 'Davom etish →';
       nextBtn.disabled = false;
@@ -743,9 +744,9 @@
     window.checkOption = (btn, selected, correct) => {
       document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       if (selected === correct) {
-        btn.classList.add('correct');
+        btn.classList.add('correct', 'bounce-in');
       } else {
-        btn.classList.add('wrong');
+        btn.classList.add('wrong'); btn.classList.add('wrong-shake'); setTimeout(()=>btn.classList.remove('wrong-shake'),400);
         document.querySelectorAll('.option-btn').forEach(b => {
           if (b.textContent === correct) b.classList.add('correct');
         });
