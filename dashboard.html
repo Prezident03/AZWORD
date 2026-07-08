@@ -143,6 +143,7 @@
     }
     .qa-btn:hover { background: rgba(251,191,36,0.06); transform: translateY(-2px); }
     .qa-btn .qa-icon { font-size: 1.4rem; line-height: 1; }
+    .qa-icon-svg { width: 24px; height: 24px; stroke-width: 2; }
     .qa-btn .qa-label { font-size: 0.78rem; font-weight: 600; text-align: center; }
 
     .qa-btn.qa-shop { border-color: rgba(52,211,153,0.4); color: #34d399; }
@@ -250,15 +251,15 @@
       <!-- Coin & Star badges -->
       <div class="nav-badges">
         <div class="nav-badge streak" id="nav-streak-badge" title="Kunlik streak" onclick="window.location.href='streak.html'" style="cursor:pointer">
-          <span class="badge-icon">🔥</span>
+          <i data-lucide="flame" style="width:16px;height:16px;color:#fb923c"></i>
           <span class="badge-val" id="nav-streak">0</span>
         </div>
         <div class="nav-badge star" title="Yulduzchalar (reyting)">
-          <span class="badge-icon">⭐</span>
+          <i data-lucide="star" style="width:16px;height:16px;color:#fbbf24;fill:#fbbf24"></i>
           <span class="badge-val" id="nav-stars">0</span>
         </div>
         <div class="nav-badge coin" title="Tangalar (xarid)">
-          <span class="badge-icon">🪙</span>
+          <i data-lucide="coins" style="width:16px;height:16px;color:#34d399"></i>
           <span class="badge-val" id="nav-coins">0</span>
         </div>
       </div>
@@ -278,7 +279,7 @@
         </div>
 
         <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div>
-        <button class="profile-btn-item" onclick="window.location.href='profile.html'">👤 Profil</button>
+        <button class="profile-btn-item" onclick="window.location.href='profile.html'"><i data-lucide="user" style="width:15px;height:15px"></i> Profil</button>
         <div id="notif-menu-wrap" style="padding:8px 12px;border-bottom:1px solid var(--border)">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <span style="font-size:0.85rem;color:var(--text-muted)">🔔 Eslatma</span>
@@ -296,9 +297,9 @@
           </div>
         </div>
         <div id="admin-btn-wrap" style="display:none">
-          <button class="profile-btn-item" style="color:var(--danger)" onclick="window.location.href='admin.html'">⚙️ Admin panel</button>
+          <button class="profile-btn-item" style="color:var(--danger)" onclick="window.location.href='admin.html'"><i data-lucide="settings" style="width:15px;height:15px"></i> Admin panel</button>
         </div>
-        <button class="profile-btn-item" onclick="logout()">🚪 Chiqish</button>
+        <button class="profile-btn-item" onclick="logout()"><i data-lucide="log-out" style="width:15px;height:15px;color:var(--danger)"></i> Chiqish</button>
       </div>
 
     </div>
@@ -309,29 +310,29 @@
     <div class="dash-header">
       <h1>Salom, <span id="greeting-name">...</span> 👋</h1>
       <button class="btn-add" id="header-add-btn" onclick="openModal()">
-        <span>＋</span> Yangi bo'lim
+        <i data-lucide="plus" style="width:16px;height:16px"></i> Yangi bo'lim
       </button>
     </div>
 
     <div class="quick-actions">
       <button class="qa-btn" onclick="window.location.href='leaderboard.html'">
-        <span class="qa-icon">🏆</span>
+        <i data-lucide="trophy" class="qa-icon-svg" style="color:#fbbf24"></i>
         <span class="qa-label">Leaderboard</span>
       </button>
       <button class="qa-btn qa-shop" onclick="window.location.href='shop.html'">
-        <span class="qa-icon">🛒</span>
+        <i data-lucide="shopping-bag" class="qa-icon-svg" style="color:#34d399"></i>
         <span class="qa-label">Shop</span>
       </button>
       <button class="qa-btn qa-ach" onclick="window.location.href='achievements.html'">
-        <span class="qa-icon">🏅</span>
+        <i data-lucide="medal" class="qa-icon-svg" style="color:#fbbf24"></i>
         <span class="qa-label">Mukofotlar</span>
       </button>
       <button class="qa-btn qa-stats" onclick="window.location.href='stats.html'">
-        <span class="qa-icon">📊</span>
+        <i data-lucide="bar-chart-2" class="qa-icon-svg" style="color:#60a5fa"></i>
         <span class="qa-label">Statistika</span>
       </button>
       <button class="qa-btn qa-add-mobile" onclick="openModal()">
-        <span class="qa-icon">＋</span>
+        <i data-lucide="plus-circle" class="qa-icon-svg" style="color:var(--purple-light)"></i>
         <span class="qa-label">Yangi bo'lim</span>
       </button>
     </div>
@@ -871,5 +872,6 @@ document.getElementById('folder-name').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') window.createFolder();
     });
   </script>
+  <script>if(window.lucide) lucide.createIcons();</script>
 </body>
 </html>

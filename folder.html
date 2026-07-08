@@ -285,7 +285,7 @@
   <div class="folder-page">
 
     <button class="back-btn" onclick="window.location.href='dashboard.html'">
-      ← Orqaga
+      <i data-lucide="arrow-left" style="width:15px;height:15px"></i> Orqaga
     </button>
 
     <div class="folder-page-header">
@@ -298,12 +298,12 @@
       </div>
       <div class="header-actions">
         <button class="btn-ai-gen locked" id="ai-gen-btn" onclick="openAIGenModal()" title="AI bilan lugat yaratish">
-          🤖 AI Generator
+          <i data-lucide="sparkles" style="width:15px;height:15px"></i> AI Generator
           <span class="uses-badge" id="ai-uses-badge">0</span>
         </button>
-        <button class="btn-upload" onclick="goUpload()">📂 Fayl yuklash</button>
-        <button class="btn-add" onclick="openAddModal()">＋ So'z qo'shish</button>
-        <button class="btn-study" id="study-btn" onclick="startStudy()" disabled>▶ Mashq boshlash</button>
+        <button class="btn-upload" onclick="goUpload()"><i data-lucide="upload" style="width:15px;height:15px"></i> Fayl yuklash</button>
+        <button class="btn-add" onclick="openAddModal()"><i data-lucide="plus" style="width:15px;height:15px"></i> So'z qo'shish</button>
+        <button class="btn-study" id="study-btn" onclick="startStudy()" disabled><i data-lucide="play" style="width:15px;height:15px"></i> Mashq boshlash</button>
       </div>
     </div>
 
@@ -484,7 +484,7 @@
             ${w.example ? `<div class="word-example">"${w.example}"</div>` : ''}
           </div>
           <div class="word-actions">
-            <button class="icon-btn" onclick="deleteWord('${w.id}')" title="O'chirish">🗑</button>
+            <button class="icon-btn" onclick="deleteWord('${w.id}')" title="O'chirish"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>
           </div>
         `;
         container.appendChild(div);
@@ -810,5 +810,6 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
   </script>
+  <script>if(window.lucide) lucide.createIcons();</script>
 </body>
 </html>
