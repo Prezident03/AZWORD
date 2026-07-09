@@ -872,6 +872,19 @@ document.getElementById('folder-name').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') window.createFolder();
     });
   </script>
-  <script>if(window.lucide) lucide.createIcons();</script>
+  <script>
+    // Lucide iconlarni ishga tushirish
+    function initLucide() {
+      if (window.lucide) {
+        lucide.createIcons();
+      } else {
+        setTimeout(initLucide, 100);
+      }
+    }
+    initLucide();
+    // Firebase module yuklangandan keyin ham yangilaymiz
+    setTimeout(initLucide, 1000);
+    setTimeout(initLucide, 2000);
+  </script>
 </body>
 </html>
