@@ -1,876 +1,845 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AzWord — Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
   <style>
-    /* Coin & Star badges */
-    .nav-badges {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .nav-badge {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 5px 12px;
-      border-radius: 99px;
-      font-size: 0.82rem;
-      font-weight: 700;
-    }
-    .nav-badge.star {
-      background: rgba(251,191,36,0.12);
-      border: 1.5px solid rgba(251,191,36,0.35);
-      color: #fbbf24;
-    }
-    .nav-badge.coin {
-      background: rgba(52,211,153,0.1);
-      border: 1.5px solid rgba(52,211,153,0.3);
-      color: #34d399;
-    }
+    /* ── LAYOUT ── */
+    body { display: flex; min-height: 100vh; background: var(--bg-deep); }
 
-    .nav-badge.streak {
-      background: rgba(251,146,60,0.12);
-      border: 1.5px solid rgba(251,146,60,0.35);
-      color: #fb923c;
-    }
-    .nav-badge.streak.zero { opacity: 0.5; }
-    .nav-badge .badge-val {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.9rem;
-    }
-
-    .btn-leaderboard {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 20px;
-      background: transparent;
-      border: 1.5px solid rgba(251,191,36,0.4);
-      color: #fbbf24;
-      border-radius: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-    .btn-leaderboard:hover {
-      background: rgba(251,191,36,0.08);
-      border-color: #fbbf24;
-    }
-
-    /* E'lon banner */
-    .announce-banner {
-      margin: 0 0 20px 0;
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 220px;
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      position: fixed;
+      top: 0; left: 0;
+      height: 100vh;
+      z-index: 200;
+      transition: transform 0.3s;
     }
-    .announce-item-banner {
+
+    .sidebar-logo {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 18px;
+      gap: 10px;
+    }
+    .sidebar-logo .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sidebar-logo .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #9d5cf6, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* User info */
+    .sidebar-user {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sidebar-user:hover { background: var(--bg-hover); }
+    .sb-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 0.9rem;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .sb-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .sb-user-info { flex: 1; min-width: 0; }
+    .sb-user-name { font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-user-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+
+    /* Nav */
+    .sidebar-nav { flex: 1; padding: 10px 10px; overflow-y: auto; }
+    .nav-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      padding: 10px 10px 5px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.855rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+      margin-bottom: 1px;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: var(--bg-hover); color: var(--text-main); }
+    .nav-item.active {
+      background: var(--purple-glow);
+      color: var(--purple-light);
+    }
+    .nav-item svg { flex-shrink: 0; opacity: 0.8; }
+    .nav-item.active svg { opacity: 1; }
+
+    /* Streak banner */
+    .sb-streak {
+      margin: 10px;
+      padding: 12px 14px;
+      background: rgba(251,146,60,0.1);
+      border: 1px solid rgba(251,146,60,0.25);
       border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .sb-streak:hover { background: rgba(251,146,60,0.15); }
+    .sb-streak-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fb923c;
+    }
+    .sb-streak-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+    .sb-streak-arrow { margin-left: auto; color: var(--text-dim); }
+
+    .sidebar-bottom { padding: 10px; border-top: 1px solid var(--border); }
+
+    /* ── MAIN ── */
+    .dash-main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
+
+    /* Topbar */
+    .dash-topbar {
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15,13,26,0.85);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .topbar-left h1 span { color: var(--purple-light); }
+    .topbar-left p { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    /* Stats row */
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 99px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border: 1.5px solid;
+    }
+    .stat-pill.streak { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); color: #fb923c; }
+    .stat-pill.stars { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fbbf24; cursor: pointer; }
+    .stat-pill.coins { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.3); color: #34d399; }
+
+    .topbar-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff; font-size: 0.9rem;
+      cursor: pointer; overflow: hidden;
+      border: 2px solid rgba(124,58,237,0.3);
+      transition: border-color 0.2s;
+    }
+    .topbar-avatar:hover { border-color: var(--purple-main); }
+    .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    /* ── CONTENT ── */
+    .dash-content { padding: 28px; flex: 1; }
+
+    /* Announce */
+    .announce-banner { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .announce-item-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 12px; font-size: 0.875rem;
       animation: slideDown 0.3s ease;
     }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-8px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .announce-item-banner.type-yangilik {
-      background: rgba(124,58,237,0.1);
-      border: 1px solid rgba(124,58,237,0.25);
-    }
-    .announce-item-banner.type-ogohlantirish {
-      background: rgba(251,191,36,0.08);
-      border: 1px solid rgba(251,191,36,0.25);
-    }
-    .announce-item-banner.type-sovga {
-      background: rgba(52,211,153,0.08);
-      border: 1px solid rgba(52,211,153,0.25);
-    }
-    .announce-item-banner.type-eslatma {
-      background: rgba(139,127,184,0.08);
-      border: 1px solid rgba(139,127,184,0.2);
-    }
-    .announce-item-banner.type-yangilanish {
-      background: rgba(96,165,250,0.08);
-      border: 1px solid rgba(96,165,250,0.2);
-    }
-    .announce-emoji { font-size: 1.2rem; flex-shrink: 0; }
-    .announce-close {
-      margin-left: auto;
-      background: none;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0 4px;
-      line-height: 1;
-      transition: color 0.2s;
-    }
-    .announce-close:hover { color: var(--text-muted); }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+    .announce-item-banner.type-yangilik { background:rgba(124,58,237,0.1); border:1px solid rgba(124,58,237,0.25); }
+    .announce-item-banner.type-ogohlantirish { background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25); }
+    .announce-item-banner.type-sovga { background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.25); }
+    .announce-item-banner.type-eslatma { background:rgba(139,127,184,0.08); border:1px solid rgba(139,127,184,0.2); }
+    .announce-item-banner.type-yangilanish { background:rgba(96,165,250,0.08); border:1px solid rgba(96,165,250,0.2); }
+    .announce-emoji { font-size:1.2rem; flex-shrink:0; }
+    .announce-close { margin-left:auto; background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0 4px; }
 
-    /* Quick actions grid */
-    .quick-actions {
+    /* Notification banners */
+    .notif-banner {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 16px; background: rgba(96,165,250,0.08);
+      border: 1.5px solid rgba(96,165,250,0.25); border-radius: 12px;
+      margin-bottom: 16px; font-size: 0.875rem;
+    }
+    .notif-banner .nb-text { flex:1; color:var(--text-muted); line-height:1.4; }
+    .notif-banner .nb-text strong { color:var(--text-main); }
+    .notif-banner .nb-btn {
+      padding: 7px 14px; background: #60a5fa; color: #fff;
+      border: none; border-radius: 8px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif;
+      flex-shrink: 0; transition: opacity 0.2s;
+    }
+    .notif-banner .nb-btn:hover { opacity: 0.88; }
+    .notif-banner .nb-close { background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0 4px; flex-shrink:0; }
+
+    /* Section header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Folders grid */
+    .folders-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
       margin-bottom: 32px;
     }
 
-    .qa-btn {
+    /* Folder card */
+    .folder-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .folder-card:hover { border-color: var(--purple-main); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.15); }
+
+    .folder-icon {
+      width: 42px; height: 42px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(157,92,246,0.15));
+      border: 1px solid rgba(124,58,237,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 12px;
+    }
+    .folder-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .folder-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; }
+
+    .folder-progress { height: 4px; background: var(--bg-deep); border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+    .folder-progress-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--purple-main), var(--purple-light)); transition: width 0.4s; }
+
+    .folder-score {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 99px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      color: var(--purple-light);
+    }
+    .folder-delete {
+      position: absolute; top: 12px; right: 12px;
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transition: all 0.15s;
+    }
+    .folder-card:hover .folder-delete { opacity: 1; }
+    .folder-delete:hover { border-color: var(--danger); color: var(--danger); background: rgba(248,113,113,0.08); }
+
+    /* Add folder card */
+    .folder-card-add {
+      background: transparent;
+      border: 2px dashed var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 16px 10px;
-      background: var(--bg-card);
-      border: 1.5px solid rgba(251,191,36,0.35);
-      color: #fbbf24;
-      border-radius: 14px;
-      cursor: pointer;
-      font-family: 'Inter', sans-serif;
-      transition: all 0.2s;
-    }
-    .qa-btn:hover { background: rgba(251,191,36,0.06); transform: translateY(-2px); }
-    .qa-btn .qa-icon { font-size: 1.4rem; line-height: 1; }
-    .qa-icon-svg { width: 24px; height: 24px; stroke-width: 2; }
-    .qa-btn .qa-label { font-size: 0.78rem; font-weight: 600; text-align: center; }
-
-    .qa-btn.qa-shop { border-color: rgba(52,211,153,0.4); color: #34d399; }
-    .qa-btn.qa-shop:hover { background: rgba(52,211,153,0.06); }
-
-    .qa-btn.qa-ach { border-color: rgba(251,191,36,0.4); color: #fbbf24; }
-
-    .qa-btn.qa-stats {
-      border-color: rgba(96,165,250,0.4);
-      color: #60a5fa;
-    }
-    .qa-btn.qa-stats:hover { background: rgba(96,165,250,0.06); }
-
-    .qa-btn.qa-add-mobile {
-      border-color: var(--purple-main);
-      color: var(--purple-light);
-      background: var(--purple-glow);
-      display: none;
-    }
-    .qa-btn.qa-add-mobile:hover { background: rgba(124,58,237,0.18); }
-
-    /* Mobile: header btn yashirin, quick-actions add ko'rinadi */
-    @media (max-width: 480px) {
-      .nav-badges { gap: 5px; }
-      .nav-badge { padding: 4px 8px; font-size: 0.75rem; }
-      .nav-badge .badge-icon { font-size: 0.85rem; }
-    }
-
-    @media (max-width: 640px) {
-      .quick-actions { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-      #header-add-btn { display: none; }
-      .qa-btn.qa-add-mobile { display: flex; }
-      .qa-btn .qa-icon { font-size: 1.25rem; }
-      .qa-btn .qa-label { font-size: 0.7rem; }
-      .qa-btn { padding: 13px 6px; }
-      .dash-header h1 { font-size: 1.4rem; }
-      .announce-item-banner { font-size: 0.82rem; padding: 10px 14px; }
-    }
-
-    @media (max-width: 420px) {
-      .quick-actions { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    /* Notification banner */
-    .notif-banner {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 18px;
-      background: rgba(96,165,250,0.08);
-      border: 1.5px solid rgba(96,165,250,0.25);
-      border-radius: 14px;
-      margin-bottom: 20px;
-      font-size: 0.875rem;
-    }
-    .notif-banner .nb-icon { font-size: 1.4rem; flex-shrink: 0; }
-    .notif-banner .nb-text { flex: 1; color: var(--text-muted); line-height: 1.4; }
-    .notif-banner .nb-text strong { color: var(--text-main); }
-    .notif-banner .nb-btn {
-      padding: 8px 16px;
-      background: #60a5fa;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: "Inter", sans-serif;
-      white-space: nowrap;
-      transition: opacity 0.2s;
-      flex-shrink: 0;
-    }
-    .notif-banner .nb-btn:hover { opacity: 0.88; }
-    .notif-banner .nb-close {
-      background: none;
-      border: none;
+      gap: 8px;
+      min-height: 140px;
       color: var(--text-dim);
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 0 4px;
-      flex-shrink: 0;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .folder-card-add:hover { border-color: var(--purple-main); color: var(--purple-light); background: var(--purple-glow); }
+    .folder-card-add svg { opacity: 0.5; transition: opacity 0.2s; }
+    .folder-card-add:hover svg { opacity: 1; }
+
+    /* Empty state */
+    .folders-empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
 
-    .score-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: var(--purple-glow);
-      border: 1.5px solid var(--purple-main);
-      border-radius: 99px;
-      padding: 3px 10px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--purple-light);
-      margin-top: 8px;
+    /* Modal */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:999; }
+    .modal-overlay.open { display:flex; }
+
+    /* Notification dropdown */
+    .notif-menu-wrap {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .notif-toggle-row {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+    }
+    .notif-toggle-label { font-size: 0.82rem; color: var(--text-muted); }
+    .toggle-switch { position:relative; width:36px; height:20px; cursor:pointer; }
+    .toggle-switch input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-track { position:absolute; inset:0; background:var(--border); border-radius:99px; transition:0.25s; }
+    .toggle-thumb { position:absolute; top:2px; left:2px; width:16px; height:16px; background:#fff; border-radius:50%; transition:0.25s; }
+    .toggle-switch input:checked + .toggle-track { background:var(--purple-main); }
+    .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(16px); }
+
+    /* Mobile */
+    .mobile-menu-btn { display:none; }
+    .sidebar-overlay { display:none; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .dash-main { margin-left: 0; }
+      .dash-topbar { padding: 12px 16px; }
+      .dash-content { padding: 16px; }
+      .mobile-menu-btn { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border:1.5px solid var(--border); border-radius:9px; background:transparent; cursor:pointer; color:var(--text-muted); }
+      .sidebar-overlay { display:block; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:199; display:none; }
+      .sidebar-overlay.open { display:block; }
+      .folders-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap:10px; }
+      .topbar-left p { display:none; }
     }
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <div class="nav-logo">AzWord</div>
-    <div class="nav-user">
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
-      <!-- Coin & Star badges -->
-      <div class="nav-badges">
-        <div class="nav-badge streak" id="nav-streak-badge" title="Kunlik streak" onclick="window.location.href='streak.html'" style="cursor:pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-          <span class="badge-val" id="nav-streak">0</span>
-        </div>
-        <div class="nav-badge star" title="Yulduzchalar (reyting)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <span class="badge-val" id="nav-stars">0</span>
-        </div>
-        <div class="nav-badge coin" title="Tangalar (xarid)">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
-          <span class="badge-val" id="nav-coins">0</span>
-        </div>
-      </div>
-
-      <div class="profile-avatar" id="profile-avatar">
-        <span id="avatar-text">A</span>
-      </div>
-
-      <div class="profile-dropdown" id="profile-dropdown">
-        <div class="profile-head">
-          <div class="profile-avatar-lg">
-            <span id="avatar-text-lg">A</span>
-          </div>
-
-          <h4 id="user-name">...</h4>
-          <p id="user-email">...</p>
-        </div>
-
-        <div class="profile-stats"><div id="profileStats">📚 Yuklanmoqda...</div></div>
-        <button class="profile-btn-item" onclick="window.location.href='profile.html'"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Profil</button>
-        <div id="notif-menu-wrap" style="padding:8px 12px;border-bottom:1px solid var(--border)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <span style="font-size:0.85rem;color:var(--text-muted)">🔔 Eslatma</span>
-            <label style="position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0">
-              <input type="checkbox" id="notif-menu-toggle" onchange="toggleNotifFromMenu(this.checked)" style="opacity:0;width:0;height:0;position:absolute"/>
-              <div id="notif-track" style="position:absolute;inset:0;background:var(--border);border-radius:99px;transition:0.25s"></div>
-              <div id="notif-thumb" style="position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:0.25s"></div>
-            </label>
-          </div>
-          <div id="notif-time-row" style="display:none;align-items:center;justify-content:space-between;gap:8px">
-            <span style="font-size:0.78rem;color:var(--text-dim)">Vaqt:</span>
-            <input type="time" id="notif-time-input" value="19:00"
-              style="background:var(--bg-deep);border:1.5px solid var(--border);border-radius:7px;padding:4px 8px;color:var(--text-main);font-size:0.8rem;font-family:'Inter',sans-serif;outline:none;width:90px"
-              onchange="saveNotifTime(this.value)"/>
-          </div>
-        </div>
-        <div id="admin-btn-wrap" style="display:none">
-          <button class="profile-btn-item" style="color:var(--danger)" onclick="window.location.href='admin.html'"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Admin panel</button>
-        </div>
-        <button class="profile-btn-item" onclick="logout()"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Chiqish</button>
-      </div>
-
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
     </div>
+    <span class="logo-text">AzWord</span>
+  </div>
+
+  <div class="sidebar-user" onclick="window.location.href='profile.html'">
+    <div class="sb-avatar" id="sb-avatar">A</div>
+    <div class="sb-user-info">
+      <div class="sb-user-name" id="sb-user-name">Yuklanmoqda...</div>
+      <div class="sb-user-sub" id="sb-user-email"></div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Asosiy</div>
+    <a class="nav-item active" href="dashboard.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-item" href="stats.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Statistika
+    </a>
+    <a class="nav-item" href="achievements.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/><path d="M12 18v-2h-.5"/></svg>
+      Mukofotlar
+    </a>
+    <a class="nav-item" href="leaderboard.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+      Leaderboard
+    </a>
+    <a class="nav-item" href="shop.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Shop
+    </a>
+    <a class="nav-item" href="profile.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profil
+    </a>
+
+    <div class="nav-label" id="admin-nav-label" style="display:none">Admin</div>
+    <a class="nav-item" href="admin.html" id="admin-nav-item" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      Admin panel
+    </a>
   </nav>
 
-  <div class="dashboard">
+  <!-- Streak -->
+  <div class="sb-streak" onclick="window.location.href='streak.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+    <div>
+      <div class="sb-streak-num"><span id="sb-streak">0</span> kun</div>
+      <div class="sb-streak-label">Ketma-ket streak</div>
+    </div>
+    <div class="sb-streak-arrow">›</div>
+  </div>
 
-    <div class="dash-header">
-      <h1>Salom, <span id="greeting-name">...</span> 👋</h1>
-      <button class="btn-add" id="header-add-btn" onclick="openModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Yangi bo'lim
+  <div class="sidebar-bottom">
+    <!-- Notification -->
+    <div class="notif-menu-wrap">
+      <div class="notif-toggle-row">
+        <span class="notif-toggle-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;margin-right:5px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          Eslatma
+        </span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="notif-menu-toggle" onchange="toggleNotifFromMenu(this.checked)"/>
+          <div class="toggle-track" id="notif-track"></div>
+          <div class="toggle-thumb" id="notif-thumb"></div>
+        </label>
+      </div>
+      <div id="notif-time-row" style="display:none;align-items:center;justify-content:space-between;gap:8px">
+        <span style="font-size:0.72rem;color:var(--text-dim)">Vaqt:</span>
+        <input type="time" id="notif-time-input" value="19:00"
+          style="background:var(--bg-deep);border:1.5px solid var(--border);border-radius:7px;padding:3px 8px;color:var(--text-main);font-size:0.78rem;font-family:'Inter',sans-serif;outline:none;width:85px"
+          onchange="saveNotifTime(this.value)"/>
+      </div>
+    </div>
+    <button class="nav-item" onclick="logout()" style="color:var(--danger);width:100%;margin-top:4px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Chiqish
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="dash-main">
+  <!-- Topbar -->
+  <div class="dash-topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="mobile-menu-btn" onclick="openSidebar()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-left">
+        <h1>Salom, <span id="greeting-name">...</span> 👋</h1>
+        <p>Bugun yangi so'zlar bilan o'rganishni davom ettiring</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="stats-row">
+        <div class="stat-pill streak" id="tp-streak" onclick="window.location.href='streak.html'" style="cursor:pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          <span id="nav-streak">0</span>
+        </div>
+        <div class="stat-pill stars">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <span id="nav-stars">0</span>
+        </div>
+        <div class="stat-pill coins">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+          <span id="nav-coins">0</span>
+        </div>
+      </div>
+      <div class="topbar-avatar" id="topbar-avatar" onclick="window.location.href='profile.html'">A</div>
+      <button class="btn-add" onclick="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Yangi bo'lim
       </button>
     </div>
+  </div>
 
-    <div class="quick-actions">
-      <button class="qa-btn" onclick="window.location.href='leaderboard.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="qa-icon-svg"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        <span class="qa-label">Leaderboard</span>
-      </button>
-      <button class="qa-btn qa-shop" onclick="window.location.href='shop.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="qa-icon-svg"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span class="qa-label">Shop</span>
-      </button>
-      <button class="qa-btn qa-ach" onclick="window.location.href='achievements.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="qa-icon-svg"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/><path d="M12 18v-2h-.5"/></svg>
-        <span class="qa-label">Mukofotlar</span>
-      </button>
-      <button class="qa-btn qa-stats" onclick="window.location.href='stats.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="qa-icon-svg"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span class="qa-label">Statistika</span>
-      </button>
-      <button class="qa-btn qa-add-mobile" onclick="openModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="qa-icon-svg"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        <span class="qa-label">Yangi bo'lim</span>
-      </button>
-    </div>
-
-    <!-- E'lonlar banneri -->
+  <!-- Content -->
+  <div class="dash-content">
+    <!-- Announce banner -->
     <div class="announce-banner" id="announce-banner"></div>
 
-    <!-- Notification banner -->
+    <!-- Notification banners -->
     <div id="notif-banner" class="notif-banner" style="display:none">
-      <span class="nb-icon">🔔</span>
-      <div class="nb-text">
-        <strong>Kunlik eslatma</strong><br>
-        Har kuni soat 19:00 da "Mashq vaqti!" xabari olasiz
-      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <div class="nb-text"><strong>Kunlik eslatma</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
       <button class="nb-btn" onclick="enableNotifications()">Yoqish</button>
       <button class="nb-close" onclick="dismissNotifBanner()">✕</button>
     </div>
-
     <div id="notif-enabled-banner" class="notif-banner" style="display:none;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.06)">
-      <span class="nb-icon">✅</span>
-      <div class="nb-text">
-        <strong>Eslatma yoqilgan!</strong><br>
-        Har kuni soat 19:00 da xabar olasiz
-      </div>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="nb-text"><strong>Eslatma yoqilgan!</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
       <button class="nb-close" onclick="disableNotifications()">O'chirish</button>
     </div>
 
-    <div id="admin-section" style="display:none">
-      <div class="section-label">📚 Umumiy bo'limlar</div>
-      <div class="folder-grid" id="admin-folders">
-        <div class="empty-state">
-          <div class="emoji">📭</div>
-          <p>Hozircha umumiy bo'limlar yo'q</p>
+    <!-- Admin section -->
+    <div id="admin-section" style="display:none;margin-bottom:24px">
+      <div class="section-header">
+        <div class="section-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          Umumiy bo'limlar
         </div>
       </div>
+      <div class="folders-grid" id="admin-folders"></div>
     </div>
 
-    <div class="section-label">🗂️ Mening bo'limlarim</div>
-    <div class="folder-grid" id="my-folders">
-      <div class="empty-state" id="empty-msg" style="padding:40px 20px">
-          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:16px;opacity:0.7">
-            <rect x="20" y="30" width="80" height="60" rx="8" fill="#2e2845" stroke="#4a3f6b" stroke-width="2"/>
-            <rect x="30" y="20" width="60" height="50" rx="6" fill="#3d3160" stroke="#6b5b9e" stroke-width="2"/>
-            <circle cx="60" cy="45" r="12" fill="#7c3aed" opacity="0.5"/>
-            <path d="M54 45 L58 49 L66 41" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <rect x="38" y="62" width="44" height="3" rx="1.5" fill="#4a3f6b"/>
-            <rect x="44" y="68" width="32" height="3" rx="1.5" fill="#3d3160"/>
-          </svg>
-        <div class="emoji">✨</div>
-        <p>Hali bo'lim yo'q. Birinchi bo'limingizni yarating!</p>
+    <!-- My folders -->
+    <div class="section-header">
+      <div class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+        Mening bo'limlarim
       </div>
     </div>
-
-  </div>
-
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <h3>Yangi bo'lim yaratish</h3>
-      <div class="form-group">
-        <label>Bo'lim nomi</label>
-        <input type="text" id="folder-name" placeholder="Masalan: Mevalar, Hayvonlar..." />
-      </div>
-      <div class="form-group">
-        <label>Emoji (ixtiyoriy)</label>
-        <input type="text" id="folder-emoji" placeholder="🍎" maxlength="2" />
-      </div>
-      <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeModal()">Bekor qilish</button>
-        <button class="btn-confirm" onclick="createFolder()">Yaratish</button>
+    <div class="folders-grid" id="my-folders">
+      <div class="folders-empty">
+        <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.6">
+          <rect x="20" y="30" width="80" height="60" rx="8" fill="#2e2845" stroke="#4a3f6b" stroke-width="2"/>
+          <rect x="30" y="20" width="60" height="50" rx="6" fill="#3d3160" stroke="#6b5b9e" stroke-width="2"/>
+          <circle cx="60" cy="45" r="12" fill="#7c3aed" opacity="0.5"/>
+          <path d="M54 45 L58 49 L66 41" stroke="#c084fc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p style="font-weight:600">Hali bo'limlar yo'q</p>
+        <p style="font-size:0.82rem">Birinchi bo'limingizni yarating!</p>
+        <button class="btn-add" onclick="openModal()" style="margin-top:8px">
+          + Yangi bo'lim
+        </button>
       </div>
     </div>
   </div>
+</main>
 
-  <div class="toast" id="toast"></div>
+<!-- New folder modal -->
+<div class="modal-overlay" id="folder-modal">
+  <div class="modal">
+    <h3>Yangi bo'lim yaratish</h3>
+    <div class="form-group">
+      <label>Bo'lim nomi</label>
+      <input type="text" id="folder-name" placeholder="Masalan: IELTS Vocabulary" onkeydown="if(event.key==='Enter') createFolder()"/>
+    </div>
+    <div class="form-group">
+      <label>Emoji</label>
+      <input type="text" id="folder-emoji" placeholder="📚" maxlength="2"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Bekor</button>
+      <button class="btn-confirm" onclick="createFolder()">Yaratish</button>
+    </div>
+  </div>
+</div>
 
-  <script>
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let _ctx = null;
-  function getCtx() { if (!_ctx) _ctx = new AudioCtx(); return _ctx; }
-  window.playSound = function(type) {
-    try {
-      const ctx = getCtx();
-      if (type === 'correct') {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(880, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
-        g.gain.setValueAtTime(0.3, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        o.start(); o.stop(ctx.currentTime + 0.3);
-      } else if (type === 'wrong') {
-        const o = ctx.createOscillator(), g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sawtooth';
-        o.frequency.setValueAtTime(300, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
-        g.gain.setValueAtTime(0.2, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-        o.start(); o.stop(ctx.currentTime + 0.2);
-      } else if (type === 'coin') {
-        [0, 0.08].forEach((d, i) => {
-          const o = ctx.createOscillator(), g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(i===0?1047:1319, ctx.currentTime+d);
-          g.gain.setValueAtTime(0.25, ctx.currentTime+d);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+d+0.25);
-          o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.25);
-        });
-      } else if (type === 'victory') {
-        [523,659,784,1047].forEach((f,i) => {
-          const o = ctx.createOscillator(), g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(f, ctx.currentTime+i*0.12);
-          g.gain.setValueAtTime(0.25, ctx.currentTime+i*0.12);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+i*0.12+0.3);
-          o.start(ctx.currentTime+i*0.12); o.stop(ctx.currentTime+i*0.12+0.3);
-        });
-      } else if (type === 'achievement') {
-        [784,988,1175,1568].forEach((f,i) => {
-          const o = ctx.createOscillator(), g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = i<3?'sine':'triangle';
-          o.frequency.setValueAtTime(f, ctx.currentTime+i*0.1);
-          g.gain.setValueAtTime(0.2, ctx.currentTime+i*0.1);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+i*0.1+0.5);
-          o.start(ctx.currentTime+i*0.1); o.stop(ctx.currentTime+i*0.1+0.5);
-        });
-      }
-    } catch(e) {}
-  };
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc,
+  query, where, orderBy, limit, serverTimestamp, increment
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
+let currentUser = null;
+
+onAuthStateChanged(auth, async user => {
+  if (!user) return location.href = 'index.html';
+  currentUser = user;
+
+  localStorage.setItem('last-study-date', new Date().toISOString().slice(0, 10));
+
+  const name = user.displayName || user.email.split('@')[0];
+  const letter = name.charAt(0).toUpperCase();
+  document.getElementById('greeting-name').textContent = name.split(' ')[0] || name;
+  document.getElementById('sb-user-name').textContent = name;
+  document.getElementById('sb-user-email').textContent = user.email;
+
+  if (user.email === ADMIN_EMAIL) {
+    document.getElementById('admin-section').style.display = 'block';
+    document.getElementById('admin-nav-label').style.display = 'block';
+    document.getElementById('admin-nav-item').style.display = 'flex';
+  }
+
+  await loadUserStats(user.uid);
+  await loadFolders();
+  await loadAnnouncements();
+  checkNotificationStatus();
+});
+
+async function loadUserStats(uid) {
+  try {
+    const ud = await getDoc(doc(db, 'users', uid));
+    if (ud.exists()) {
+      const d = ud.data();
+      const streak = d.streakDays || 0;
+      const stars = d.stars || 0;
+      const coins = d.coins || 0;
+
+      document.getElementById('nav-streak').textContent = streak;
+      document.getElementById('nav-stars').textContent = stars;
+      document.getElementById('nav-coins').textContent = coins;
+      document.getElementById('sb-streak').textContent = streak;
+
+      // Avatar
+      const avatarEls = ['sb-avatar', 'topbar-avatar'];
+      avatarEls.forEach(id => {
+        const el = document.getElementById(id);
+        if (d.photoBase64) {
+          el.innerHTML = `<img src="${d.photoBase64}" alt="avatar">`;
+        } else {
+          el.textContent = (d.displayName || currentUser.email || 'A').charAt(0).toUpperCase();
+        }
+      });
+    }
+  } catch(e) {}
+}
+
+async function loadFolders() {
+  const myQ = query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false));
+  const adminQ = query(collection(db,'folders'), where('isAdmin','==',true));
+  const [mySnap, adminSnap] = await Promise.all([getDocs(myQ), getDocs(adminQ)]);
+  renderFolders(mySnap, 'my-folders', false);
+  renderFolders(adminSnap, 'admin-folders', true);
+}
+
+function renderFolders(snap, containerId, isAdmin) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  if (snap.empty) {
+    if (!isAdmin) {
+      container.innerHTML = `<div class="folders-empty">
+        <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.6">
+          <rect x="20" y="30" width="80" height="60" rx="8" fill="#2e2845" stroke="#4a3f6b" stroke-width="2"/>
+          <rect x="30" y="20" width="60" height="50" rx="6" fill="#3d3160" stroke="#6b5b9e" stroke-width="2"/>
+        </svg>
+        <p style="font-weight:600">Hali bolim yoq</p>
+        <button class="btn-add" onclick="openModal()" style="margin-top:8px">+ Yangi bolim</button>
+      </div>`;
+    }
+    return;
+  }
+
+  container.innerHTML = '';
+  snap.forEach(d => {
+    const f = d.data();
+    const id = d.id;
+    const wc = f.wordCount || 0;
+    const score = f.lastScore;
+    const pct = score !== null && score !== undefined ? score : 0;
+
+    const card = document.createElement('div');
+    card.className = 'folder-card';
+    card.onclick = () => location.href = `folder.html?id=${id}`;
+    card.innerHTML = `
+      ${!isAdmin ? `<button class="folder-delete" onclick="deleteFolder(event,'${id}')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>` : ''}
+      <div class="folder-icon">${f.emoji || '📁'}</div>
+      <div class="folder-name">${f.name}</div>
+      <div class="folder-meta">${wc} ta soz</div>
+      <div class="folder-progress">
+        <div class="folder-progress-fill" style="width:${pct}%"></div>
+      </div>
+      ${score !== null && score !== undefined ? `<div class="folder-score">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        ${score}/${wc}
+      </div>` : ''}
+    `;
+    container.appendChild(card);
+  });
+
+  if (!isAdmin) {
+    const addCard = document.createElement('div');
+    addCard.className = 'folder-card-add';
+    addCard.onclick = openModal;
+    addCard.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      Yangi bolim
+    `;
+    container.appendChild(addCard);
+  }
+}
+
+window.openModal = () => { document.getElementById('folder-modal').classList.add('open'); setTimeout(()=>document.getElementById('folder-name').focus(),100); };
+window.closeModal = () => { document.getElementById('folder-modal').classList.remove('open'); document.getElementById('folder-name').value=''; document.getElementById('folder-emoji').value=''; };
+
+window.createFolder = async () => {
+  const name = document.getElementById('folder-name').value.trim();
+  const emoji = document.getElementById('folder-emoji').value.trim() || '📁';
+  if (!name) return;
+  const existing = await getDocs(query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false)));
+  if ([...existing.docs].find(d => d.data().name.toLowerCase() === name.toLowerCase())) {
+    return showToast(name + " nomli bolim allaqachon mavjud!", true);
+  }
+  await addDoc(collection(db,'folders'), { name, emoji, uid:currentUser.uid, isAdmin:false, wordCount:0, progress:0, lastScore:null, createdAt:serverTimestamp() });
+  closeModal();
+  showToast("Bolim yaratildi!");
+  await loadFolders();
+};
+
+window.deleteFolder = async (e, id) => {
+  e.stopPropagation();
+  if (!confirm("Bu bolimni ochirasizmi?")) return;
+  const ws = await getDocs(collection(db,'folders',id,'words'));
+  for (const w of ws.docs) await deleteDoc(doc(db,'folders',id,'words',w.id));
+  await deleteDoc(doc(db,'folders',id));
+  showToast("Ochirildi");
+  await loadFolders();
+};
+
+async function loadAnnouncements() {
+  try {
+    const snap = await getDocs(query(collection(db,'announcements'), orderBy('createdAt','desc'), limit(5)));
+    const banner = document.getElementById('announce-banner');
+    if (!banner || snap.empty) return;
+    banner.innerHTML = '';
+    const typeClass = {'🎉':'type-yangilik','⚠️':'type-ogohlantirish','🎁':'type-sovga','🔔':'type-eslatma','🚀':'type-yangilanish'};
+    snap.forEach(d => {
+      const dat = d.data();
+      const div = document.createElement('div');
+      div.className = `announce-item-banner ${typeClass[dat.emoji]||'type-yangilik'}`;
+      div.innerHTML = `<span class="announce-emoji">${dat.emoji||'📢'}</span><span>${dat.text}</span><button class="announce-close" onclick="this.parentElement.remove()">✕</button>`;
+      banner.appendChild(div);
+    });
+  } catch(e) {}
+}
+
+window.logout = async () => { await signOut(auth); location.href='index.html'; };
+
+// Sidebar mobile
+window.openSidebar = () => { document.getElementById('sidebar').classList.add('open'); document.getElementById('sb-overlay').classList.add('open'); };
+window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); };
+
+// Notifications
+function checkNotificationStatus() {
+  if (!("Notification" in window)) return;
+  const dismissed = localStorage.getItem('notif-dismissed');
+  const enabled = localStorage.getItem('notif-enabled');
+  if (enabled==='true' && Notification.permission==='granted') {
+    document.getElementById('notif-enabled-banner').style.display='flex';
+    setNotifMenuUI(true);
+    scheduleReminder();
+  } else if (dismissed!=='true' && Notification.permission!=='denied') {
+    document.getElementById('notif-banner').style.display='flex';
+  }
+  const savedTime = localStorage.getItem('notif-time')||'19:00';
+  const timeInput = document.getElementById('notif-time-input');
+  if (timeInput) timeInput.value = savedTime;
+}
+
+window.enableNotifications = async () => {
+  const perm = await Notification.requestPermission();
+  if (perm==='granted') {
+    localStorage.setItem('notif-enabled','true');
+    localStorage.removeItem('notif-dismissed');
+    document.getElementById('notif-banner').style.display='none';
+    document.getElementById('notif-enabled-banner').style.display='flex';
+    setNotifMenuUI(true);
+    showToast("Eslatma yoqildi!");
+    scheduleReminder();
+  } else { showToast("Ruxsat berilmadi",true); dismissNotifBanner(); }
+};
+window.dismissNotifBanner = () => { localStorage.setItem('notif-dismissed','true'); document.getElementById('notif-banner').style.display='none'; };
+window.disableNotifications = () => { localStorage.removeItem('notif-enabled'); localStorage.setItem('notif-dismissed','true'); document.getElementById('notif-enabled-banner').style.display='none'; setNotifMenuUI(false); showToast("Eslatma ochirildi"); };
+
+window.toggleNotifFromMenu = async checked => {
+  if (!("Notification" in window)) return;
+  if (checked) {
+    const perm = await Notification.requestPermission();
+    if (perm==='granted') { localStorage.setItem('notif-enabled','true'); localStorage.removeItem('notif-dismissed'); setNotifMenuUI(true); showToast("Eslatma yoqildi!"); scheduleReminder(); }
+    else { setNotifMenuUI(false); showToast("Ruxsat berilmadi",true); }
+  } else { localStorage.removeItem('notif-enabled'); localStorage.setItem('notif-dismissed','true'); if(window._reminderTimeout) clearTimeout(window._reminderTimeout); setNotifMenuUI(false); showToast("Eslatma ochirildi"); }
+};
+
+window.saveNotifTime = time => { localStorage.setItem('notif-time',time); if(window._reminderTimeout) clearTimeout(window._reminderTimeout); scheduleReminder(); showToast("Vaqt saqlandi: "+time); };
+
+function setNotifMenuUI(on) {
+  const toggle=document.getElementById('notif-menu-toggle');
+  const track=document.getElementById('notif-track');
+  const thumb=document.getElementById('notif-thumb');
+  const timeRow=document.getElementById('notif-time-row');
+  if (!toggle) return;
+  toggle.checked=on;
+  if(track) track.style.background=on?'var(--purple-main)':'var(--border)';
+  if(thumb) thumb.style.transform=on?'translateX(16px)':'translateX(0)';
+  if(timeRow) timeRow.style.display=on?'flex':'none';
+}
+
+function scheduleReminder() {
+  if (Notification.permission!=='granted') return;
+  const savedTime=localStorage.getItem('notif-time')||'19:00';
+  const [h,m]=savedTime.split(':').map(Number);
+  const now=new Date(), target=new Date();
+  target.setHours(h,m,0,0);
+  if (now>target) target.setDate(target.getDate()+1);
+  if(window._reminderTimeout) clearTimeout(window._reminderTimeout);
+  window._reminderTimeout=setTimeout(()=>{
+    const today=new Date().toISOString().slice(0,10);
+    if(localStorage.getItem('last-study-date')!==today){
+      new Notification("AzWord — Mashq vaqti!", { body:"Bugun hali mashq qilmadingiz. Streakingizni saqlang!", tag:"azword-reminder" });
+    }
+    scheduleReminder();
+  }, target-now);
+}
+
+function showToast(msg, isErr=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isErr?' error':''); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+document.getElementById('folder-modal').addEventListener('click', e=>{ if(e.target===document.getElementById('folder-modal')) closeModal(); });
 </script>
-  <script type="module">
-    import { auth, db } from './firebase.js';
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, query, where, orderBy, limit, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
-    let currentUser = null;
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return window.location.href = 'index.html';
-      currentUser = user;
-      document.getElementById('user-email').textContent = user.email;
-      const letter = (user.displayName || user.email).charAt(0).toUpperCase();
-
-      // Avatar: Firestore dan rasm yuklaymiz
-      try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists() && userDoc.data().photoBase64) {
-          const b64 = userDoc.data().photoBase64;
-          document.getElementById('avatar-text').innerHTML = `<img src="${b64}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;" />`;
-          document.getElementById('avatar-text-lg').innerHTML = `<img src="${b64}" style="width:70px;height:70px;border-radius:50%;object-fit:cover;" />`;
-        } else {
-          document.getElementById('avatar-text').textContent = letter;
-          document.getElementById('avatar-text-lg').textContent = letter;
-        }
-      } catch(e) {
-        document.getElementById('avatar-text').textContent = letter;
-        document.getElementById('avatar-text-lg').textContent = letter;
-      }
-
-      document.getElementById('user-name').textContent = user.displayName || user.email;
-      document.getElementById('greeting-name').textContent = user.displayName?.split(' ')[0] || 'Foydalanuvchi';
-
-      if (user.email === ADMIN_EMAIL) {
-        document.getElementById('admin-section').style.display = 'block';
-        const adminBtn = document.getElementById('admin-btn-wrap');
-        if (adminBtn) adminBtn.style.display = 'block';
-      }
-
-      // Foydalanuvchi ma'lumotlarini Firestoreda yangilash (displayName, email)
-      try {
-        await setDoc(doc(db, 'users', user.uid), {
-          displayName: user.displayName || '',
-          email: user.email || '',
-        }, { merge: true });
-      } catch(e) {}
-
-      // Bugungi kirish sanasini saqlaymiz
-      localStorage.setItem('last-study-date', new Date().toISOString().slice(0, 10));
-      await loadUserStats(user.uid);
-      await loadFolders();
-      await loadAnnouncements();
-      checkNotificationStatus();
-    });
-
-    // ── DAILY REMINDER ──
-    function updateNotifMenuBtn() {
-      const enabled = localStorage.getItem('notif-enabled') === 'true' && Notification.permission === 'granted';
-      const savedTime = localStorage.getItem('notif-time') || '19:00';
-      const timeInput = document.getElementById('notif-time-input');
-      if (timeInput) timeInput.value = savedTime;
-      setNotifMenuUI(enabled);
-    }
-
-    function checkNotificationStatus() {
-      if (!("Notification" in window)) return; // brauzer qollab-quvvatlamasa
-
-      const dismissed = localStorage.getItem('notif-dismissed');
-      const enabled = localStorage.getItem('notif-enabled');
-
-      if (enabled === 'true' && Notification.permission === 'granted') {
-        document.getElementById('notif-enabled-banner').style.display = 'flex';
-        scheduleReminder();
-        updateNotifMenuBtn();
-      } else if (dismissed !== 'true' && Notification.permission !== 'denied') {
-        document.getElementById('notif-banner').style.display = 'flex';
-      }
-    }
-
-    window.enableNotifications = async () => {
-      if (!("Notification" in window)) {
-        showToast("Brauzeringiz notification qollab-quvvatlamaydi", true);
-        return;
-      }
-      const permission = await Notification.requestPermission();
-      if (permission === 'granted') {
-        localStorage.setItem('notif-enabled', 'true');
-        localStorage.removeItem('notif-dismissed');
-        document.getElementById('notif-banner').style.display = 'none';
-        document.getElementById('notif-enabled-banner').style.display = 'flex';
-        showToast("Eslatma yoqildi! 🔔");
-        scheduleReminder();
-      } else {
-        showToast("Ruxsat berilmadi", true);
-        dismissNotifBanner();
-      }
-    };
-
-    window.toggleNotifFromMenu = async checked => {
-      if (!("Notification" in window)) {
-        showToast("Brauzeringiz notification qollab-quvvatlamaydi", true);
-        setNotifMenuUI(false);
-        return;
-      }
-      if (checked) {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          localStorage.setItem('notif-enabled', 'true');
-          localStorage.removeItem('notif-dismissed');
-          document.getElementById('notif-banner').style.display = 'none';
-          document.getElementById('notif-enabled-banner').style.display = 'flex';
-          setNotifMenuUI(true);
-          showToast("Eslatma yoqildi! 🔔");
-          scheduleReminder();
-        } else {
-          showToast("Ruxsat berilmadi", true);
-          setNotifMenuUI(false);
-        }
-      } else {
-        localStorage.removeItem('notif-enabled');
-        localStorage.setItem('notif-dismissed', 'true');
-        if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
-        document.getElementById('notif-enabled-banner').style.display = 'none';
-        setNotifMenuUI(false);
-        showToast("Eslatma ochirildi");
-      }
-    };
-
-    window.saveNotifTime = time => {
-      localStorage.setItem('notif-time', time);
-      if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
-      scheduleReminder();
-      showToast("Vaqt saqlandi: " + time + " ✅");
-    };
-
-    function setNotifMenuUI(on) {
-      const toggle = document.getElementById('notif-menu-toggle');
-      const track = document.getElementById('notif-track');
-      const thumb = document.getElementById('notif-thumb');
-      const timeRow = document.getElementById('notif-time-row');
-      if (!toggle) return;
-      toggle.checked = on;
-      if (track) track.style.background = on ? 'var(--purple-main)' : 'var(--border)';
-      if (thumb) thumb.style.transform = on ? 'translateX(16px)' : 'translateX(0)';
-      if (timeRow) timeRow.style.display = on ? 'flex' : 'none';
-    }
-
-    window.dismissNotifBanner = () => {
-      localStorage.setItem('notif-dismissed', 'true');
-      document.getElementById('notif-banner').style.display = 'none';
-    };
-
-    window.disableNotifications = () => {
-      localStorage.removeItem('notif-enabled');
-      localStorage.setItem('notif-dismissed', 'true');
-      document.getElementById('notif-enabled-banner').style.display = 'none';
-      showToast("Eslatma o'chirildi");
-    };
-
-    function scheduleReminder() {
-      if (Notification.permission !== 'granted') return;
-
-      const savedTime = localStorage.getItem('notif-time') || '19:00';
-      const [hours, minutes] = savedTime.split(':').map(Number);
-
-      const now = new Date();
-      const target = new Date();
-      target.setHours(hours, minutes, 0, 0);
-
-      // Agar soat 19 o'tib ketgan bo'lsa — ertaga
-      if (now > target) target.setDate(target.getDate() + 1);
-
-      const delay = target - now;
-
-      // Eski timeout ni tozalaymiz
-      if (window._reminderTimeout) clearTimeout(window._reminderTimeout);
-
-      window._reminderTimeout = setTimeout(() => {
-        // Bugun mashq qilganmi tekshiramiz
-        const today = new Date().toISOString().slice(0, 10);
-        const lastStudy = localStorage.getItem('last-study-date');
-
-        if (lastStudy !== today) {
-          new Notification("AzWord — Mashq vaqti! 🔥", {
-            body: "Bugun hali mashq qilmadingiz. Streak'ingizni saqlang!",
-            icon: "/favicon.ico",
-            badge: "/favicon.ico",
-            tag: "azword-reminder",
-          });
-        }
-
-        // Keyingi kun uchun ham rejalashtir
-        scheduleReminder();
-      }, delay);
-    }
-
-    async function loadAnnouncements() {
-      try {
-        const snap = await getDocs(
-          query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(5))
-        );
-        const banner = document.getElementById('announce-banner');
-        if (!banner) return;
-        banner.innerHTML = '';
-        if (snap.empty) return;
-
-        const typeClass = {
-          '🎉': 'type-yangilik',
-          '⚠️': 'type-ogohlantirish',
-          '🎁': 'type-sovga',
-          '🔔': 'type-eslatma',
-          '🚀': 'type-yangilanish',
-        };
-
-        snap.forEach(d => {
-          const data = d.data();
-          const cls = typeClass[data.emoji] || 'type-yangilik';
-          const div = document.createElement('div');
-          div.className = `announce-item-banner ${cls}`;
-          div.innerHTML = `
-            <span class="announce-emoji">${data.emoji || '📢'}</span>
-            <span>${data.text}</span>
-            <button class="announce-close" onclick="this.parentElement.remove()" title="Yopish">✕</button>
-          `;
-          banner.appendChild(div);
-        });
-      } catch(e) {}
-    }
-
-    async function loadUserStats(uid) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          document.getElementById('nav-stars').textContent = data.stars || 0;
-          document.getElementById('nav-coins').textContent = data.coins || 0;
-
-          const streak = data.streakDays || 0;
-          document.getElementById('nav-streak').textContent = streak;
-          const streakBadge = document.getElementById('nav-streak-badge');
-          if (streakBadge) {
-            streakBadge.classList.toggle('zero', streak === 0);
-            streakBadge.title = streak > 0 ? `${streak} kunlik streak!` : "Streak yo'q hali";
-          }
-        }
-      } catch(e) {}
-    }
-
-    async function loadFolders() {
-      const myQ = query(
-        collection(db, 'folders'),
-        where('uid', '==', currentUser.uid),
-        where('isAdmin', '==', false)
-      );
-      const mySnap = await getDocs(myQ);
-
-      // Dropdown statistikani yangilash
-      let totalWords = 0;
-      mySnap.forEach(d => totalWords += d.data().wordCount || 0);
-      const statsEl = document.getElementById('profileStats');
-      if (statsEl) statsEl.innerHTML = `📚 ${mySnap.size} bo'lim &nbsp;·&nbsp; 📝 ${totalWords} so'z`;
-
-      renderFolders(mySnap, 'my-folders', false);
-
-      const adminQ = query(collection(db, 'folders'), where('isAdmin', '==', true));
-      const adminSnap = await getDocs(adminQ);
-      if (!adminSnap.empty) {
-        document.getElementById('admin-section').style.display = 'block';
-        renderFolders(adminSnap, 'admin-folders', true);
-      }
-    }
-
-    function renderFolders(snap, containerId, isAdminSection) {
-      const container = document.getElementById(containerId);
-      if (snap.empty) {
-        if (containerId === 'my-folders') {
-          container.innerHTML = `
-            <div class="empty-state" id="empty-msg">
-              <div class="emoji">✨</div>
-              <p>Hali bo'lim yo'q. Birinchi bo'limingizni yarating!</p>
-            </div>`;
-        }
-        return;
-      }
-
-      container.innerHTML = '';
-      snap.forEach(docSnap => {
-        const data = docSnap.data();
-        const id = docSnap.id;
-        const canDelete = !isAdminSection || currentUser.email === ADMIN_EMAIL;
-
-        // Reyting badge
-        const scoreBadge = data.lastScore
-          ? `<div class="score-badge">⭐ ${data.lastScore}</div>`
-          : '';
-
-        const card = document.createElement('div');
-        card.className = 'folder-card';
-        card.innerHTML = `
-          <div class="folder-icon">${data.emoji || '📁'}</div>
-          <div class="folder-name">${data.name}</div>
-          <div class="folder-meta">${data.wordCount || 0} ta so'z</div>
-          ${scoreBadge}
-          <div class="folder-progress">
-            <div class="folder-progress-bar" style="width:${data.progress || 0}%"></div>
-          </div>
-          ${canDelete ? `<div class="folder-actions">
-            <button class="icon-btn" onclick="deleteFolder(event, '${id}')">🗑</button>
-          </div>` : ''}
-        `;
-        card.addEventListener('click', () => {
-          window.location.href = `folder.html?id=${id}`;
-        });
-        container.appendChild(card);
-      });
-    }
-
-    window.openModal = () => {
-      document.getElementById('modal').classList.add('open');
-      setTimeout(() => document.getElementById('folder-name').focus(), 100);
-    };
-
-    window.closeModal = () => {
-      document.getElementById('modal').classList.remove('open');
-      document.getElementById('folder-name').value = '';
-      document.getElementById('folder-emoji').value = '';
-    };
-
-    window.createFolder = async () => {
-      const name = document.getElementById('folder-name').value.trim();
-      const emoji = document.getElementById('folder-emoji').value.trim() || '📁';
-      if (!name) return;
-
-      // ── DUPLIKAT BO'LIM TEKSHIRUVI ──
-      const existingQ = query(
-        collection(db, 'folders'),
-        where('uid', '==', currentUser.uid),
-        where('isAdmin', '==', false)
-      );
-      const existingSnap = await getDocs(existingQ);
-      const duplicate = [...existingSnap.docs].find(
-        d => d.data().name.toLowerCase() === name.toLowerCase()
-      );
-      if (duplicate) {
-        showToast(`"${name}" nomli bo'lim allaqachon mavjud! ❌`, true);
-        return;
-      }
-
-      await addDoc(collection(db, 'folders'), {
-        name,
-        emoji,
-        uid: currentUser.uid,
-        isAdmin: false,
-        wordCount: 0,
-        progress: 0,
-        lastScore: null,
-        createdAt: serverTimestamp()
-      });
-
-      closeModal();
-      showToast("Bo'lim yaratildi! 🎉");
-      await loadFolders();
-    };
-
-    window.deleteFolder = async (e, id) => {
-      e.stopPropagation();
-      if (!confirm("Bu bo'limni o'chirasizmi?")) return;
-      await deleteDoc(doc(db, 'folders', id));
-      showToast("Bo'lim o'chirildi", true);
-      await loadFolders();
-    };
-
-    window.logout = async () => {
-      await signOut(auth);
-      window.location.href = 'index.html';
-    };
-
-    function showToast(msg, isError = false) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = 'toast' + (isError ? ' error' : '');
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    
-    const avatar = document.getElementById('profile-avatar');
-    const dropdown = document.getElementById('profile-dropdown');
-
-    avatar?.addEventListener('click', () => {
-      dropdown.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.nav-user')) {
-        dropdown.classList.remove('open');
-      }
-    });
-
-document.getElementById('folder-name').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') window.createFolder();
-    });
-  </script>
 </body>
 </html>
