@@ -116,7 +116,6 @@
       max-width: 100%;
     }
 
-    /* Stage 2 */
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -142,7 +141,6 @@
     .option-btn.correct { border-color: var(--success); background: rgba(52,211,153,0.12); color: var(--success); }
     .option-btn.wrong { border-color: var(--danger); background: rgba(248,113,113,0.12); color: var(--danger); }
 
-    /* Stage 3 */
     .pieces-area {
       display: flex;
       flex-wrap: wrap;
@@ -177,7 +175,6 @@
       letter-spacing: 2px;
     }
 
-    /* Stage 4 */
     .match-area {
       display: flex;
       flex-direction: column;
@@ -210,7 +207,6 @@
     .match-btn.matched { border-color: var(--success); background: rgba(52,211,153,0.1); color: var(--success); opacity: 0.7; cursor: default; }
     .match-btn.wrong-match { border-color: var(--danger); background: rgba(248,113,113,0.1); }
 
-    /* Stage 5 */
     .type-input {
       width: 100%;
       background: var(--bg-deep);
@@ -231,7 +227,6 @@
     .type-input.correct-input { border-color: var(--success); }
     .type-input.wrong-input { border-color: var(--danger); }
 
-    /* Stage 6 */
     .sentence-input {
       width: 100%;
       background: var(--bg-deep);
@@ -262,7 +257,6 @@
     .ai-feedback.good { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
     .ai-feedback.bad { background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
 
-    /* Feedback overlay */
     .feedback-overlay {
       position: absolute;
       inset: 0;
@@ -283,7 +277,6 @@
 
     .hint-text { font-size: 0.8rem; color: var(--text-dim); margin-top: 10px; }
 
-    /* 🔊 Audio button */
     .speak-btn {
       display: inline-flex;
       align-items: center;
@@ -449,7 +442,6 @@
       const ctx = getCtx();
 
       if (type === 'correct') {
-        // Yumshoq "ding" - to'g'ri javob
         const o = ctx.createOscillator();
         const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
@@ -462,7 +454,6 @@
         o.stop(ctx.currentTime + 0.3);
 
       } else if (type === 'wrong') {
-        // Xato tovushi
         const o = ctx.createOscillator();
         const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
@@ -475,7 +466,6 @@
         o.stop(ctx.currentTime + 0.2);
 
       } else if (type === 'coin') {
-        // Tanga tovushi - ikki nota
         [0, 0.08].forEach((delay, i) => {
           const o = ctx.createOscillator();
           const g = ctx.createGain();
@@ -489,7 +479,6 @@
         });
 
       } else if (type === 'victory') {
-        // Victory - 4 nota fanfar
         const notes = [523, 659, 784, 1047];
         notes.forEach((freq, i) => {
           const o = ctx.createOscillator();
@@ -504,7 +493,6 @@
         });
 
       } else if (type === 'achievement') {
-        // Achievement - yuqori nota + reverb effekti
         const notes = [784, 988, 1175, 1568];
         notes.forEach((freq, i) => {
           const o = ctx.createOscillator();
@@ -519,7 +507,6 @@
         });
 
       } else if (type === 'click') {
-        // Kichkina click
         const o = ctx.createOscillator();
         const g = ctx.createGain();
         o.connect(g); g.connect(ctx.destination);
@@ -554,18 +541,14 @@
     if (!folderId) window.location.href = 'dashboard.html';
 
     let words = [];
-    // Yangi logika: bosqich bo'yicha barcha so'zlar
-    // currentStage: 1-6, currentWordIndex: joriy so'z indeksi (bosqich ichida)
     let currentStage = 1;
     let currentWordIndex = 0;
-    let results = {}; // wordId -> { en, uz, mistakes: [] }
+    let results = {};
     let currentUser = null;
 
-    // Matching state
     let matchSelected = null;
     let matchedPairs = 0;
 
-    // Piece state
     let pieces = [];
     let assembled = '';
     let assembledPieces = [];
@@ -592,15 +575,12 @@
     }
 
     function updateProgress() {
-      // Jami: 6 bosqich * N so'z
-      // Stage 4 (moslashtirish) bitta boss bo'ladi, shuning uchun uni alohida hisoblash
       const totalSteps = words.length * 6;
-      // Stage 4 da 1 ta qadam (barcha so'zlar uchun bitta matching)
       let doneSteps;
       if (currentStage < 4) {
         doneSteps = (currentStage - 1) * words.length + currentWordIndex;
       } else if (currentStage === 4) {
-        doneSteps = 3 * words.length; // 1,2,3 bosqichlar tugagan
+        doneSteps = 3 * words.length;
       } else {
         doneSteps = (currentStage - 1) * words.length + currentWordIndex;
       }
@@ -633,7 +613,6 @@
       else if (currentStage === 5) renderStage5(words[currentWordIndex], card);
     }
 
-    // ── STAGE 1: Tanishtirish — barcha so'zlar ──
     function renderStage1(word, card) {
       const exStr = word.example ? word.example.replace(/\\/g, '\\\\').replace(/'/g, "\\'") : '';
       const speakSvg = icon('bot', { size: 16, strokeWidth: 2.2 });
@@ -656,12 +635,9 @@
       `;
       document.getElementById('next-btn').textContent = "Tushundim →";
 
-      // Avtomatik o'qib berish
       setTimeout(() => speakWord(word.en), 600);
     }
 
-    // ── TEXT-TO-SPEECH ──
-    // Ovozlar ro'yxati
     let gbVoice = null;
     function loadVoices() {
       const voices = window.speechSynthesis.getVoices();
@@ -706,7 +682,6 @@
       window.speechSynthesis.speak(utter);
     };
 
-    // ── TARJIMA (Stage 1) ──
     window.translateExample = async (sentence) => {
       const btn = document.getElementById('translate-btn');
       const translationEl = document.getElementById('example-translation');
@@ -733,7 +708,6 @@
       }
     };
 
-    // ── STAGE 2: Variantlar — barcha so'zlar ──
     function renderStage2(word, card) {
       const opts = generateOptions(word, 'en', 4);
       card.innerHTML = `
@@ -750,11 +724,13 @@
       document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
       if (selected === correct) {
         btn.classList.add('correct', 'bounce-in');
+        playSound('correct');
       } else {
         btn.classList.add('wrong'); btn.classList.add('wrong-shake'); setTimeout(()=>btn.classList.remove('wrong-shake'),400);
         document.querySelectorAll('.option-btn').forEach(b => {
           if (b.textContent === correct) b.classList.add('correct');
         });
+        playSound('wrong');
         markMistake(2);
       }
       document.getElementById('next-btn').disabled = false;
@@ -767,7 +743,6 @@
       return [...shuffled, correct].sort(() => Math.random() - 0.5);
     }
 
-    // ── STAGE 3: Bo'laklash — barcha so'zlar ──
     function renderStage3(word, card) {
       const en = word.en.toLowerCase();
       pieces = splitWord(en);
@@ -799,7 +774,6 @@
         const p2 = Math.floor(len * 2 / 3);
         parts = [word.slice(0, p1), word.slice(p1, p2), word.slice(p2)];
       }
-      // Bo'laklarni aralashtirish (shuffle)
       for (let i = parts.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [parts[i], parts[j]] = [parts[j], parts[i]];
@@ -817,7 +791,6 @@
       display.textContent = assembled;
       display.style.color = '';
 
-      // Undo tugmasini ko'rsatish
       const undoBtn = document.getElementById('undo-btn');
       if (undoBtn) undoBtn.style.display = 'inline-flex';
 
@@ -860,17 +833,14 @@
       document.getElementById('next-btn').disabled = true;
     };
 
-    // ── STAGE 4: Moslashtirish — chap EN, o'ng UZ, har biri alohida qatorda ──
     function renderStage4(card) {
       matchSelected = null;
       matchedPairs = 0;
 
       const sample = words.slice(0, Math.min(words.length, 8));
-      // EN va UZ larni alohida aralashtirish
       const enList = [...sample].sort(() => Math.random() - 0.5);
       const uzList = [...sample].sort(() => Math.random() - 0.5);
 
-      // Chap va o'ng ustunni alohida ko'rsatamiz
       const rows = Math.max(enList.length, uzList.length);
       let rowsHtml = '';
       for (let i = 0; i < rows; i++) {
@@ -937,12 +907,13 @@
         if (matchedPairs === total) {
           document.getElementById('next-btn').disabled = false;
           showToast(`Hammasi to'g'ri! ${icon('party-popper', { size: 16 })}`);
+          playSound('victory');
         }
       } else {
         matchSelected.classList.remove('selected');
         matchSelected.classList.add('wrong-match');
         btn.classList.add('wrong-match');
-        // Stage 4 xatosini faqat bir marta belgilash
+        playSound('wrong');
         markMistakeForAll(4);
         setTimeout(() => {
           matchSelected && matchSelected.classList.remove('wrong-match');
@@ -952,10 +923,7 @@
       }
     };
 
-    // Stage 4 da barcha so'zlarga xato belgilash (1 xato = hamma xato emas, faqat xato qilinganlar)
     function markMistakeForAll(stage) {
-      // Matching da aniq qaysi so'z xato qilingani bilinmaydi,
-      // shuning uchun hozirgi tanlovni topamiz
       if (matchSelected) {
         const wordEn = matchSelected.dataset.word;
         const word = words.find(w => w.en === wordEn);
@@ -963,7 +931,6 @@
       }
     }
 
-    // ── STAGE 5: Yozish — barcha so'zlar ──
     function renderStage5(word, card) {
       card.innerHTML = `
         <div class="word-sub">Quyidagi so'zni inglizcha yozing:</div>
@@ -984,6 +951,7 @@
           document.getElementById('next-btn').disabled = false;
           document.getElementById('type-hint').innerHTML = icon('check', { size: 14, strokeWidth: 3 }) + " To'g'ri!";
           document.getElementById('type-hint').style.color = 'var(--success)';
+          playSound('correct');
         } else {
           input.classList.remove('correct-input', 'wrong-input');
           document.getElementById('type-hint').textContent = '';
@@ -1004,6 +972,7 @@
         input.classList.add('wrong-input');
         document.getElementById('type-hint').textContent = `To'g'ri: ${word.en}`;
         document.getElementById('type-hint').style.color = 'var(--danger)';
+        playSound('wrong');
         markMistake(5);
         setTimeout(() => {
           input.classList.remove('wrong-input');
@@ -1013,15 +982,11 @@
       }
     }
 
-
-
-    // ── NAVIGATION ──
     window.nextAction = () => {
       goNext();
     };
 
     function goNext() {
-      // 2-urinish rejimi: retryTasks bo'yicha bittadan ishlash
       if (isSecondRound && window._retryTasks) {
         window._retryIndex++;
         if (window._retryIndex >= window._retryTasks.length) {
@@ -1032,7 +997,6 @@
         return;
       }
 
-      // Stage 4 (moslashtirish) bitta: keyingi bosqichga o'tamiz
       if (currentStage === 4) {
         currentStage = 5;
         currentWordIndex = 0;
@@ -1040,10 +1004,8 @@
         return;
       }
 
-      // Joriy bosqichda keyingi so'zga o'tamiz
       currentWordIndex++;
       if (currentWordIndex >= words.length) {
-        // Bu bosqich tugadi, keyingi bosqichga
         currentStage++;
         currentWordIndex = 0;
 
@@ -1063,11 +1025,9 @@
       if (!task) { finishStudy(); return; }
 
       currentStage = task.stage;
-      // words massivida ushbu so'zni topamiz
       const wordIdx = words.indexOf(task.word);
       currentWordIndex = wordIdx >= 0 ? wordIdx : 0;
 
-      // Agar words massivida yo'q bo'lsa qo'shamiz
       if (wordIdx < 0) {
         words = [...(originalWords.length ? originalWords : words)];
         currentWordIndex = words.findIndex(w => w.id === task.word.id) || 0;
@@ -1100,15 +1060,12 @@
       }
     }
 
-    // ── FINISH ──
     let isSecondRound = false;
     let originalWords = [];
 
     async function finishStudy() {
-      // 2-urinish: xato so'zlar va ularning xato bosqichlari
       if (!isSecondRound) {
-        // Xato qilingan so'zlar va bosqichlarni topamiz
-        const retryTasks = []; // { word, stage }
+        const retryTasks = [];
         for (const word of words) {
           const r = results[word.id];
           if (r && r.mistakes.length > 0) {
@@ -1122,11 +1079,9 @@
           isSecondRound = true;
           originalWords = [...words];
 
-          // Xato bosqichlarni tartiblab qaytadan ishlash uchun saqlash
           window._retryTasks = retryTasks;
           window._retryIndex = 0;
 
-          // Xato so'zlarning mistakes ni reset qilamiz (2-urinish uchun)
           retryTasks.forEach(({ word }) => {
             if (results[word.id]) results[word.id].mistakes = [];
           });
@@ -1136,7 +1091,6 @@
         }
       }
 
-      // BUG FIX: avval sessionStorage, keyin redirect
       const allWords = isSecondRound ? originalWords : words;
       sessionStorage.setItem('studyResults', JSON.stringify(results));
       sessionStorage.setItem('studyWords', JSON.stringify(allWords));
@@ -1145,7 +1099,6 @@
       const earnedStars = perfectWords;
       const earnedCoins = allWords.length;
 
-      // 1. studyResults ga yozish
       try {
         await setDoc(
           doc(db, 'studyResults', `${currentUser.uid}_${folderId}_${Date.now()}`),
@@ -1160,7 +1113,6 @@
         );
       } catch(e) { console.log('studyResults:', e); }
 
-      // 2. Foydalanuvchiga stars va coins berish
       try {
         await updateDoc(doc(db, 'users', currentUser.uid), {
           stars: increment(earnedStars),
@@ -1170,7 +1122,6 @@
         });
       } catch(e) { console.log('stars/coins:', e); }
 
-      // 3. Papka reytingini yangilash
       try {
         await updateDoc(doc(db, 'folders', folderId), {
           lastScore: `${perfectWords}/${allWords.length}`,

@@ -6,7 +6,6 @@
   <title>AzWord Shop</title>
   <link rel="stylesheet" href="style.css"/>
   <style>
-    /* Shop styles */
     .shop-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
 
     .back-btn {
@@ -34,7 +33,6 @@
     }
     .coin-balance .label { font-size: 0.8rem; color: var(--text-muted); }
 
-    /* Category tabs */
     .shop-tabs {
       display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
     }
@@ -47,7 +45,6 @@
     .shop-tab:hover { border-color: var(--purple-main); color: var(--purple-light); }
     .shop-tab.active { background: var(--purple-main); border-color: var(--purple-main); color: #fff; }
 
-    /* Items grid */
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -129,7 +126,6 @@
       font-family: 'Inter', sans-serif; margin-top: 4px;
     }
 
-    /* Purchase history */
     .history-item {
       display: flex; align-items: center; gap: 14px;
       padding: 12px 16px; background: var(--bg-card);
@@ -142,7 +138,6 @@
     .history-date { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
     .history-price { color: var(--danger); font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
 
-    /* Premium AI card */
     .ai-premium-card {
       grid-column: 1 / -1;
       background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(192,132,252,0.1));
@@ -267,12 +262,16 @@
       color: var(--success);
     }
 
-    /* Empty */
     .shop-empty {
       text-align: center; padding: 48px 24px; color: var(--text-muted);
       display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
-    .shop-empty svg { opacity: 0.65; }
+
+    .section-label { 
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; 
+      text-transform: uppercase; color: var(--text-dim); 
+      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
 
     @media (max-width: 640px) {
       .shop-wrap { padding: 20px 16px; }
@@ -294,9 +293,7 @@
     @media (max-width: 380px) {
       .shop-grid { grid-template-columns: 1fr; }
     }
-    .shop-empty .emoji { font-size: 2.5rem; margin-bottom: 12px; }
 
-    /* Confirm modal */
     .confirm-item-preview {
       text-align: center; padding: 16px;
       background: var(--bg-deep); border-radius: 12px; margin-bottom: 16px;
@@ -318,15 +315,17 @@
 </nav>
 
 <div class="shop-wrap">
-  <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Orqaga
+  </button>
 
   <div class="shop-header">
     <div>
-      <h1><span id="shop-title-icon" style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle"></span>Shop</h1>
+      <h1><span id="shop-title-icon" style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Shop</h1>
       <p style="color:var(--text-muted);font-size:0.875rem;margin-top:4px">Tangalaringizni sarflang va maxsus narsalar oling</p>
     </div>
     <div class="coin-balance">
-      <span id="shop-balance-icon" style="display:inline-flex;align-items:center"></span>
+      <span id="shop-balance-icon" style="display:inline-flex;align-items:center"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>
       <div>
         <div class="amount" id="balance-coins">0</div>
         <div class="label">tangangiz bor</div>
@@ -334,28 +333,24 @@
     </div>
   </div>
 
-  <!-- Tabs -->
   <div class="shop-tabs">
     <button class="shop-tab active" onclick="filterCategory('all')">Hammasi</button>
-    <button class="shop-tab" onclick="filterCategory('badge')"><span id="tab-badge-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Badge</button>
-    <button class="shop-tab" onclick="filterCategory('avatar')"><span id="tab-avatar-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Avatar</button>
-    <button class="shop-tab" onclick="filterCategory('theme')"><span id="tab-theme-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Tema</button>
-    <button class="shop-tab" onclick="filterCategory('boost')"><span id="tab-boost-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Boost</button>
+    <button class="shop-tab" onclick="filterCategory('badge')"><span id="tab-badge-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/><path d="M12 18v-2h-.5"/></svg></span>Badge</button>
+    <button class="shop-tab" onclick="filterCategory('avatar')"><span id="tab-avatar-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>Avatar</button>
+    <button class="shop-tab" onclick="filterCategory('theme')"><span id="tab-theme-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg></span>Tema</button>
+    <button class="shop-tab" onclick="filterCategory('boost')"><span id="tab-boost-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span>Boost</button>
   </div>
 
-  <!-- AI Premium Card -->
   <div id="ai-premium-section" style="margin-bottom:28px">
-    <div class="section-label"><span id="premium-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Premium xizmatlar</div>
+    <div class="section-label"><span id="premium-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span> Premium xizmatlar</div>
     <div id="ai-premium-card-wrap"></div>
   </div>
 
-  <!-- Items -->
   <div class="shop-grid" id="shop-grid">
     <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Yuklanmoqda...</div>
   </div>
 
-  <!-- Purchase history -->
-  <div class="section-label"><span id="history-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Xaridlar tarixi</div>
+  <div class="section-label"><span id="history-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span> Xaridlar tarixi</div>
   <div id="history-list">
     <div style="text-align:center;padding:24px;color:var(--text-muted)">Yuklanmoqda...</div>
   </div>
@@ -364,19 +359,19 @@
 <!-- AI Buy Modal -->
 <div class="modal-overlay" id="ai-buy-modal">
   <div class="modal">
-    <h3><span id="ai-modal-title-icon"></span> AI Word Generator</h3>
+    <h3><span id="ai-modal-title-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span> AI Word Generator</h3>
     <div style="background:var(--bg-deep);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
-      <div style="font-size:3rem;margin-bottom:8px" id="ai-modal-emoji"></div>
+      <div style="font-size:3rem;margin-bottom:8px" id="ai-modal-emoji"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></div>
       <div style="font-weight:700;margin-bottom:4px">AI Word Generator</div>
       <div style="color:var(--text-muted);font-size:0.85rem">20 marta ishlatish huquqi</div>
     </div>
     <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:8px">
       <span style="color:var(--text-muted)">Narxi:</span>
-      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif"><span id="ai-confirm-price-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>100 coin</span>
+      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif"><span id="ai-confirm-price-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>100 coin</span>
     </div>
     <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:16px">
       <span style="color:var(--text-muted)">Balansingiz:</span>
-      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif" id="ai-confirm-balance"><span id="ai-confirm-balance-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>0</span>
+      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif" id="ai-confirm-balance"><span id="ai-confirm-balance-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>0</span>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeAIBuyModal()">Bekor</button>
@@ -396,11 +391,11 @@
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:16px">
       <span style="color:var(--text-muted)">Narxi:</span>
-      <span style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#34d399" id="confirm-price"><span id="confirm-price-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>0</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#34d399" id="confirm-price"><span id="confirm-price-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>0</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:4px">
       <span style="color:var(--text-muted)">Balansingiz:</span>
-      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399" id="confirm-balance"><span id="confirm-balance-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>0</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399" id="confirm-balance"><span id="confirm-balance-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span>0</span>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeBuyModal()">Bekor</button>
@@ -448,7 +443,6 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('ai-modal-emoji').innerHTML = icon('bot',{size:48,color:'var(--purple-light)'});
   document.getElementById('ai-confirm-balance-icon').innerHTML = icon('coins',{size:14,color:'#34d399'});
 
-  // Avatar
   try {
     const ud = await getDoc(doc(db,'users',user.uid));
     if (ud.exists()) {
@@ -494,7 +488,6 @@ function renderAICard() {
   if (!wrap) return;
 
   const owned = ownedItems.has(AI_GEN_ITEM_ID);
-  // aiGeneratorUses ni userdan olamiz
   const uses = window._aiUses || 0;
   const canAfford = userCoins >= AI_GEN_PRICE;
 
@@ -530,7 +523,7 @@ function renderAICard() {
 
   wrap.innerHTML = `
     <div class="ai-premium-card">
-      <div class="ai-premium-icon">🤖</div>
+      <div class="ai-premium-icon">${icon('bot',{size:48,color:'var(--purple-light)'})}</div>
       <div class="ai-premium-info">
         <div class="ai-premium-badge">${icon('flame',{size:12,color:'#fbbf24'})} Premium xizmat — Yangi!</div>
         <div class="ai-premium-title">AI Word Generator</div>
@@ -600,7 +593,6 @@ function renderItems(items) {
   });
 }
 
-// AI Generator buy
 window.openAIBuyModal = () => {
   document.getElementById('ai-confirm-balance').innerHTML = `${icon('coins',{size:14,color:'#34d399'})} ${userCoins}`;
   document.getElementById('ai-buy-modal').classList.add('open');
@@ -647,7 +639,6 @@ window.filterCategory = cat => {
   renderItems(filtered);
 };
 
-// Buy modal
 window.openBuyModal = id => {
   const item = allItems.find(i => i.id === id);
   if (!item) return;
@@ -673,13 +664,11 @@ window.confirmBuy = async () => {
   btn.disabled = true; btn.textContent = 'Saqlanmoqda...';
 
   try {
-    // Coin ayirish
     await updateDoc(doc(db,'users',currentUser.uid), {
       coins: increment(-pendingItem.price),
       ownedItems: [...ownedItems, pendingItem.id]
     });
 
-    // Xarid tarixi
     await addDoc(collection(db,'users',currentUser.uid,'purchases'), {
       itemId: pendingItem.id,
       itemName: pendingItem.name,
@@ -703,7 +692,6 @@ window.confirmBuy = async () => {
   btn.disabled = false; btn.textContent = 'Sotib olish';
 };
 
-// Equip item
 window.equipItem = async (itemId, category) => {
   try {
     equippedItems[category] = itemId;
@@ -715,7 +703,6 @@ window.equipItem = async (itemId, category) => {
   }
 };
 
-// History
 async function loadHistory() {
   const list = document.getElementById('history-list');
   let snap;

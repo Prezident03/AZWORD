@@ -67,7 +67,6 @@
     .result-mistakes { font-size: 0.78rem; color: var(--danger); margin-top: 4px; }
     .result-ok { font-size: 0.78rem; color: var(--success); margin-top: 4px; }
 
-    /* Xato so'zlarning to'g'ri javoblari */
     .correct-answer-box {
       margin-top: 10px;
       padding: 10px 14px;
@@ -112,16 +111,9 @@
       margin-top: 4px;
     }
 
-    /* Mistakes section */
-    .mistakes-section {
-      margin-bottom: 32px;
-    }
+    .mistakes-section { margin-bottom: 32px; }
+    .mistakes-section .section-label { color: var(--danger); }
 
-    .mistakes-section .section-label {
-      color: var(--danger);
-    }
-
-    /* Actions */
     .results-actions {
       display: flex;
       gap: 12px;
@@ -158,7 +150,6 @@
     }
     .btn-home:hover { opacity: 0.88; }
 
-    /* Reward box */
     .reward-box {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
@@ -186,6 +177,9 @@
     .reward-amount.coin { color: #34d399; }
     .reward-label { font-size: 0.75rem; color: var(--text-muted); }
     .reward-divider { width: 1px; height: 48px; background: var(--border); }
+
+    .score-pop { animation: scorePop 0.5s ease; }
+    @keyframes scorePop { 0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1} }
   </style>
 </head>
 <body>
@@ -210,14 +204,12 @@
       </div>
     </div>
 
-    <!-- Xato so'zlar — to'g'ri javoblar bilan -->
     <div id="mistakes-section" style="display:none" class="mistakes-section">
-      <div class="section-label" style="color:var(--danger)"><span id="mistakes-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Xato qilingan so'zlar — to'g'ri javoblar</div>
+      <div class="section-label" id="mistakes-label" style="color:var(--danger)"><span id="mistakes-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Xato qilingan so'zlar — to'g'ri javoblar</div>
       <div id="mistakes-list"></div>
     </div>
 
-    <!-- Barcha so'zlar natijalari -->
-    <div class="section-label"><span id="all-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Barcha so'zlar natijalari</div>
+    <div class="section-label" id="all-label"><span id="all-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Barcha so'zlar natijalari</div>
     <div id="results-list"></div>
 
     <div class="results-actions">
@@ -297,6 +289,8 @@
     document.getElementById('result-emoji').innerHTML = icon('party-popper', {size:48,color:'#fbbf24'});
     document.getElementById('mistakes-label-icon').innerHTML = icon('x-circle', {size:16,color:'var(--danger)'});
     document.getElementById('all-label-icon').innerHTML = icon('clipboard-list', {size:16,color:'var(--purple-light)'});
+    document.getElementById('all-label').innerHTML = icon('clipboard-list', {size:16,color:'var(--purple-light)'}) + ' Barcha so\'zlar natijalari';
+    document.getElementById('mistakes-label').innerHTML = icon('x-circle', {size:16,color:'var(--danger)'}) + ' Xato qilingan so\'zlar — to\'g\'ri javoblar';
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -316,21 +310,17 @@
       2: 'Variantlar',
       3: "Bo'laklash",
       4: 'Moslashtirish',
-      5: 'Yozish',
-      6: 'Gap tuzish'
+      5: 'Yozish'
     };
 
     const totalWords = words.length;
     const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
     const mistakeWords = words.filter(w => results[w.id] && results[w.id].mistakes.length > 0);
 
-    // Score display
     document.getElementById('score-num').textContent = `${perfectWords}/${totalWords}`;
     document.getElementById('score-num').classList.add('score-pop');
     setTimeout(() => playSound('victory'), 500);
     setTimeout(() => playSound('victory'), 500);
-
-    // Reward: faqat birinchi marta mukammal o'zlashtirilgan so'zlar uchun
 
     function floatReward(type, amount, x, y) {
       const el = document.createElement('div');
@@ -344,7 +334,6 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
 
-      // ── DAILY STREAK ──
       try {
         const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
@@ -357,19 +346,15 @@
         let currentStreak = udata.streakDays || 0;
 
         if (lastDate !== todayKey) {
-          // Kechagi sana bilan solishtiramiz
           const yesterday = new Date(today);
           yesterday.setDate(today.getDate() - 1);
           const yesterdayKey = yesterday.getFullYear() + '-' + String(yesterday.getMonth()+1).padStart(2,'0') + '-' + String(yesterday.getDate()).padStart(2,'0');
 
           if (lastDate === yesterdayKey) {
-            // Ketma-ket kun — streak +1
             currentStreak += 1;
           } else if (lastDate === null) {
-            // Birinchi marta
             currentStreak = 1;
           } else {
-            // Uzilgan — qaytadan 1 dan
             currentStreak = 1;
           }
 
@@ -379,7 +364,6 @@
             longestStreak: Math.max(currentStreak, udata.longestStreak || 0)
           });
 
-          // Streak banner ko'rsatish (faqat yangi kun bo'lsa)
           if (currentStreak > 1) {
             const streakBanner = document.createElement('div');
             streakBanner.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(251,146,60,0.1);border:1.5px solid rgba(251,146,60,0.3);border-radius:14px;padding:14px 20px;margin:0 auto 20px;max-width:400px';
@@ -397,13 +381,11 @@
         console.error('Streak xato:', e);
       }
 
-      // ── MASHQ STATISTIKASINI SAQLASH ──
       try {
         const totalWords = words.length;
         const correctWords = words.filter(w => results[w.id] && results[w.id].mistakes.length === 0).length;
         const accuracy = totalWords > 0 ? Math.round((correctWords / totalWords) * 100) : 0;
 
-        // studyLog ga yozamiz
         await addDoc(collection(db, 'users', user.uid, 'studyLog'), {
           folderId: params.get('id') || '',
           totalWords,
@@ -413,7 +395,6 @@
           dateKey: new Date().toISOString().slice(0, 10)
         });
 
-        // Eng qiyin so'zlarni belgilaymiz (3+ xato)
         for (const word of words) {
           const r = results[word.id];
           if (r && r.mistakes.length >= 2) {
@@ -431,29 +412,23 @@
       }
 
       try {
-        // Mukammal so'zlarni topamiz
         const perfectWordsList = words.filter(w => results[w.id] && results[w.id].mistakes.length === 0);
         if (perfectWordsList.length === 0) return;
 
-        // Har bir so'zning folderId sini topamiz (sessionStorage dan)
         const folderId = params.get('id');
         if (!folderId) return;
 
-        // Qaysi so'zlar hali reward olmagan — tekshiramiz
         let newlyRewarded = 0;
         for (const word of perfectWordsList) {
           const wordRef = doc(db, 'folders', folderId, 'words', word.id);
           const wordSnap = await getDoc(wordRef);
           if (wordSnap.exists() && !wordSnap.data().rewarded) {
-            // Birinchi marta — reward beramiz va belgilaymiz
             await updateDoc(wordRef, { rewarded: true });
             newlyRewarded++;
           }
         }
 
-        // Faqat yangi so'zlar uchun coin/star beramiz
         if (newlyRewarded > 0) {
-          // Haftalik reset uchun weekKey (2024-W01 formatda)
           const now = new Date();
           const weekNum = Math.ceil((((now - new Date(now.getFullYear(), 0, 1)) / 86400000) + new Date(now.getFullYear(), 0, 1).getDay() + 1) / 7);
           const weekKey = `${now.getFullYear()}-W${String(weekNum).padStart(2,'0')}`;
@@ -466,7 +441,6 @@
             displayName: user.displayName || user.email.split('@')[0]
           }, { merge: true });
 
-          // Reward box ko'rsatish
           const rewardBox = document.createElement('div');
           rewardBox.className = 'reward-box';
           rewardBox.innerHTML = `
@@ -484,7 +458,6 @@
           `;
           document.querySelector('.results-hero').appendChild(rewardBox);
         } else {
-          // Hammasi oldin reward olgan
           const infoBox = document.createElement('div');
           infoBox.className = 'reward-box';
           infoBox.style.opacity = '0.6';
@@ -501,7 +474,6 @@
       }
     });
 
-    // Emoji & title
     const pct = perfectWords / totalWords;
     if (pct === 1) {
       document.getElementById('result-emoji').innerHTML = icon('trophy',{size:64,color:'#fbbf24'});
@@ -521,7 +493,6 @@
       document.getElementById('result-subtitle').textContent = 'Qaytadan ishlash tavsiya etiladi.';
     }
 
-    // Xato so'zlar bo'limi
     if (mistakeWords.length > 0) {
       document.getElementById('mistakes-section').style.display = 'block';
       const mistakesList = document.getElementById('mistakes-list');
@@ -530,7 +501,7 @@
         const div = document.createElement('div');
         div.className = 'result-item has-mistakes';
         div.innerHTML = `
-          <div class="result-icon">❌</div>
+          <div class="result-icon">${icon('x-circle',{size:18,color:'var(--danger)'})}</div>
           <div class="result-word">
             <div class="result-en">${word.en}</div>
             <div class="result-uz">${word.uz}</div>
@@ -550,7 +521,6 @@
       });
     }
 
-    // Barcha so'zlar ro'yxati
     const list = document.getElementById('results-list');
     words.forEach(word => {
       const r = results[word.id];
@@ -558,13 +528,13 @@
       const div = document.createElement('div');
       div.className = `result-item ${perfect ? 'perfect' : 'has-mistakes'}`;
       div.innerHTML = `
-        <div class="result-icon">${perfect ? '✅' : '❌'}</div>
+        <div class="result-icon">${perfect ? icon('circle-check',{size:18,color:'var(--success)'}) : icon('x-circle',{size:18,color:'var(--danger)'})}</div>
         <div class="result-word">
           <div class="result-en">${word.en}</div>
           <div class="result-uz">${word.uz}</div>
           ${perfect
-            ? `<div class="result-ok">Barcha bosqichlar to'g'ri ✓</div>`
-            : `<div class="result-mistakes">Xato bosqichlar: ${r.mistakes.map(s => STAGE_NAMES[s]).join(', ')}</div>`
+            ? `<div class="result-ok">${icon('check',{size:14,color:'var(--success)'})} Barcha bosqichlar to'g'ri</div>`
+            : `<div class="result-mistakes">${icon('x',{size:14})} Xato bosqichlar: ${r.mistakes.map(s => STAGE_NAMES[s]).join(', ')}</div>`
           }
         </div>
       `;

@@ -6,14 +6,12 @@
   <title>AzWord — Fayl yuklash</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Excel (xlsx) va Word (docx) parsing uchun -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
   <style>
     .upload-page { max-width: 760px; margin: 0 auto; padding: 40px 24px; }
 
-    /* Back */
     .back-btn {
       display: inline-flex;
       align-items: center;
@@ -33,7 +31,6 @@
     .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; }
     .page-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 36px; }
 
-    /* Namuna kartalar */
     .samples-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -97,14 +94,12 @@
       line-height: 1.5;
     }
 
-    /* Divider */
     .divider-line {
       height: 1px;
       background: var(--border);
       margin: 32px 0;
     }
 
-    /* Upload zone */
     .upload-section-title {
       font-size: 1.1rem;
       font-weight: 600;
@@ -163,7 +158,6 @@
       color: var(--text-dim);
     }
 
-    /* Preview */
     .preview-section {
       margin-top: 28px;
       display: none;
@@ -233,7 +227,6 @@
       color: var(--danger);
     }
 
-    /* Error box */
     .parse-error {
       background: rgba(248,113,113,0.08);
       border: 1px solid rgba(248,113,113,0.3);
@@ -245,7 +238,6 @@
       display: none;
     }
 
-    /* Save btn */
     .save-row {
       display: flex;
       align-items: center;
@@ -275,7 +267,6 @@
     .btn-save:hover { opacity: 0.88; }
     .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* Scrollbar */
     .preview-list::-webkit-scrollbar { width: 6px; }
     .preview-list::-webkit-scrollbar-track { background: transparent; }
     .preview-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
@@ -293,18 +284,19 @@
 
   <div class="upload-page">
 
-    <button class="back-btn" onclick="goBack()">← Orqaga</button>
+    <button class="back-btn" onclick="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Orqaga
+    </button>
 
-    <div class="page-title" id="page-title">Fayl orqali so'z qo'shish</div>
+    <div class="page-title" id="page-title"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:8px"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span> Fayl orqali so'z qo'shish</div>
     <div class="page-sub">Quyidagi namunalardan birini ko'rib, fayl tayyorlab yuklang — so'zlar avtomatik qo'shiladi.</div>
 
     <!-- NAMUNALAR -->
     <div class="samples-grid">
 
-      <!-- TXT -->
       <div class="sample-card">
         <div class="sample-header">
-          <div class="sample-icon txt" id="icon-txt"></div>
+          <div class="sample-icon txt" id="icon-txt"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
           <div>
             <div class="sample-title">Matnli fayl</div>
             <div class="sample-ext">.txt</div>
@@ -316,7 +308,15 @@
 <span class="val">school</span><span class="sep">, </span><span class="val">maktab</span></div>
         <div class="sample-note">Har qatorda: <b>inglizcha, o'zbekcha, misol gap</b><br>Misol gap ixtiyoriy — bo'lmasa ham bo'ladi</div>
       </div>
-      </div>
+
+      <div class="sample-card">
+        <div class="sample-header">
+          <div class="sample-icon csv" id="icon-csv"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
+          <div>
+            <div class="sample-title">CSV fayl</div>
+            <div class="sample-ext">.csv</div>
+          </div>
+        </div>
         <div class="sample-code"><span class="kw">english</span><span class="sep">,</span><span class="kw">uzbek</span><span class="sep">,</span><span class="kw">example</span>
 <span class="val">apple</span><span class="sep">,</span><span class="val">olma</span><span class="sep">,</span>I eat an apple
 <span class="val">book</span><span class="sep">,</span><span class="val">kitob</span><span class="sep">,</span>I read a book
@@ -324,10 +324,9 @@
         <div class="sample-note">Birinchi qator sarlavha bo'lishi mumkin — avtomatik o'tkaziladi</div>
       </div>
 
-      <!-- Excel -->
       <div class="sample-card">
         <div class="sample-header">
-          <div class="sample-icon xlsx" id="icon-xlsx"></div>
+          <div class="sample-icon xlsx" id="icon-xlsx"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg></div>
           <div>
             <div class="sample-title">Excel fayl</div>
             <div class="sample-ext">.xlsx / .xls</div>
@@ -340,10 +339,9 @@
         <div class="sample-note"><b>A</b> = inglizcha, <b>B</b> = o'zbekcha, <b>C</b> = misol gap (ixtiyoriy)</div>
       </div>
 
-      <!-- Word -->
       <div class="sample-card">
         <div class="sample-header">
-          <div class="sample-icon docx" id="icon-docx"></div>
+          <div class="sample-icon docx" id="icon-docx"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg></div>
           <div>
             <div class="sample-title">Word hujjat</div>
             <div class="sample-ext">.docx</div>
@@ -360,16 +358,16 @@
 
     <div class="divider-line"></div>
 
-    <!-- YUKLASH -->
-    <div class="upload-section-title" id="upload-section-title">Faylni yuklang</div>
+    <div class="upload-section-title" id="upload-section-title"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> Faylni yuklang</div>
 
     <div class="drop-zone" id="drop-zone">
       <input type="file" id="file-input" accept=".txt,.xlsx,.xls,.docx" />
-      <div class="drop-icon" id="drop-icon"></div>
+      <div class="drop-icon" id="drop-icon"><svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></svg></div>
       <div class="drop-title">Faylni shu yerga tashlang yoki bosing</div>
       <div class="drop-sub">Fayl tanlansin va so'zlar ko'rinadi</div>
       <div class="drop-formats">
         <span class="fmt-tag">TXT</span>
+        <span class="fmt-tag">CSV</span>
         <span class="fmt-tag">XLSX</span>
         <span class="fmt-tag">XLS</span>
         <span class="fmt-tag">DOCX</span>
@@ -378,16 +376,15 @@
 
     <div class="parse-error" id="parse-error"></div>
 
-    <!-- PREVIEW -->
     <div class="preview-section" id="preview-section">
       <div class="preview-header">
-        <div class="preview-title" id="preview-title">Ko'rib chiqing</div>
+        <div class="preview-title" id="preview-title"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span> Ko'rib chiqing</div>
         <div class="preview-count" id="preview-count"></div>
       </div>
       <div class="preview-list" id="preview-list"></div>
       <div class="save-row">
         <div class="save-info" id="save-info"></div>
-        <button class="btn-save" id="save-btn" onclick="saveWords()">Saqlash</button>
+        <button class="btn-save" id="save-btn"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Saqlash</button>
       </div>
     </div>
 
@@ -403,39 +400,12 @@
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { icon, starIcon, fromEmoji, PATHS } from './icons.js';
 
-    const folderSvg = icon('folder', { size: 22, color: 'var(--purple-light)', strokeWidth: 2 });
-    const fileTextSvg = icon('file-text', { size: 20, color: '#a78bfa', strokeWidth: 2 });
-    const excelSvg = icon('circle-dot', { size: 20, color: '#22c55e', fill: '#22c55e', strokeWidth: 2 });
-    const wordSvg = icon('circle-dot', { size: 20, color: '#3b82f6', fill: '#3b82f6', strokeWidth: 2 });
-    const uploadSvg = icon('upload', { size: 20, color: 'var(--purple-light)', strokeWidth: 2 });
-    const dropFolderSvg = icon('folder-open', { size: 56, color: 'var(--text-muted)', strokeWidth: 1.5 });
-    const checkSvg = icon('circle-check', { size: 18, color: 'var(--success)', strokeWidth: 2 });
-    const previewSvg = icon('layout-dashboard', { size: 18, color: 'var(--text-main)', strokeWidth: 2 });
-    const checkBtnSvg = icon('circle-check', { size: 18, strokeWidth: 2 });
-
-    const pt = document.getElementById('page-title');
-    if (pt) pt.innerHTML = `${folderSvg} ${pt.textContent}`;
-    const it = document.getElementById('icon-txt');
-    if (it) it.innerHTML = fileTextSvg;
-    const ix = document.getElementById('icon-xlsx');
-    if (ix) ix.innerHTML = excelSvg;
-    const idc = document.getElementById('icon-docx');
-    if (idc) idc.innerHTML = wordSvg;
-    const ust = document.getElementById('upload-section-title');
-    if (ust) ust.innerHTML = `${uploadSvg} ${ust.textContent}`;
-    const di = document.getElementById('drop-icon');
-    if (di) di.innerHTML = dropFolderSvg;
-    const prvT = document.getElementById('preview-title');
-    if (prvT) prvT.innerHTML = `${previewSvg} ${prvT.textContent}`;
-    const svBtn = document.getElementById('save-btn');
-    if (svBtn) svBtn.innerHTML = `${checkBtnSvg} Saqlash`;
-
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
     if (!folderId) window.location.href = 'dashboard.html';
 
     let currentUser = null;
-    let parsedWords = []; // { en, uz, example }
+    let parsedWords = [];
 
     onAuthStateChanged(auth, (user) => {
       if (!user) return window.location.href = 'index.html';
@@ -445,7 +415,6 @@
 
     window.goBack = () => window.location.href = `folder.html?id=${folderId}`;
 
-    // ── DROP ZONE ──
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
 
@@ -464,7 +433,6 @@
       if (fileInput.files[0]) processFile(fileInput.files[0]);
     });
 
-    // ── FAYL QAYTA ISHLASH ──
     async function processFile(file) {
       const ext = file.name.split('.').pop().toLowerCase();
       hideError();
@@ -496,39 +464,32 @@
     }
 
     async function generateExample(en, uz) {
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 80,
-        messages: [{
-          role: "user",
-          content: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). Reply ONLY with the sentence, no quotes, no explanation.`
-        }]
-      })
-    });
+      try {
+        const res = await fetch("/api/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: `Write ONE simple, short English example sentence using the word "${en}" (which means "${uz}" in Uzbek). Reply ONLY with the sentence, no quotes, no explanation.`
+          })
+        });
 
-    if (!res.ok) return '';
+        if (!res.ok) return '';
 
-    const data = await res.json();
-    return (data.content?.[0]?.text || '').trim().replace(/^["'"]|["'"]$/g, '');
+        const data = await res.json();
+        return (data.content?.[0]?.text || '').trim().replace(/^["'"]|["'"]$/g, '');
 
-  } catch (e) {
-    console.error(e);
-    return '';
-  }
-}
+      } catch (e) {
+        console.error(e);
+        return '';
+      }
+    }
 
-    // TXT va CSV parser
     function parseTextOrCSV(text) {
       const lines = text.split(/\r?\n/).filter(l => l.trim());
       const words = [];
 
       for (const line of lines) {
         let parts;
-        // Tab (bir yoki bir nechta) bilan ajratilgan
         if (/\t/.test(line)) {
           parts = line.split(/\t+/).map(p => p.trim()).filter(p => p);
         } else if (line.includes(',')) {
@@ -536,7 +497,6 @@
         } else if (line.includes(' - ')) {
           parts = line.split(' - ').map(p => p.trim());
         } else {
-          // Bo'sh joy bilan ajratilgan bo'lishi mumkin (2+ bo'sh joy)
           const spaceMatch = line.match(/^(\S+)\s{2,}(.+)$/);
           if (spaceMatch) {
             parts = [spaceMatch[1].trim(), spaceMatch[2].trim()];
@@ -549,7 +509,6 @@
         const uz = parts[1];
 
         if (!en || !uz) continue;
-        // Sarlavha qatorini o'tkazib yuborish
         if (['english','en','inglizcha','word','so\'z'].includes(en.toLowerCase())) continue;
 
         words.push({
@@ -561,7 +520,6 @@
       return words;
     }
 
-    // Excel parser (SheetJS)
     async function parseExcel(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -579,7 +537,6 @@
               const example = (row[2] || '').toString().trim();
 
               if (!en || !uz) continue;
-              // Sarlavha qatorini o'tkazib yuborish
               if (en.toLowerCase() === 'english' || en.toLowerCase() === 'en' ||
                   en.toLowerCase() === 'inglizcha' || en.toLowerCase() === 'a ustun') continue;
 
@@ -595,7 +552,6 @@
       });
     }
 
-    // Word (docx) parser — mammoth.js
     async function parseDocx(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -613,7 +569,6 @@
       });
     }
 
-    // ── PREVIEW ──
     function renderPreview(words) {
       const section = document.getElementById('preview-section');
       const list = document.getElementById('preview-list');
@@ -640,17 +595,15 @@
       section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // ── SAQLASH ──
     window.saveWords = async () => {
       if (!parsedWords.length) return;
       const btn = document.getElementById('save-btn');
       btn.disabled = true;
-      btn.innerHTML = `${checkBtnSvg} Tekshirilmoqda...`;
+      btn.innerHTML = '<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span> Tekshirilmoqda...';
 
       try {
         const wordsRef = collection(db, 'folders', folderId, 'words');
 
-        // ── GLOBAL DUPLIKAT TEKSHIRUVI (barcha bo'limlar) ──
         const allFoldersSnap = await getDocs(query(
           collection(db, 'folders'),
           where('uid', '==', currentUser.uid)
@@ -661,14 +614,13 @@
           wSnap.forEach(d => globalExisting.add(d.data().en.toLowerCase()));
         }
 
-        // Duplikatlarni filtrlash
         const newWords = parsedWords.filter(w => !globalExisting.has(w.en.toLowerCase()));
         const skipped = parsedWords.length - newWords.length;
 
         if (newWords.length === 0) {
           showError(`Barcha ${parsedWords.length} ta so'z sizning lug'atlarda allaqachon mavjud!`);
           btn.disabled = false;
-          btn.innerHTML = `${checkBtnSvg} Saqlash`;
+          btn.innerHTML = '<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Saqlash';
           return;
         }
 
@@ -677,8 +629,7 @@
           await new Promise(r => setTimeout(r, 1200));
         }
 
-        // Faqat yangi so'zlarni AI bilan boyitib saqlash
-        const botSvg = icon('bot', { size: 18, strokeWidth: 2 });
+        const botSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
         btn.innerHTML = `${botSvg} AI misol yozmoqda... (0/${newWords.length})`;
         for (let i = 0; i < newWords.length; i++) {
           const word = newWords[i];
@@ -694,26 +645,24 @@
           });
         }
 
-        // wordCount yangilash
         await updateDoc(doc(db, 'folders', folderId), {
           wordCount: increment(newWords.length)
         });
 
-        const succSvg = icon('circle-check', { size: 16, strokeWidth: 2 });
+        const succSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
         showToast(`${newWords.length} ta yangi so'z qo'shildi! ${succSvg}`);
         setTimeout(() => window.location.href = `folder.html?id=${folderId}`, 1500);
 
       } catch(e) {
         showError("Saqlashda xato: " + e.message);
         btn.disabled = false;
-        btn.innerHTML = `${checkBtnSvg} Saqlash`;
+        btn.innerHTML = '<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span> Saqlash';
       }
     };
 
-    // ── HELPERS ──
     function showError(msg) {
       const el = document.getElementById('parse-error');
-      el.innerHTML = icon('alert-triangle', { size: 16, strokeWidth: 2.2 }) + ' ' + msg;
+      el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> ' + msg;
       el.style.display = 'block';
     }
 

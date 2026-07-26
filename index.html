@@ -15,16 +15,13 @@
         <p>Ingliz so'zlarini oson o'zlashtirib boring</p>
       </div>
 
-      <!-- Tabs -->
       <div class="auth-tabs">
         <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Kirish</button>
         <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Ro'yxatdan o'tish</button>
       </div>
 
-      <!-- Error -->
       <div class="auth-error" id="auth-error"></div>
 
-      <!-- Login Form -->
       <div id="form-login">
         <div class="form-group">
           <label>Email</label>
@@ -42,7 +39,6 @@
         </button>
       </div>
 
-      <!-- Register Form -->
       <div id="form-register" style="display:none">
         <div class="form-group">
           <label>Ism</label>
@@ -100,7 +96,6 @@
       } catch(e) { console.error('saveUser:', e); }
     }
 
-    // Agar kirgan bo'lsa dashboard ga o'tkazamiz
     onAuthStateChanged(auth, async (user) => {
       if (user) { await saveUserToFirestore(user); window.location.href = 'dashboard.html'; }
     });

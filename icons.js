@@ -45,11 +45,22 @@ export const PATHS = {
   'graduation-cap': '<path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>',
   brain: '<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/>',
   lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  'arrow-left': '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  calendar: '<rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  'clipboard-list': '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  'x-circle': '<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>',
+  camera: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+  key: '<path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7.5m-6.5 6.5L22 8.5M15.5 7.5L11 12m4.5 4.5L11 12"/>',
+  save: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>',
+  play: '<polygon points="6 3 20 12 6 21 6 3"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'
 };
+
 export const FOLDER_ICONS = [
   'book-open', 'folder', 'graduation-cap', 'brain', 'languages',
   'file-text', 'star', 'trophy', 'flame', 'sparkles'
 ];
+
 export const EMOJI_TO_ICON = {
   '📚': 'book-open', '📁': 'folder', '📖': 'book-marked',
   '⭐': 'star', '🪙': 'coins', '🔥': 'flame', '🏆': 'trophy',
@@ -60,8 +71,9 @@ export const EMOJI_TO_ICON = {
   '✍️': 'pen-line', '✅': 'circle-check', '⚠️': 'alert-triangle',
   '👑': 'crown', '🎁': 'gift', '🗑': 'trash-2', '🗑️': 'trash-2',
   '🟢': 'circle-dot', '🔔': 'bell', '🚀': 'rocket', '❌': 'circle-x',
-  '✕': 'x', '✓': 'check', '✗': 'circle-x', '🚫': 'ban', '🔒': 'lock',
+  '✕': 'x', '✓': 'check', '✗': 'circle-x', '🚫': 'ban', '🔒': 'lock'
 };
+
 export function icon(name, opts = {}) {
   const {
     size = 20,
@@ -74,23 +86,29 @@ export function icon(name, opts = {}) {
   if (!paths) return `<span class="az-icon-fallback ${className}">${name}</span>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="az-icon ${className}" aria-hidden="true">${paths}</svg>`;
 }
+
 export function fromEmoji(value, opts = {}) {
   if (!value) return icon('folder', opts);
   if (PATHS[value]) return icon(value, opts);
   return icon(EMOJI_TO_ICON[value] || 'folder', opts);
 }
+
 export function folderIcon(value, opts = {}) {
   return fromEmoji(value, { size: 32, color: 'var(--purple-light)', ...opts });
 }
+
 export function starIcon(size = 16) {
   return icon('star', { size, color: '#fbbf24', fill: '#fbbf24', strokeWidth: 2 });
 }
+
 export function coinIcon(size = 16) {
   return icon('coins', { size, color: '#34d399' });
 }
+
 export function flameIcon(size = 16) {
   return icon('flame', { size, color: '#fb923c' });
 }
+
 export function iconPickerHtml(selected = 'folder', inputId = 'folder-icon') {
   return `<div class="icon-picker" id="${inputId}-picker">
     ${FOLDER_ICONS.map(n => `
@@ -101,6 +119,7 @@ export function iconPickerHtml(selected = 'folder', inputId = 'folder-icon') {
     <input type="hidden" id="${inputId}" value="${selected}"/>
   </div>`;
 }
+
 window.selectIcon = (inputId, name) => {
   const input = document.getElementById(inputId);
   if (input) input.value = name;

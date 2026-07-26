@@ -31,7 +31,6 @@
     .lb-header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
     .lb-header p { color: var(--text-muted); font-size: 0.9rem; }
 
-    /* Tabs */
     .lb-tabs {
       display: flex;
       background: var(--bg-card);
@@ -60,7 +59,6 @@
       color: #fff;
     }
 
-    /* Weekly info */
     .week-info {
       display: flex;
       align-items: center;
@@ -75,7 +73,6 @@
     }
     .week-info span { color: var(--purple-light); font-weight: 600; }
 
-    /* Leaderboard list */
     .lb-list { display: flex; flex-direction: column; gap: 10px; }
 
     .lb-item {
@@ -90,7 +87,6 @@
     }
     .lb-item:hover { border-color: var(--purple-main); transform: translateX(4px); }
 
-    /* Top 3 */
     .lb-item.rank-1 {
       border-color: rgba(251,191,36,0.5);
       background: rgba(251,191,36,0.05);
@@ -160,7 +156,6 @@
       color: #fbbf24;
     }
 
-    /* Empty / Loading */
     .lb-empty {
       text-align: center;
       padding: 48px 24px;
@@ -174,7 +169,6 @@
       color: var(--text-muted);
     }
 
-    /* My rank banner */
     .my-rank-banner {
       background: rgba(124,58,237,0.1);
       border: 1.5px solid rgba(124,58,237,0.3);
@@ -229,31 +223,29 @@
 
   <div class="lb-page">
 
-    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg> Orqaga
+    </button>
 
     <div class="lb-header">
-      <h1><span style="display:inline-flex;align-items:center;margin-right:8px" id="lb-title-icon"></span>Leaderboard</h1>
+      <h1><span style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle" id="lb-title-icon"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></span>Leaderboard</h1>
       <p>Eng ko'p so'z o'rganganlar reytingi</p>
     </div>
 
-    <!-- Tabs -->
     <div class="lb-tabs">
-      <button class="lb-tab active" onclick="switchTab('weekly')" id="lb-tab-weekly"><span id="lb-weekly-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Haftalik</button>
-      <button class="lb-tab" onclick="switchTab('alltime')" id="lb-tab-alltime"><span id="lb-alltime-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Alltime</button>
+      <button class="lb-tab active" onclick="switchTab('weekly')" id="lb-tab-weekly"><span id="lb-weekly-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>Haftalik</button>
+      <button class="lb-tab" onclick="switchTab('alltime')" id="lb-tab-alltime"><span id="lb-alltime-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.019a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></span>Alltime</button>
     </div>
 
-    <!-- Weekly info -->
     <div class="week-info" id="week-info">
-      <span id="lb-cal-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span><span id="week-label">Yuklanmoqda...</span>
+      <span id="lb-cal-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span id="week-label">Yuklanmoqda...</span>
       &nbsp;·&nbsp; Dushanbada reset bo'ladi
     </div>
 
-    <!-- List -->
     <div class="lb-list" id="lb-list">
-      <div class="lb-loading"><span id="lb-loading-icon"></span> Yuklanmoqda...</div>
+      <div class="lb-loading"><span id="lb-loading-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Yuklanmoqda...</div>
     </div>
 
-    <!-- My rank -->
     <div class="my-rank-banner" id="my-rank-banner" style="display:none">
       <span>Sizning o'rningiz:</span>
       <span class="rank-num" id="my-rank-num">#—</span>
@@ -274,7 +266,6 @@
     let currentTab = 'weekly';
     let allUsers = [];
 
-    // Hafta nomeri hisoblash
     function getWeekKey() {
       const now = new Date();
       const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -301,10 +292,9 @@
       document.getElementById('lb-title-icon').innerHTML = icon('trophy',{size:26});
       document.getElementById('lb-weekly-icon').innerHTML = icon('flame',{size:14,color:'#fb923c'});
       document.getElementById('lb-alltime-icon').innerHTML = icon('crown',{size:14,color:'#fbbf24'});
-      document.getElementById('lb-cal-icon').innerHTML = icon('bar-chart',{size:14});
+      document.getElementById('lb-cal-icon').innerHTML = icon('calendar',{size:14});
       document.getElementById('lb-loading-icon').innerHTML = icon('clock',{size:16,color:'var(--text-dim)'});
 
-      // Avatar
       const letter = (user.displayName || user.email).charAt(0).toUpperCase();
       try {
         const uDoc = await getDoc(doc(db, 'users', user.uid));
@@ -320,10 +310,7 @@
         }
       } catch(e) {}
 
-      // Week label
       document.getElementById('week-label').textContent = getWeekLabel();
-
-      // Load all users
       await loadAllUsers();
       renderBoard('weekly');
     });
@@ -342,9 +329,7 @@
 
       snap.forEach(d => {
         const data = d.data();
-        // Haftalik reset: weekKey mos kelmasa weeklyStars = 0
         const weeklyStars = data.weekKey === currentWeekKey ? (data.weeklyStars || 0) : 0;
-        // displayName: Firestore dan, yo'q bo'lsa email boshidan olamiz
         let userName = data.displayName || data.name || '';
         if (!userName && data.email) {
           userName = data.email.split('@')[0];

@@ -46,7 +46,6 @@
       background-clip: text;
     }
 
-    /* User info */
     .sidebar-user {
       padding: 14px 16px;
       border-bottom: 1px solid var(--border);
@@ -70,7 +69,6 @@
     .sb-user-name { font-weight: 600; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .sb-user-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
 
-    /* Nav */
     .sidebar-nav { flex: 1; padding: 10px 10px; overflow-y: auto; }
     .nav-label {
       font-size: 0.62rem;
@@ -107,7 +105,6 @@
     .nav-item svg { flex-shrink: 0; opacity: 0.8; }
     .nav-item.active svg { opacity: 1; }
 
-    /* Streak banner */
     .sb-streak {
       margin: 10px;
       padding: 12px 14px;
@@ -132,10 +129,8 @@
 
     .sidebar-bottom { padding: 10px; border-top: 1px solid var(--border); }
 
-    /* ── MAIN ── */
     .dash-main { margin-left: 220px; flex: 1; display: flex; flex-direction: column; }
 
-    /* Topbar */
     .dash-topbar {
       padding: 14px 28px;
       border-bottom: 1px solid var(--border);
@@ -156,7 +151,6 @@
 
     .topbar-right { display: flex; align-items: center; gap: 10px; }
 
-    /* Stats row */
     .stats-row {
       display: flex;
       gap: 10px;
@@ -173,7 +167,7 @@
       font-weight: 700;
       border: 1.5px solid;
     }
-    .stat-pill.streak { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); color: #fb923c; }
+    .stat-pill.streak { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.3); color: #fb923c; cursor: pointer; }
     .stat-pill.stars { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.3); color: #fbbf24; cursor: pointer; }
     .stat-pill.coins { background: rgba(52,211,153,0.1); border-color: rgba(52,211,153,0.3); color: #34d399; }
 
@@ -190,10 +184,8 @@
     .topbar-avatar:hover { border-color: var(--purple-main); }
     .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-    /* ── CONTENT ── */
     .dash-content { padding: 28px; flex: 1; }
 
-    /* Announce */
     .announce-banner { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
     .announce-item-banner {
       display: flex; align-items: center; gap: 12px;
@@ -209,7 +201,6 @@
     .announce-emoji { font-size:1.2rem; flex-shrink:0; }
     .announce-close { margin-left:auto; background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0 4px; }
 
-    /* Notification banners */
     .notif-banner {
       display: flex; align-items: center; gap: 14px;
       padding: 13px 16px; background: rgba(96,165,250,0.08);
@@ -227,7 +218,6 @@
     .notif-banner .nb-btn:hover { opacity: 0.88; }
     .notif-banner .nb-close { background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0 4px; flex-shrink:0; }
 
-    /* Section header */
     .section-header {
       display: flex;
       align-items: center;
@@ -245,7 +235,6 @@
       gap: 8px;
     }
 
-    /* Folders grid */
     .folders-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -253,7 +242,6 @@
       margin-bottom: 32px;
     }
 
-    /* Folder card */
     .folder-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
@@ -304,7 +292,6 @@
     .folder-card:hover .folder-delete { opacity: 1; }
     .folder-delete:hover { border-color: var(--danger); color: var(--danger); background: rgba(248,113,113,0.08); }
 
-    /* Add folder card */
     .folder-card-add {
       background: transparent;
       border: 2px dashed var(--border);
@@ -326,7 +313,6 @@
     .folder-card-add svg { opacity: 0.5; transition: opacity 0.2s; }
     .folder-card-add:hover svg { opacity: 1; }
 
-    /* Empty state */
     .folders-empty {
       grid-column: 1 / -1;
       text-align: center;
@@ -338,7 +324,6 @@
       gap: 12px;
     }
 
-    /* Modal */
     .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); display:none; align-items:center; justify-content:center; z-index:999; }
     .modal-overlay.open { display:flex; }
 
@@ -430,7 +415,6 @@
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.error { border-color: var(--danger); color: var(--danger); }
 
-    /* Notification dropdown */
     .notif-menu-wrap {
       padding: 10px 14px;
       border-bottom: 1px solid var(--border);
@@ -446,7 +430,6 @@
     .toggle-switch input:checked + .toggle-track { background:var(--purple-main); }
     .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(16px); }
 
-    /* Mobile */
     .mobile-menu-btn { display:none; }
     .sidebar-overlay { display:none; }
 
@@ -466,10 +449,8 @@
 </head>
 <body>
 
-<!-- Sidebar overlay (mobile) -->
 <div class="sidebar-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div class="logo-icon">
@@ -520,7 +501,6 @@
     </a>
   </nav>
 
-  <!-- Streak -->
   <div class="sb-streak" onclick="window.location.href='streak.html'">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
     <div>
@@ -531,7 +511,6 @@
   </div>
 
   <div class="sidebar-bottom">
-    <!-- Notification -->
     <div class="notif-menu-wrap">
       <div class="notif-toggle-row">
         <span class="notif-toggle-label">
@@ -558,9 +537,7 @@
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="dash-main">
-  <!-- Topbar -->
   <div class="dash-topbar">
     <div style="display:flex;align-items:center;gap:12px">
       <button class="mobile-menu-btn" onclick="openSidebar()">
@@ -594,12 +571,9 @@
     </div>
   </div>
 
-  <!-- Content -->
   <div class="dash-content">
-    <!-- Announce banner -->
     <div class="announce-banner" id="announce-banner"></div>
 
-    <!-- Notification banners -->
     <div id="notif-banner" class="notif-banner" style="display:none">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
       <div class="nb-text"><strong>Kunlik eslatma</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
@@ -612,7 +586,6 @@
       <button class="nb-close" onclick="disableNotifications()">O'chirish</button>
     </div>
 
-    <!-- Admin section -->
     <div id="admin-section" style="display:none;margin-bottom:24px">
       <div class="section-header">
         <div class="section-title">
@@ -623,7 +596,6 @@
       <div class="folders-grid" id="admin-folders"></div>
     </div>
 
-    <!-- My folders -->
     <div class="section-header">
       <div class="section-title">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
@@ -641,14 +613,14 @@
         <p style="font-weight:600">Hali bo'limlar yo'q</p>
         <p style="font-size:0.82rem">Birinchi bo'limingizni yarating!</p>
         <button class="btn-add" onclick="openModal()" style="margin-top:8px">
-          + Yangi bo'lim
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Yangi bo'lim
         </button>
       </div>
     </div>
   </div>
 </main>
 
-<!-- New folder modal -->
 <div class="modal-overlay" id="folder-modal">
   <div class="modal">
     <h3>Yangi bo'lim yaratish</h3>
@@ -692,6 +664,14 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('sb-user-name').textContent = name;
   document.getElementById('sb-user-email').textContent = user.email;
 
+  // Greeting emoji
+  const hour = new Date().getHours();
+  let emoji = '👋';
+  if (hour < 12) emoji = '🌅';
+  else if (hour < 18) emoji = '☀️';
+  else emoji = '🌙';
+  document.getElementById('greeting-emoji').textContent = emoji;
+
   if (user.email === ADMIN_EMAIL) {
     document.getElementById('admin-section').style.display = 'block';
     document.getElementById('admin-nav-label').style.display = 'block';
@@ -718,7 +698,6 @@ async function loadUserStats(uid) {
       document.getElementById('nav-coins').textContent = coins;
       document.getElementById('sb-streak').textContent = streak;
 
-      // Avatar
       const avatarEls = ['sb-avatar', 'topbar-avatar'];
       avatarEls.forEach(id => {
         const el = document.getElementById(id);
@@ -752,7 +731,10 @@ function renderFolders(snap, containerId, isAdmin) {
           <rect x="30" y="20" width="60" height="50" rx="6" fill="#3d3160" stroke="#6b5b9e" stroke-width="2"/>
         </svg>
         <p style="font-weight:600">Hali bolim yoq</p>
-        <button class="btn-add" onclick="openModal()" style="margin-top:8px">+ Yangi bolim</button>
+        <button class="btn-add" onclick="openModal()" style="margin-top:8px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Yangi bolim
+        </button>
       </div>`;
     }
     return;
@@ -773,7 +755,7 @@ function renderFolders(snap, containerId, isAdmin) {
       ${!isAdmin ? `<button class="folder-delete" onclick="deleteFolder(event,'${id}')">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>` : ''}
-      <div class="folder-icon">${f.emoji || icon('folder',{size:24,color:'var(--purple-light)'})}</div>
+      <div class="folder-icon">${f.emoji || '📁'}</div>
       <div class="folder-name">${f.name}</div>
       <div class="folder-meta">${wc} ta soz</div>
       <div class="folder-progress">
@@ -845,11 +827,9 @@ async function loadAnnouncements() {
 
 window.logout = async () => { await signOut(auth); location.href='index.html'; };
 
-// Sidebar mobile
 window.openSidebar = () => { document.getElementById('sidebar').classList.add('open'); document.getElementById('sb-overlay').classList.add('open'); };
 window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sb-overlay').classList.remove('open'); };
 
-// Notifications
 function checkNotificationStatus() {
   if (!("Notification" in window)) return;
   const dismissed = localStorage.getItem('notif-dismissed');
