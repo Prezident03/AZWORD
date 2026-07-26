@@ -23,8 +23,101 @@ body {
   background: var(--bg-deep);
   color: var(--text-main);
   line-height: 1.5;
+  position: relative;
+  min-height: 100vh;
 }
 
+/* ── Gradient blurlar (purple, blue, pink) ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(124, 58, 237, 0.30) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.20) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* ── Noise texture ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  pointer-events: none;
+}
+
+/* ── Qo'shimcha: harakatlanuvchi blurlar (agar xohlasangiz) ── */
+/* 
+   Agar harakatlanuvchi blurlarni ham xohlasangiz, quyidagi kodni 
+   HTML fayllaringizdagi <body> ichiga qo'shing:
+
+   <div class="blur-spots">
+     <div class="blur-spot purple"></div>
+     <div class="blur-spot blue"></div>
+     <div class="blur-spot pink"></div>
+   </div>
+
+   Va ushbu CSS ni qo'shing:
+*/
+.blur-spots {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blur-spot {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  animation: float 25s infinite ease-in-out;
+}
+
+.blur-spot.purple {
+  width: 400px;
+  height: 400px;
+  background: #7c3aed;
+  top: -100px;
+  left: -100px;
+  animation-delay: 0s;
+}
+
+.blur-spot.blue {
+  width: 350px;
+  height: 350px;
+  background: #3b82f6;
+  bottom: -50px;
+  right: -50px;
+  animation-delay: -8s;
+}
+
+.blur-spot.pink {
+  width: 300px;
+  height: 300px;
+  background: #ec4899;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -16s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(40px, -30px) scale(1.1); }
+  50% { transform: translate(-30px, 50px) scale(0.9); }
+  75% { transform: translate(20px, -40px) scale(1.05); }
+}
+
+/* ── Tugma uslubi ── */
 .btn-add {
   display: inline-flex;
   align-items: center;
