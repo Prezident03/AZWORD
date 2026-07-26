@@ -568,7 +568,68 @@ a:hover { text-decoration: underline; }
   color: #34d399;
 }
 
-.nav-badge .badge-icon { font-size: 1rem; }
+.nav-badge .badge-icon {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+/* ── SVG ICONS ── */
+.az-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.az-icon-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.icon-picker-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-deep);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.icon-picker-btn:hover {
+  border-color: var(--purple-main);
+  background: var(--bg-hover);
+}
+
+.icon-picker-btn.selected {
+  border-color: var(--purple-main);
+  background: var(--purple-glow);
+}
+
+.folder-icon-wrap,
+.ach-icon-wrap svg,
+.item-icon-wrap,
+.fs-icon-wrap,
+.afc-icon-wrap,
+.announce-icon-wrap,
+.ov-icon-wrap,
+.streak-stat-icon,
+.results-icon-wrap,
+.stage-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .nav-badge .badge-val {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 0.9rem;
