@@ -1,5 +1,4 @@
 /* AzWord — Lucide-style SVG icon helper */
-
 const PATHS = {
   star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
   coins: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
@@ -47,12 +46,10 @@ const PATHS = {
   brain: '<path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/>',
   lock: '<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
 };
-
 export const FOLDER_ICONS = [
   'book-open', 'folder', 'graduation-cap', 'brain', 'languages',
   'file-text', 'star', 'trophy', 'flame', 'sparkles'
 ];
-
 export const EMOJI_TO_ICON = {
   '📚': 'book-open', '📁': 'folder', '📖': 'book-marked',
   '⭐': 'star', '🪙': 'coins', '🔥': 'flame', '🏆': 'trophy',
@@ -65,7 +62,6 @@ export const EMOJI_TO_ICON = {
   '🟢': 'circle-dot', '🔔': 'bell', '🚀': 'rocket', '❌': 'circle-x',
   '✕': 'x', '✓': 'check', '✗': 'circle-x', '🚫': 'ban', '🔒': 'lock',
 };
-
 export function icon(name, opts = {}) {
   const {
     size = 20,
@@ -78,29 +74,23 @@ export function icon(name, opts = {}) {
   if (!paths) return `<span class="az-icon-fallback ${className}">${name}</span>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="az-icon ${className}" aria-hidden="true">${paths}</svg>`;
 }
-
 export function fromEmoji(value, opts = {}) {
   if (!value) return icon('folder', opts);
   if (PATHS[value]) return icon(value, opts);
   return icon(EMOJI_TO_ICON[value] || 'folder', opts);
 }
-
 export function folderIcon(value, opts = {}) {
   return fromEmoji(value, { size: 32, color: 'var(--purple-light)', ...opts });
 }
-
 export function starIcon(size = 16) {
   return icon('star', { size, color: '#fbbf24', fill: '#fbbf24', strokeWidth: 2 });
 }
-
 export function coinIcon(size = 16) {
   return icon('coins', { size, color: '#34d399' });
 }
-
 export function flameIcon(size = 16) {
   return icon('flame', { size, color: '#fb923c' });
 }
-
 export function iconPickerHtml(selected = 'folder', inputId = 'folder-icon') {
   return `<div class="icon-picker" id="${inputId}-picker">
     ${FOLDER_ICONS.map(n => `
@@ -111,7 +101,6 @@ export function iconPickerHtml(selected = 'folder', inputId = 'folder-icon') {
     <input type="hidden" id="${inputId}" value="${selected}"/>
   </div>`;
 }
-
 window.selectIcon = (inputId, name) => {
   const input = document.getElementById(inputId);
   if (input) input.value = name;
