@@ -192,6 +192,20 @@
       font-weight: 700;
       color: var(--purple-light);
     }
+
+    @media (max-width: 640px) {
+      .lb-page { padding: 20px 16px; }
+      .lb-tabs { flex-direction: row; }
+      .lb-tab { padding: 9px 8px; font-size: 0.82rem; }
+      .lb-item { padding: 12px 14px; gap: 10px; }
+      .lb-avatar { width: 36px; height: 36px; font-size: 0.9rem; }
+      .lb-score { font-size: 0.95rem; }
+      .lb-name { font-size: 0.88rem; }
+      .lb-sub { font-size: 0.72rem; }
+      .lb-rank { min-width: 30px; font-size: 1rem; }
+      .week-info { flex-direction: column; gap: 4px; font-size: 0.8rem; }
+      .my-rank-banner { flex-direction: column; gap: 6px; text-align: center; }
+    }
   </style>
 </head>
 <body>
@@ -201,11 +215,11 @@
     <div class="nav-user">
       <div class="nav-badges">
         <div class="nav-badge star">
-          <span class="badge-icon">⭐</span>
+          <span class="badge-icon" id="lb-star-icon"></span>
           <span class="badge-val" id="nav-stars">0</span>
         </div>
         <div class="nav-badge coin">
-          <span class="badge-icon">🪙</span>
+          <span class="badge-icon" id="lb-coin-icon"></span>
           <span class="badge-val" id="nav-coins">0</span>
         </div>
       </div>
@@ -218,23 +232,19 @@
     <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
 
     <div class="lb-header">
-      <h1>🏆 Leaderboard</h1>
+      <h1><span style="display:inline-flex;align-items:center;margin-right:8px" id="lb-title-icon"></span>Leaderboard</h1>
       <p>Eng ko'p so'z o'rganganlar reytingi</p>
     </div>
 
     <!-- Tabs -->
     <div class="lb-tabs">
-      <button class="lb-tab active" id="tab-weekly" onclick="switchTab('weekly')">
-        🔥 Haftalik
-      </button>
-      <button class="lb-tab" id="tab-alltime" onclick="switchTab('alltime')">
-        👑 Alltime
-      </button>
+      <button class="lb-tab active" onclick="switchTab('weekly')" id="lb-tab-weekly"><span id="lb-weekly-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Haftalik</button>
+      <button class="lb-tab" onclick="switchTab('alltime')" id="lb-tab-alltime"><span id="lb-alltime-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Alltime</button>
     </div>
 
     <!-- Weekly info -->
     <div class="week-info" id="week-info">
-      📅 <span id="week-label">Yuklanmoqda...</span>
+      <span id="lb-cal-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span><span id="week-label">Yuklanmoqda...</span>
       &nbsp;·&nbsp; Dushanbada reset bo'ladi
     </div>
 
@@ -247,7 +257,7 @@
     <div class="my-rank-banner" id="my-rank-banner" style="display:none">
       <span>Sizning o'rningiz:</span>
       <span class="rank-num" id="my-rank-num">#—</span>
-      <span id="my-rank-score">⭐ 0</span>
+      <span id="my-rank-score"></span>
     </div>
 
   </div>
@@ -258,6 +268,7 @@
     import {
       collection, getDocs, doc, getDoc, query, orderBy, limit
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { icon, fromEmoji, starIcon, PATHS } from './icons.js';
 
     let currentUser = null;
     let currentTab = 'weekly';
@@ -284,6 +295,13 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) return window.location.href = 'index.html';
       currentUser = user;
+
+      document.getElementById('lb-star-icon').innerHTML = starIcon(14);
+      document.getElementById('lb-coin-icon').innerHTML = icon('coins',{size:14, color:'#34d399'});
+      document.getElementById('lb-title-icon').innerHTML = icon('trophy',{size:26});
+      document.getElementById('lb-weekly-icon').innerHTML = icon('flame',{size:14,color:'#fb923c'});
+      document.getElementById('lb-alltime-icon').innerHTML = icon('crown',{size:14,color:'#fbbf24'});
+      document.getElementById('lb-cal-icon').innerHTML = icon('bar-chart',{size:14});
 
       // Avatar
       const letter = (user.displayName || user.email).charAt(0).toUpperCase();
@@ -315,7 +333,7 @@
         snap = await getDocs(collection(db, 'users'));
       } catch(e) {
         console.error('loadAllUsers xato:', e);
-        document.getElementById('lb-list').innerHTML = `<div class="lb-empty"><div class="emoji">⚠️</div><p>Xato: ${e.message}</p></div>`;
+        document.getElementById('lb-list').innerHTML = `<div class="lb-empty"><div class="emoji">${icon('alert-triangle',{size:42,color:'#fbbf24'})}</div><p>Xato: ${e.message}</p></div>`;
         return;
       }
       allUsers = [];
@@ -345,17 +363,23 @@
 
     window.switchTab = (tab) => {
       currentTab = tab;
-      document.getElementById('tab-weekly').classList.toggle('active', tab === 'weekly');
-      document.getElementById('tab-alltime').classList.toggle('active', tab === 'alltime');
+      document.getElementById('lb-tab-weekly').classList.toggle('active', tab === 'weekly');
+      document.getElementById('lb-tab-alltime').classList.toggle('active', tab === 'alltime');
       document.getElementById('week-info').style.display = tab === 'weekly' ? 'flex' : 'none';
       renderBoard(tab);
     };
+
+    function rankIcon(i) {
+      if (i===0) return icon('crown',{size:28,color:'#fbbf24'});
+      if (i===1) return icon('medal',{size:28,color:'#d1d5db'});
+      if (i===2) return icon('medal',{size:28,color:'#cd7f32'});
+      return `<span style="font-weight:700;color:var(--text-dim);font-size:1.1rem">#${i+1}</span>`;
+    }
 
     function renderBoard(tab) {
       const list = document.getElementById('lb-list');
       const scoreField = tab === 'weekly' ? 'weeklyStars' : 'stars';
 
-      // Saralash
       const sorted = [...allUsers]
         .filter(u => u[scoreField] > 0)
         .sort((a, b) => b[scoreField] - a[scoreField]);
@@ -363,16 +387,14 @@
       if (sorted.length === 0) {
         list.innerHTML = `
           <div class="lb-empty">
-            <div class="emoji">${tab === 'weekly' ? '🔥' : '👑'}</div>
+            <div class="emoji">${tab === 'weekly' ? icon('flame',{size:42,color:'#fb923c'}) : icon('crown',{size:42,color:'#fbbf24'})}</div>
             <p>${tab === 'weekly' ? 'Bu hafta hali hech kim ball yig\'magan' : 'Hali hech kim ball yig\'magan'}</p>
           </div>`;
         document.getElementById('my-rank-banner').style.display = 'none';
         return;
       }
 
-      // Top 10
       const top10 = sorted.slice(0, 10);
-      const rankEmojis = ['🥇', '🥈', '🥉'];
 
       list.innerHTML = '';
       top10.forEach((user, i) => {
@@ -386,28 +408,27 @@
           : user.name.charAt(0).toUpperCase();
 
         div.innerHTML = `
-          <div class="lb-rank">${rank <= 3 ? rankEmojis[rank-1] : rank}</div>
+          <div class="lb-rank">${rankIcon(i)}</div>
           <div class="lb-avatar">${avatarContent}</div>
           <div class="lb-info">
             <div class="lb-name">
               ${user.name}
               ${isMe ? '<span class="you-badge">Siz</span>' : ''}
             </div>
-            <div class="lb-sub">${user.coins} 🪙 tanga</div>
+            <div class="lb-sub">${icon('coins',{size:14,color:'#34d399'})} ${user.coins} tanga</div>
           </div>
-          <div class="lb-score">⭐ ${user[scoreField]}</div>
+          <div class="lb-score">${starIcon(16)} ${user[scoreField]}</div>
         `;
         list.appendChild(div);
       });
 
-      // Mening o'rnim (top 10 da bo'lmasa)
       const myRank = sorted.findIndex(u => u.uid === currentUser.uid);
       const myRankBanner = document.getElementById('my-rank-banner');
 
       if (myRank >= 10) {
         myRankBanner.style.display = 'flex';
         document.getElementById('my-rank-num').textContent = `#${myRank + 1}`;
-        document.getElementById('my-rank-score').textContent = `⭐ ${sorted[myRank][scoreField]}`;
+        document.getElementById('my-rank-score').innerHTML = `${starIcon(16)} ${sorted[myRank][scoreField]}`;
       } else {
         myRankBanner.style.display = 'none';
       }

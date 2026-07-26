@@ -277,7 +277,7 @@
       </div>
     </div>
     <div class="streak-stat-card">
-      <div class="streak-stat-icon blue">🏆</div>
+      <div class="streak-stat-icon blue" id="trophy-stat-icon">🏆</div>
       <div>
         <div class="streak-stat-num" id="stat-longest">0</div>
         <div class="streak-stat-label">Eng uzun streak</div>
@@ -301,7 +301,7 @@
   </div>
 
   <div class="goal-card">
-    <div class="goal-title">🎯 Streak maqsadi</div>
+    <div class="goal-title" id="goal-title">🎯 Streak maqsadi</div>
     <div class="goal-bar-wrap">
       <div class="goal-tag" id="goal-tag-start">0</div>
       <div class="goal-progress-track"><div class="goal-progress-fill" id="goal-fill" style="width:0%"></div></div>
@@ -309,9 +309,7 @@
     </div>
   </div>
 
-  <div class="motivation-box" id="motivation-text">
-    Har kuni o'rganishda davom eting va streak'ingizni saqlang! 🔥
-  </div>
+  <div class="motivation-box" id="motivation-text"></div>
 
 </div>
 
@@ -319,6 +317,7 @@
 import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { icon, starIcon, PATHS } from './icons.js';
 
 let currentDate = new Date();
 let studyDates = new Set(); // 'YYYY-MM-DD' studied days
@@ -328,6 +327,9 @@ const MONTH_NAMES_UZ = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Av
 
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
+
+  document.getElementById('trophy-stat-icon').innerHTML = icon('trophy', {size:22,color:'#60a5fa'});
+  document.getElementById('goal-title').innerHTML = icon('sparkles', {size:18,color:'#fbbf24'}) + ' Streak maqsadi';
 
   try {
     const ud = await getDoc(doc(db,'users',user.uid));
@@ -340,7 +342,9 @@ onAuthStateChanged(auth, async user => {
       document.getElementById('stat-longest').textContent = longest;
 
       if (streak >= 7) {
-        document.getElementById('streak-society-badge').style.display = 'inline-block';
+        const badge = document.getElementById('streak-society-badge');
+        badge.innerHTML = starIcon(12) + ' Streak jamiyati';
+        badge.style.display = 'inline-block';
       }
 
       // studyDates - hozircha faqat lastStudyDate bor (Firestore da tarix saqlanmagan)
@@ -441,15 +445,15 @@ function updateGoal(streak) {
 function updateMotivation(streak) {
   const el = document.getElementById('motivation-text');
   if (streak === 0) {
-    el.textContent = "Bugun mashq qiling va streak'ingizni boshlang! 🔥";
+    el.innerHTML = `Bugun mashq qiling va streak'ingizni boshlang! ${icon('flame',{size:16,color:'#fb923c'})}`;
   } else if (streak < 7) {
-    el.textContent = `${streak} kun! Davom eting, 7 kunga ${7-streak} kun qoldi! 💪`;
+    el.innerHTML = `${streak} kun! Davom eting, 7 kunga ${7-streak} kun qoldi! 💪`;
   } else if (streak < 30) {
-    el.textContent = `Ajoyib! ${streak} kunlik streak'ingiz bor. 30 kunga yetkazing! 🚀`;
+    el.innerHTML = `Ajoyib! ${streak} kunlik streak'ingiz bor. 30 kunga yetkazing! ${icon('rocket',{size:16,color:'#c084fc'})}`;
   } else if (streak < 100) {
-    el.textContent = `Zo'rsiz! ${streak} kun ketma-ket. Bu chinakam sodiqlik! 🏆`;
+    el.innerHTML = `Zo'rsiz! ${streak} kun ketma-ket. Bu chinakam sodiqlik! ${icon('trophy',{size:16,color:'#fbbf24'})}`;
   } else {
-    el.textContent = `${streak} kun! Siz haqiqiy AzWord chempionisiz! 👑`;
+    el.innerHTML = `${streak} kun! Siz haqiqiy AzWord chempionisiz! ${icon('crown',{size:16,color:'#fbbf24'})}`;
   }
 }
 </script>

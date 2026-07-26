@@ -310,8 +310,8 @@
   <div class="nav-logo">AzWord</div>
   <div class="nav-user">
     <div class="nav-badges">
-      <div class="nav-badge star"><span class="badge-icon">⭐</span><span class="badge-val" id="nav-stars">0</span></div>
-      <div class="nav-badge coin"><span class="badge-icon">🪙</span><span class="badge-val" id="nav-coins">0</span></div>
+      <div class="nav-badge star"><span class="badge-icon" id="shop-star-icon"></span><span class="badge-val" id="nav-stars">0</span></div>
+      <div class="nav-badge coin"><span class="badge-icon" id="shop-coin-icon"></span><span class="badge-val" id="nav-coins">0</span></div>
     </div>
     <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer">A</div>
   </div>
@@ -322,11 +322,11 @@
 
   <div class="shop-header">
     <div>
-      <h1>🛒 Shop</h1>
+      <h1><span id="shop-title-icon" style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle"></span>Shop</h1>
       <p style="color:var(--text-muted);font-size:0.875rem;margin-top:4px">Tangalaringizni sarflang va maxsus narsalar oling</p>
     </div>
     <div class="coin-balance">
-      <span style="font-size:1.4rem">🪙</span>
+      <span id="shop-balance-icon" style="display:inline-flex;align-items:center"></span>
       <div>
         <div class="amount" id="balance-coins">0</div>
         <div class="label">tangangiz bor</div>
@@ -337,15 +337,15 @@
   <!-- Tabs -->
   <div class="shop-tabs">
     <button class="shop-tab active" onclick="filterCategory('all')">Hammasi</button>
-    <button class="shop-tab" onclick="filterCategory('badge')">🏅 Badge</button>
-    <button class="shop-tab" onclick="filterCategory('avatar')">👤 Avatar</button>
-    <button class="shop-tab" onclick="filterCategory('theme')">🎨 Tema</button>
-    <button class="shop-tab" onclick="filterCategory('boost')">⚡ Boost</button>
+    <button class="shop-tab" onclick="filterCategory('badge')"><span id="tab-badge-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Badge</button>
+    <button class="shop-tab" onclick="filterCategory('avatar')"><span id="tab-avatar-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Avatar</button>
+    <button class="shop-tab" onclick="filterCategory('theme')"><span id="tab-theme-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Tema</button>
+    <button class="shop-tab" onclick="filterCategory('boost')"><span id="tab-boost-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>Boost</button>
   </div>
 
   <!-- AI Premium Card -->
   <div id="ai-premium-section" style="margin-bottom:28px">
-    <div class="section-label">⚡ Premium xizmatlar</div>
+    <div class="section-label"><span id="premium-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Premium xizmatlar</div>
     <div id="ai-premium-card-wrap"></div>
   </div>
 
@@ -372,7 +372,7 @@
     </div>
     <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:8px">
       <span style="color:var(--text-muted)">Narxi:</span>
-      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif">🪙 100 coin</span>
+      <span style="font-weight:700;color:#34d399;font-family:'Space Grotesk',sans-serif"><span id="ai-confirm-price-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>100 coin</span>
     </div>
     <div style="display:flex;justify-content:space-between;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:16px">
       <span style="color:var(--text-muted)">Balansingiz:</span>
@@ -396,11 +396,11 @@
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:16px">
       <span style="color:var(--text-muted)">Narxi:</span>
-      <span style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#34d399" id="confirm-price">🪙 0</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;color:#34d399" id="confirm-price"><span id="confirm-price-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>0</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-deep);border-radius:10px;margin-bottom:4px">
       <span style="color:var(--text-muted)">Balansingiz:</span>
-      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399" id="confirm-balance">🪙 0</span>
+      <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399" id="confirm-balance"><span id="confirm-balance-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px"></span>0</span>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeBuyModal()">Bekor</button>
@@ -413,6 +413,7 @@
 
 <script type="module">
 import { auth, db } from './firebase.js';
+import { icon, fromEmoji, starIcon, coinIcon, PATHS } from './icons.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   collection, getDocs, doc, getDoc, setDoc, addDoc,
@@ -429,6 +430,19 @@ let pendingItem = null;
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
   currentUser = user;
+
+  document.getElementById('shop-star-icon').innerHTML = starIcon(14);
+  document.getElementById('shop-coin-icon').innerHTML = icon('coins',{size:14,color:'#34d399'});
+  document.getElementById('shop-title-icon').innerHTML = icon('shopping-bag',{size:24});
+  document.getElementById('shop-balance-icon').innerHTML = icon('coins',{size:24,color:'#34d399'});
+  document.getElementById('tab-badge-icon').innerHTML = icon('medal',{size:16,color:'#fbbf24'});
+  document.getElementById('tab-avatar-icon').innerHTML = icon('users',{size:16});
+  document.getElementById('tab-theme-icon').innerHTML = icon('sparkles',{size:16,color:'#c084fc'});
+  document.getElementById('tab-boost-icon').innerHTML = icon('rocket',{size:16,color:'#f87171'});
+  document.getElementById('premium-label-icon').innerHTML = icon('rocket',{size:16,color:'#fbbf24'});
+  document.getElementById('ai-confirm-price-icon').innerHTML = icon('coins',{size:14,color:'#34d399'});
+  document.getElementById('confirm-price-icon').innerHTML = icon('coins',{size:16,color:'#34d399'});
+  document.getElementById('confirm-balance-icon').innerHTML = icon('coins',{size:14,color:'#34d399'});
 
   // Avatar
   try {
@@ -484,7 +498,7 @@ function renderAICard() {
   if (owned && uses > 0) {
     actionHtml = `
       <div class="ai-owned-badge">
-        <span>✅ Faol</span>
+        <span>${icon('circle-check',{size:16,color:'#34d399'})} Faol</span>
         <span class="ai-uses-left">${uses} marta</span>
         <span style="font-size:0.78rem;color:var(--text-muted)">qoldi</span>
       </div>
@@ -494,15 +508,15 @@ function renderAICard() {
   } else if (owned && uses === 0) {
     actionHtml = `
       <div class="ai-owned-badge" style="background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.3);color:var(--danger)">
-        ⚠️ Marta tugadi
+        ${icon('alert-triangle',{size:16,color:'var(--danger)'})} Marta tugadi
       </div>
       <button class="btn-buy-premium" onclick="openAIBuyModal()">
-        🪙 100 — Yana sotib olish
+        <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px">${icon('coins',{size:14,color:'#34d399'})}</span>100 — Yana sotib olish
       </button>`;
   } else {
     actionHtml = `
       <div class="ai-price-tag">
-        <div class="ai-price-main">🪙 100</div>
+        <div class="ai-price-main"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px">${icon('coins',{size:22,color:'#34d399'})}</span>100</div>
         <div class="ai-price-sub">20 marta ishlatish</div>
       </div>
       <button class="btn-buy-premium" ${canAfford?'':'disabled'} onclick="openAIBuyModal()">
@@ -514,18 +528,18 @@ function renderAICard() {
     <div class="ai-premium-card">
       <div class="ai-premium-icon">🤖</div>
       <div class="ai-premium-info">
-        <div class="ai-premium-badge">🔥 Premium xizmat — Yangi!</div>
+        <div class="ai-premium-badge">${icon('flame',{size:12,color:'#fbbf24'})} Premium xizmat — Yangi!</div>
         <div class="ai-premium-title">AI Word Generator</div>
         <div class="ai-premium-desc">
           Istalgan mavzuda ingliz lugat so'zlarini AI yordamida avtomatik yarating.
           Tarjimasi, misol gaplari va daraja darajasi bilan birga!
         </div>
         <div class="ai-premium-features">
-          <div class="ai-feature"><span>✓</span> Istalgan mavzu</div>
-          <div class="ai-feature"><span>✓</span> 10-50 ta so'z</div>
-          <div class="ai-feature"><span>✓</span> Tarjima + misol gap</div>
-          <div class="ai-feature"><span>✓</span> A1-C2 daraja</div>
-          <div class="ai-feature"><span>✓</span> Bir zumda tayyor</div>
+          <div class="ai-feature"><span>${icon('check',{size:14,color:'#34d399'})}</span> Istalgan mavzu</div>
+          <div class="ai-feature"><span>${icon('check',{size:14,color:'#34d399'})}</span> 10-50 ta so'z</div>
+          <div class="ai-feature"><span>${icon('check',{size:14,color:'#34d399'})}</span> Tarjima + misol gap</div>
+          <div class="ai-feature"><span>${icon('check',{size:14,color:'#34d399'})}</span> A1-C2 daraja</div>
+          <div class="ai-feature"><span>${icon('check',{size:14,color:'#34d399'})}</span> Bir zumda tayyor</div>
         </div>
         <div class="ai-premium-buy">
           ${actionHtml}
@@ -571,11 +585,11 @@ function renderItems(items) {
 
     div.innerHTML = `
       ${item.isNew ? '<span class="item-badge new">Yangi</span>' : ''}
-      ${item.isHot ? '<span class="item-badge hot">🔥 Hot</span>' : ''}
-      <div class="item-emoji">${item.emoji || '🎁'}</div>
+      ${item.isHot ? `<span class="item-badge hot">${icon('flame',{size:12,color:'#ef4444'})} Hot</span>` : ''}
+      <div class="item-emoji">${fromEmoji(item.emoji || 'gift', {size:48,color:'var(--purple-light)'})}</div>
       <div class="item-name">${item.name}</div>
       <div class="item-desc">${item.description || ''}</div>
-      <div class="item-price">🪙 ${item.price}</div>
+      <div class="item-price">${icon('coins',{size:16,color:'#34d399'})} ${item.price}</div>
       ${actionBtn}
     `;
     grid.appendChild(div);
@@ -584,7 +598,7 @@ function renderItems(items) {
 
 // AI Generator buy
 window.openAIBuyModal = () => {
-  document.getElementById('ai-confirm-balance').textContent = `🪙 ${userCoins}`;
+  document.getElementById('ai-confirm-balance').innerHTML = `${icon('coins',{size:14,color:'#34d399'})} ${userCoins}`;
   document.getElementById('ai-buy-modal').classList.add('open');
 };
 window.closeAIBuyModal = () => {
@@ -634,11 +648,11 @@ window.openBuyModal = id => {
   const item = allItems.find(i => i.id === id);
   if (!item) return;
   pendingItem = item;
-  document.getElementById('confirm-emoji').textContent = item.emoji || '🎁';
+  document.getElementById('confirm-emoji').innerHTML = fromEmoji(item.emoji || 'gift', {size:48,color:'var(--purple-light)'});
   document.getElementById('confirm-name').textContent = item.name;
   document.getElementById('confirm-desc').textContent = item.description || '';
-  document.getElementById('confirm-price').textContent = `🪙 ${item.price}`;
-  document.getElementById('confirm-balance').textContent = `🪙 ${userCoins}`;
+  document.getElementById('confirm-price').innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px">${icon('coins',{size:16,color:'#34d399'})}</span>${item.price}`;
+  document.getElementById('confirm-balance').innerHTML = `<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px">${icon('coins',{size:14,color:'#34d399'})}</span>${userCoins}`;
   document.getElementById('buy-modal').classList.add('open');
 };
 
@@ -722,12 +736,12 @@ async function loadHistory() {
     const div = document.createElement('div');
     div.className = 'history-item';
     div.innerHTML = `
-      <div class="history-emoji">${dat.itemEmoji||'🎁'}</div>
+      <div class="history-emoji">${fromEmoji(dat.itemEmoji||'gift', {size:22})}</div>
       <div class="history-info">
         <div class="history-name">${dat.itemName}</div>
         <div class="history-date">${date}</div>
       </div>
-      <div class="history-price">-🪙 ${dat.price}</div>
+      <div class="history-price">-${icon('coins',{size:14,color:'var(--danger)'})} ${dat.price}</div>
     `;
     list.appendChild(div);
   });

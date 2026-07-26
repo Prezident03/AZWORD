@@ -166,8 +166,8 @@
   <div class="nav-logo">AzWord</div>
   <div class="nav-user">
     <div class="nav-badges">
-      <div class="nav-badge star"><span class="badge-icon">⭐</span><span class="badge-val" id="nav-stars">0</span></div>
-      <div class="nav-badge coin"><span class="badge-icon">🪙</span><span class="badge-val" id="nav-coins">0</span></div>
+      <div class="nav-badge star"><span class="badge-icon" id="badge-star-icon"></span><span class="badge-val" id="nav-stars">0</span></div>
+      <div class="nav-badge coin"><span class="badge-icon" id="badge-coin-icon"></span><span class="badge-val" id="nav-coins">0</span></div>
     </div>
     <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer">A</div>
   </div>
@@ -203,7 +203,7 @@
   <div class="ach-tabs">
     <button class="ach-tab active" onclick="filterAch('all')">Hammasi</button>
     <button class="ach-tab" onclick="filterAch('unlocked')">✅ Olingan</button>
-    <button class="ach-tab" onclick="filterAch('locked')">🔒 Qolgan</button>
+    <button class="ach-tab" onclick="filterAch('locked')"><span id="locked-tab-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Qolgan</button>
   </div>
 
   <div class="ach-grid" id="ach-grid">
@@ -219,11 +219,17 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/f
 import {
   collection, getDocs, doc, getDoc, setDoc, query, where, increment, updateDoc, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { icon, fromEmoji, starIcon, coinIcon, PATHS } from './icons.js';
 
 let currentUser = null;
 let allAchievements = [];
 let unlockedIds = new Set();
 let userStats = {};
+
+document.getElementById('badge-star-icon').innerHTML = starIcon(14);
+document.getElementById('badge-coin-icon').innerHTML = icon('coins',{size:14, color:'#34d399'});
+document.getElementById('ach-title-icon').innerHTML = icon('medal',{size:24});
+document.getElementById('locked-tab-icon').innerHTML = icon('lock',{size:14});
 
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
@@ -360,7 +366,7 @@ function renderGrid(tab) {
     card.className = 'ach-card ' + (unlocked ? 'unlocked' : 'locked');
     card.innerHTML = `
       ${unlocked ? '<span class="ach-unlocked-badge">✓ Olindi</span>' : ''}
-      <div class="ach-icon-wrap">${ach.emoji || '🏅'}</div>
+      <div class="ach-icon-wrap" style="display:flex;align-items:center;justify-content:center">${fromEmoji(ach.emoji || 'medal', { size: 40, color: 'var(--purple-light)' })}</div>
       <div class="ach-info">
         <div class="ach-name">${ach.name}</div>
         <div class="ach-desc">${ach.description || ''}</div>
@@ -370,7 +376,7 @@ function renderGrid(tab) {
         ` : ''}
         ${(ach.starReward || ach.coinReward) ? `
           <div class="ach-reward">
-            ${ach.starReward ? '⭐ +'+ach.starReward+' ' : ''}${ach.coinReward ? '🪙 +'+ach.coinReward : ''}
+            ${ach.starReward ? starIcon(14)+' +'+ach.starReward+' ' : ''}${ach.coinReward ? icon('coins',{size:14,color:'#34d399'})+' +'+ach.coinReward : ''}
           </div>
         ` : ''}
       </div>

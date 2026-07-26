@@ -413,7 +413,7 @@
     </div>
     <div class="form-group">
       <label>Emoji</label>
-      <input type="text" id="nf-emoji" placeholder="📚" maxlength="2"/>
+      <div id="nf-icon-wrap"></div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeNewFolder()">Bekor</button>
@@ -498,7 +498,7 @@
     </div>
     <div class="form-group">
       <label>Emoji</label>
-      <input type="text" id="si-emoji" placeholder="🏅" maxlength="2"/>
+      <div id="si-icon-wrap"></div>
     </div>
     <div class="form-group">
       <label>Tavsif</label>
@@ -541,7 +541,7 @@
     </div>
     <div class="form-group">
       <label>Emoji</label>
-      <input type="text" id="ach-emoji" placeholder="🏅" maxlength="4"/>
+      <div id="ach-icon-wrap"></div>
     </div>
     <div class="form-group">
       <label>Tavsif</label>
@@ -587,15 +587,108 @@ import {
   collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc,
   query, where, orderBy, limit, serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { icon, fromEmoji, starIcon, coinIcon, flameIcon, folderIcon, iconPickerHtml, PATHS, FOLDER_ICONS, EMOJI_TO_ICON } from './icons.js';
 
 const ADMIN = "abdurasul1406z@gmail.com";
 let users = [], folders = [], selUid = null, selFolder = null, parsedWords = [];
 let charts = {};
 
+function initNavIcons() {
+  const map = {'📊':'bar-chart','👥':'users','📚':'book-open','🏆':'trophy','🏅':'medal','🛒':'shopping-bag','⚙️':'settings','🤖':'bot','📢':'megaphone','🏠':'home','🚪':'log-out'};
+  document.querySelectorAll('.nav-item .nav-icon').forEach(el => {
+    const e = el.textContent.trim();
+    if (map[e]) el.innerHTML = icon(map[e],{size:16});
+  });
+}
+
+function initStatIcons() {
+  document.querySelectorAll('.stat-card .stat-icon').forEach(el => {
+    const m = {'👥':'users','🟢':'circle-dot','📚':'book-open','📝':'file-text','⭐':'star','🪙':'coins'};
+    const txt = el.textContent.trim();
+    if (m[txt]) {
+      if (txt==='⭐') el.innerHTML = starIcon(22);
+      else if (txt==='🪙') el.innerHTML = icon('coins',{size:22,color:'#34d399'});
+      else if (txt==='🟢') el.innerHTML = icon('circle-dot',{size:22,color:'#34d399'});
+      else el.innerHTML = icon(m[txt],{size:22});
+    }
+  });
+}
+
+function initChartTitles() {
+  document.querySelectorAll('.chart-title').forEach(el => {
+    let t = el.textContent.trim();
+    if (t.startsWith('⭐')) el.innerHTML = starIcon(14) + t.slice(1);
+    else if (t.startsWith('📚')) el.innerHTML = icon('book-open',{size:14}) + t.slice(1);
+    else if (t.startsWith('🪙')) el.innerHTML = icon('coins',{size:14,color:'#34d399'}) + t.slice(1);
+  });
+}
+
+function initSectionHeaders() {
+  const map = {'👥':'users','📚':'book-open','🏆':'trophy','🏅':'medal','🛒':'shopping-bag','🏷️':'activity','🔧':'settings','👑':'crown','⚠️':'alert-triangle','🔄':'rocket','📢':'megaphone','🤖':'bot'};
+  document.querySelectorAll('.sec-head h3, h3').forEach(el => {
+    const txt = el.textContent || '';
+    const first = [...txt][0];
+    if (map[first]) el.innerHTML = icon(map[first],{size:16}) + ' ' + txt.slice(1);
+  });
+}
+
+function initTopbarTitle() {
+  const tb = document.getElementById('topbar-title');
+  const t = tb.textContent.trim();
+  if (t.startsWith('📊')) tb.innerHTML = icon('bar-chart',{size:18}) + t.slice(1);
+}
+
+function initRefreshBtn() {
+  const btn = document.querySelector('.topbar .btn-sm');
+  if (btn) {
+    const txt = btn.textContent.replace('🔄','').trim();
+    btn.innerHTML = icon('rocket',{size:14}) + ' ' + txt;
+  }
+}
+
+function initDropZoneIcon() {
+  const dz = document.getElementById('drop-zone');
+  if (dz) {
+    const first = dz.querySelector('div');
+    if (first && first.textContent.trim()==='📂') first.innerHTML = icon('upload',{size:24,color:'var(--purple-light)'});
+  }
+}
+
+function rankIcon(i, size=18) {
+  if (i===0) return icon('crown',{size,color:'#fbbf24',fill:'#fbbf2433'});
+  if (i===1) return icon('medal',{size,color:'#94a3b8'});
+  if (i===2) return icon('medal',{size,color:'#cd7f32'});
+  return `<span style="color:var(--text-dim);font-weight:700">#${i+1}</span>`;
+}
+
+function applyStaticIcons() {
+  initNavIcons();
+  initStatIcons();
+  initChartTitles();
+  initSectionHeaders();
+  initTopbarTitle();
+  initRefreshBtn();
+  initDropZoneIcon();
+  const aiBtn = document.getElementById('ai-gen-btn');
+  if (aiBtn && aiBtn.textContent.includes('✨')) {
+    aiBtn.innerHTML = icon('sparkles',{size:14}) + ' ' + aiBtn.textContent.replace('✨','').trim();
+  }
+  const dangerBtn = document.querySelector('.sec .btn-cancel[onclick="resetAllWeekly()"]');
+  if (dangerBtn && dangerBtn.textContent.includes('🔄')) {
+    dangerBtn.innerHTML = icon('rocket',{size:14}) + ' ' + dangerBtn.textContent.replace('🔄','').trim();
+  }
+  const ms = document.getElementById('maintenance-status');
+  if (ms && ms.textContent.includes('🟢')) {
+    const rest = ms.textContent.replace('🟢','').trim();
+    ms.innerHTML = icon('circle-dot',{size:14,color:'#34d399'}) + ' ' + rest;
+  }
+}
+
 // AUTH
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
   if (user.email !== ADMIN) return location.href = 'dashboard.html';
+  applyStaticIcons();
   await loadAll();
 });
 
@@ -675,7 +768,7 @@ function renderAIPreview(words) {
       <td style="padding:10px 16px;color:var(--text-muted)">${w.uz}</td>
       <td style="padding:10px 16px;color:var(--text-dim);font-style:italic;font-size:0.8rem;max-width:200px">${w.example||''}</td>
       <td style="padding:10px 16px"><span style="background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:var(--purple-light);border-radius:99px;padding:2px 8px;font-size:0.72rem;font-weight:700">${w.difficulty||''}</span></td>
-      <td style="padding:10px 16px;text-align:center"><button class="abtn red" onclick="removeAIWord(${i})">🗑</button></td>`;
+      <td style="padding:10px 16px;text-align:center"><button class="abtn red" onclick="removeAIWord(${i})">${icon('trash-2',{size:14})}</button></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -724,13 +817,13 @@ async function loadShopAdmin() {
     card.style.cssText = 'background:var(--bg-deep);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;position:relative';
     card.innerHTML = `
       <div style="position:absolute;top:10px;right:10px;display:flex;gap:5px">
-        <button class="abtn" onclick="editShopItem('${item.id}')" title="Tahrirlash">✏️</button>
-        <button class="abtn red" onclick="deleteShopItem('${item.id}')" title="Ochirish">🗑</button>
+        <button class="abtn" onclick="editShopItem('${item.id}')" title="Tahrirlash">${icon('pen-line',{size:14})}</button>
+        <button class="abtn red" onclick="deleteShopItem('${item.id}')" title="Ochirish">${icon('trash-2',{size:14})}</button>
       </div>
-      <div style="font-size:2rem;margin-bottom:8px">${item.emoji||'🎁'}</div>
+      <div style="margin-bottom:8px">${fromEmoji(item.emoji||'gift',{size:48,color:'var(--purple-light)'})}</div>
       <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${item.name}</div>
       <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">${item.description||''}</div>
-      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399">🪙 ${item.price}</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399;display:inline-flex;align-items:center;gap:4px">${icon('coins',{size:16,color:'#34d399'})} ${item.price}</div>
       <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px">${item.category||''} ${item.isNew?'• Yangi':''} ${item.isHot?'• Hot':''}</div>
     `;
     grid.appendChild(card);
@@ -741,12 +834,19 @@ window.openShopItemModal = (item=null) => {
   document.getElementById('shop-modal-title').textContent = item ? 'Tahrirlash' : 'Yangi mahsulot';
   document.getElementById('shop-item-id').value = item?.id || '';
   document.getElementById('si-name').value = item?.name || '';
-  document.getElementById('si-emoji').value = item?.emoji || '';
   document.getElementById('si-desc').value = item?.description || '';
   document.getElementById('si-cat').value = item?.category || 'badge';
   document.getElementById('si-price').value = item?.price || '';
   document.getElementById('si-new').checked = item?.isNew || false;
   document.getElementById('si-hot').checked = item?.isHot || false;
+  const stored = item?.emoji || 'gift';
+  const defaultIcon = PATHS[stored] ? stored : (EMOJI_TO_ICON[stored] || 'gift');
+  const wrap = document.getElementById('si-icon-wrap');
+  if (!wrap.querySelector('.icon-picker')) {
+    wrap.innerHTML = iconPickerHtml(defaultIcon, 'si-emoji');
+  } else {
+    window.selectIcon?.('si-emoji', defaultIcon);
+  }
   document.getElementById('shop-item-modal').classList.add('open');
   setTimeout(() => document.getElementById('si-name').focus(), 100);
 };
@@ -763,7 +863,7 @@ window.editShopItem = async id => {
 window.saveShopItem = async () => {
   const id = document.getElementById('shop-item-id').value;
   const name = document.getElementById('si-name').value.trim();
-  const emoji = document.getElementById('si-emoji').value.trim() || '🎁';
+  const emoji = document.getElementById('si-emoji').value.trim() || 'gift';
   const description = document.getElementById('si-desc').value.trim();
   const category = document.getElementById('si-cat').value;
   const price = parseInt(document.getElementById('si-price').value) || 0;
@@ -816,14 +916,14 @@ async function loadAchAdmin() {
     card.style.cssText = 'background:var(--bg-deep);border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center;position:relative';
     card.innerHTML = `
       <div style="position:absolute;top:10px;right:10px;display:flex;gap:5px">
-        <button class="abtn" onclick="editAch('${item.id}')" title="Tahrirlash">✏️</button>
-        <button class="abtn red" onclick="deleteAch('${item.id}')" title="Ochirish">🗑</button>
+        <button class="abtn" onclick="editAch('${item.id}')" title="Tahrirlash">${icon('pen-line',{size:14})}</button>
+        <button class="abtn red" onclick="deleteAch('${item.id}')" title="Ochirish">${icon('trash-2',{size:14})}</button>
       </div>
-      <div style="font-size:2rem;margin-bottom:8px">${item.emoji||'🏅'}</div>
+      <div style="margin-bottom:8px">${fromEmoji(item.emoji||'medal',{size:48,color:'var(--purple-light)'})}</div>
       <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${item.name}</div>
       <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">${item.description||''}</div>
       <div style="font-size:0.75rem;color:var(--purple-light);margin-bottom:4px">${typeLabels[item.type]||item.type} >= ${item.threshold}</div>
-      <div style="font-size:0.78rem;color:#34d399">⭐ ${item.starReward||0} 🪙 ${item.coinReward||0}</div>
+      <div style="font-size:0.78rem;display:inline-flex;align-items:center;gap:8px"><span style="display:inline-flex;align-items:center;gap:2px;color:#fbbf24">${starIcon(14)} ${item.starReward||0}</span><span style="display:inline-flex;align-items:center;gap:2px;color:#34d399">${icon('coins',{size:14,color:'#34d399'})} ${item.coinReward||0}</span></div>
     `;
     grid.appendChild(card);
   });
@@ -833,12 +933,19 @@ window.openAchModal = (item=null) => {
   document.getElementById('ach-modal-title').textContent = item ? 'Tahrirlash' : 'Yangi mukofot';
   document.getElementById('ach-id').value = item?.id || '';
   document.getElementById('ach-name').value = item?.name || '';
-  document.getElementById('ach-emoji').value = item?.emoji || '';
   document.getElementById('ach-desc').value = item?.description || '';
   document.getElementById('ach-type').value = item?.type || 'words';
   document.getElementById('ach-threshold').value = item?.threshold || '';
   document.getElementById('ach-star-reward').value = item?.starReward || '';
   document.getElementById('ach-coin-reward').value = item?.coinReward || '';
+  const stored = item?.emoji || 'medal';
+  const defaultIcon = PATHS[stored] ? stored : (EMOJI_TO_ICON[stored] || 'medal');
+  const wrap = document.getElementById('ach-icon-wrap');
+  if (!wrap.querySelector('.icon-picker')) {
+    wrap.innerHTML = iconPickerHtml(defaultIcon, 'ach-emoji');
+  } else {
+    window.selectIcon?.('ach-emoji', defaultIcon);
+  }
   document.getElementById('ach-modal').classList.add('open');
   setTimeout(() => document.getElementById('ach-name').focus(), 100);
 };
@@ -853,7 +960,7 @@ window.editAch = async id => {
 window.saveAch = async () => {
   const id = document.getElementById('ach-id').value;
   const name = document.getElementById('ach-name').value.trim();
-  const emoji = document.getElementById('ach-emoji').value.trim() || '🏅';
+  const emoji = document.getElementById('ach-emoji').value.trim() || 'medal';
   const description = document.getElementById('ach-desc').value.trim();
   const type = document.getElementById('ach-type').value;
   const threshold = parseInt(document.getElementById('ach-threshold').value) || 0;
@@ -911,7 +1018,9 @@ function setMaintenanceUI(on) {
   thumb.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
   status.style.background = on ? 'rgba(248,113,113,0.1)' : 'rgba(52,211,153,0.1)';
   status.style.color = on ? 'var(--danger)' : 'var(--success)';
-  status.textContent = on ? 'Sayt yopiq (Maintenance)' : 'Sayt ishlayapti';
+  status.innerHTML = on
+    ? icon('ban',{size:14}) + ' Sayt yopiq (Maintenance)'
+    : icon('circle-dot',{size:14,color:'#34d399'}) + ' Sayt ishlayapti';
 }
 
 window.toggleMaintenance = async () => {
@@ -936,8 +1045,8 @@ function loadAdminsList(admins) {
   if (!el) return;
   el.innerHTML = admins.map(email => `
     <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg-deep);border-radius:8px;margin-bottom:6px;font-size:0.875rem">
-      <span>👑 ${email}</span>
-      ${email !== 'abdurasul1406z@gmail.com' ? `<button class="abtn red" onclick="removeAdmin('${email}')">🗑</button>` : '<span style="font-size:0.72rem;color:var(--text-dim)">Super admin</span>'}
+      <span style="display:inline-flex;align-items:center;gap:6px">${icon('crown',{size:14,color:'#fbbf24'})} ${email}</span>
+      ${email !== 'abdurasul1406z@gmail.com' ? `<button class="abtn red" onclick="removeAdmin('${email}')">${icon('trash-2',{size:14})}</button>` : '<span style="font-size:0.72rem;color:var(--text-dim)">Super admin</span>'}
     </div>
   `).join('');
 }
@@ -1050,12 +1159,12 @@ function userRow(u, rank) {
   return `<div class="tbl-row">
     <div class="u-cell">${rankHtml}<div class="u-av">${av}</div><div><div class="u-name">${nm}</div></div></div>
     <div style="color:var(--text-muted);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||''}</div>
-    <div style="font-weight:600;color:#fbbf24">⭐ ${u.stars||0}</div>
-    <div style="font-weight:600;color:#34d399">🪙 ${u.coins||0}</div>
+    <div style="font-weight:600;color:#fbbf24;display:inline-flex;align-items:center;gap:4px">${starIcon(14)} ${u.stars||0}</div>
+    <div style="font-weight:600;color:#34d399;display:inline-flex;align-items:center;gap:4px">${icon('coins',{size:14,color:'#34d399'})} ${u.coins||0}</div>
     <div><span class="sbadge ${u.blocked?'blocked':'ok'}">${u.blocked?'Bloklangan':'Faol'}</span></div>
     <div class="act-row">
-      <button class="abtn" onclick="openCoin('${u.uid}')" title="Coin">💰</button>
-      <button class="abtn red" onclick="toggleBlock('${u.uid}',${!!u.blocked})" title="Block">${u.blocked?'✅':'🚫'}</button>
+      <button class="abtn" onclick="openCoin('${u.uid}')" title="Coin">${coinIcon(14)}</button>
+      <button class="abtn red" onclick="toggleBlock('${u.uid}',${!!u.blocked})" title="Block">${u.blocked?icon('circle-check',{size:14}):icon('ban',{size:14})}</button>
     </div>
   </div>`;
 }
@@ -1106,16 +1215,16 @@ function renderLB() {
   document.getElementById('lb-list').innerHTML = sorted.length ? sorted.map((u,i)=>{
     const nm = u.displayName||(u.email||'').split('@')[0]||'User';
     const av = u.photoBase64?`<img src="${u.photoBase64}" alt="a">`:nm.charAt(0).toUpperCase();
-    const rank = i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+    const rank = rankIcon(i,18);
     return `<div class="tbl-row" style="grid-template-columns:60px 2fr 1fr 1fr 1fr 1fr">
-      <div style="font-weight:700;font-size:${i<3?'1.2':'0.9'}rem">${rank}</div>
+      <div style="font-weight:700;display:flex;align-items:center;justify-content:center">${rank}</div>
       <div class="u-cell"><div class="u-av">${av}</div><div class="u-name">${nm}</div></div>
-      <div style="font-weight:700;color:#fbbf24">⭐ ${u.stars||0}</div>
-      <div style="font-weight:600;color:#34d399">🪙 ${u.coins||0}</div>
-      <div style="color:var(--text-muted)">🔥 ${u.weeklyStars||0}</div>
+      <div style="font-weight:700;color:#fbbf24;display:inline-flex;align-items:center;gap:4px">${starIcon(14)} ${u.stars||0}</div>
+      <div style="font-weight:600;color:#34d399;display:inline-flex;align-items:center;gap:4px">${icon('coins',{size:14,color:'#34d399'})} ${u.coins||0}</div>
+      <div style="color:var(--text-muted);display:inline-flex;align-items:center;gap:4px">${flameIcon(14)} ${u.weeklyStars||0}</div>
       <div class="act-row">
-        <button class="abtn" onclick="openCoin('${u.uid}')">💰</button>
-        <button class="abtn red" onclick="resetWeekly('${u.uid}')">🔄</button>
+        <button class="abtn" onclick="openCoin('${u.uid}')">${coinIcon(14)}</button>
+        <button class="abtn red" onclick="resetWeekly('${u.uid}')" title="Reset weekly">${icon('rocket',{size:14})}</button>
       </div>
     </div>`;
   }).join('') : '<div style="padding:32px;text-align:center;color:var(--text-muted)">Malumot yoq</div>';
@@ -1150,10 +1259,10 @@ function renderFolderGrid(af) {
   af.forEach(f=>{
     const d = document.createElement('div');
     d.className = 'afc';
-    d.innerHTML = `<div class="afc-top"><span class="afc-emoji">${f.emoji||'📁'}</span>
+    d.innerHTML = `<div class="afc-top"><span class="afc-emoji">${folderIcon(f.emoji||'folder')}</span>
       <div style="display:flex;gap:5px">
-        <button class="abtn" onclick="event.stopPropagation();openWords('${f.id}')" title="Sozlar">📝</button>
-        <button class="abtn red" onclick="event.stopPropagation();delFolder('${f.id}')" title="Ochirish">🗑</button>
+        <button class="abtn" onclick="event.stopPropagation();openWords('${f.id}')" title="Sozlar">${icon('file-text',{size:14})}</button>
+        <button class="abtn red" onclick="event.stopPropagation();delFolder('${f.id}')" title="Ochirish">${icon('trash-2',{size:14})}</button>
       </div></div>
       <div class="afc-name">${f.name}</div>
       <div class="afc-meta">${f.wordCount||0} ta soz</div>
@@ -1163,11 +1272,23 @@ function renderFolderGrid(af) {
   });
 }
 
-window.openNewFolder = () => { document.getElementById('nf-modal').classList.add('open'); setTimeout(()=>document.getElementById('nf-name').focus(),100); };
-window.closeNewFolder = () => { document.getElementById('nf-modal').classList.remove('open'); document.getElementById('nf-name').value=''; document.getElementById('nf-emoji').value=''; };
+window.openNewFolder = () => {
+  const wrap = document.getElementById('nf-icon-wrap');
+  if (!wrap.querySelector('.icon-picker')) {
+    wrap.innerHTML = iconPickerHtml('book-open', 'nf-emoji');
+  } else {
+    window.selectIcon?.('nf-emoji', 'book-open');
+  }
+  document.getElementById('nf-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('nf-name').focus(),100);
+};
+window.closeNewFolder = () => {
+  document.getElementById('nf-modal').classList.remove('open');
+  document.getElementById('nf-name').value='';
+};
 window.createFolder = async () => {
   const name = document.getElementById('nf-name').value.trim();
-  const emoji = document.getElementById('nf-emoji').value.trim() || '📚';
+  const emoji = document.getElementById('nf-emoji').value.trim() || 'book-open';
   if (!name) return toast('Nom kiriting', true);
   await addDoc(collection(db,'folders'),{ name, emoji, uid:'admin', isAdmin:true, wordCount:0, progress:0, lastScore:null, createdAt:serverTimestamp() });
   toast('Bolim yaratildi');
@@ -1186,7 +1307,8 @@ window.openWords = async fid => {
   selFolder = fid;
   const af = window._adminFolders || [];
   const f = af.find(x=>x.id===fid);
-  document.getElementById('wm-title').textContent = (f?.emoji||'📁') + ' ' + (f?.name||'Bolim');
+  const tb = document.getElementById('wm-title');
+  tb.innerHTML = fromEmoji(f?.emoji||'folder',{size:18}) + ' ' + (f?.name||'Bolim');
   document.getElementById('wmodal').classList.add('open');
   await loadWords(fid);
 };
@@ -1214,7 +1336,7 @@ async function loadWords(fid) {
     const w=d.data();
     const row=document.createElement('div');
     row.className='word-row';
-    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${w.en}</span><span class="wr-uz">${w.uz}</span><span class="wr-ex">${w.example?'"'+w.example+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')">🗑</button>`;
+    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${w.en}</span><span class="wr-uz">${w.uz}</span><span class="wr-ex">${w.example?'"'+w.example+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')">${icon('trash-2',{size:14})}</button>`;
     body.appendChild(row);
   });
 }
@@ -1319,7 +1441,8 @@ async function loadAnns() {
     const date=dat.createdAt?.toDate?.()?.toLocaleDateString('uz')||'';
     const div=document.createElement('div');
     div.className='ann-item';
-    div.innerHTML=`<div class="ann-emoji">${dat.emoji||'📢'}</div><div class="ann-text">${dat.text}<div class="ann-date">${date}</div></div><button class="abtn red" onclick="delAnn('${d.id}')">🗑</button>`;
+    const icHtml = fromEmoji(dat.emoji||'megaphone',{size:20,color:'var(--purple-light)'});
+    div.innerHTML=`<div class="ann-emoji" style="display:flex;align-items:center">${icHtml}</div><div class="ann-text">${dat.text}<div class="ann-date">${date}</div></div><button class="abtn red" onclick="delAnn('${d.id}')">${icon('trash-2',{size:14})}</button>`;
     list.appendChild(div);
   });
 }
@@ -1338,6 +1461,17 @@ window.delAnn = async id => {
 };
 
 // TABS & PAGES
+const PAGE_ICONS = {
+  dashboard: 'bar-chart',
+  users: 'users',
+  folders: 'book-open',
+  aigenerator: 'bot',
+  announce: 'megaphone',
+  leaderboard: 'trophy',
+  achievements: 'medal',
+  shop: 'shopping-bag',
+  settings: 'settings'
+};
 const PAGE_TITLES = {
   dashboard: 'Dashboard',
   users: 'Foydalanuvchilar',
@@ -1354,9 +1488,15 @@ const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboa
 window.showPage = page => {
   PAGES.forEach(p => { document.getElementById('page-'+p).style.display = p===page?'block':'none'; });
   document.querySelectorAll('.nav-item').forEach((b,i)=>{ b.classList.toggle('active', PAGES[i]===page); });
-  document.getElementById('topbar-title').textContent = PAGE_TITLES[page] || page;
+  const tb = document.getElementById('topbar-title');
+  const icName = PAGE_ICONS[page] || 'layout-dashboard';
+  const title = PAGE_TITLES[page] || page;
+  tb.innerHTML = icon(icName,{size:18}) + ' ' + title;
   if (page==='folders') loadAdminFolders();
   if (page==='announce') loadAnns();
+  if (page==='shop') loadShopAdmin();
+  if (page==='achievements') loadAchAdmin();
+  if (page==='settings') loadSettings();
 };
 
 window.switchTab = tab => {

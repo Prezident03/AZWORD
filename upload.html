@@ -295,7 +295,7 @@
 
     <button class="back-btn" onclick="goBack()">← Orqaga</button>
 
-    <div class="page-title">📂 Fayl orqali so'z qo'shish</div>
+    <div class="page-title" id="page-title">Fayl orqali so'z qo'shish</div>
     <div class="page-sub">Quyidagi namunalardan birini ko'rib, fayl tayyorlab yuklang — so'zlar avtomatik qo'shiladi.</div>
 
     <!-- NAMUNALAR -->
@@ -304,7 +304,7 @@
       <!-- TXT -->
       <div class="sample-card">
         <div class="sample-header">
-          <div class="sample-icon txt">📄</div>
+          <div class="sample-icon txt" id="icon-txt"></div>
           <div>
             <div class="sample-title">Matnli fayl</div>
             <div class="sample-ext">.txt</div>
@@ -327,7 +327,7 @@
       <!-- Excel -->
       <div class="sample-card">
         <div class="sample-header">
-          <div class="sample-icon xlsx">🟢</div>
+          <div class="sample-icon xlsx" id="icon-xlsx"></div>
           <div>
             <div class="sample-title">Excel fayl</div>
             <div class="sample-ext">.xlsx / .xls</div>
@@ -343,7 +343,7 @@
       <!-- Word -->
       <div class="sample-card">
         <div class="sample-header">
-          <div class="sample-icon docx">🔵</div>
+          <div class="sample-icon docx" id="icon-docx"></div>
           <div>
             <div class="sample-title">Word hujjat</div>
             <div class="sample-ext">.docx</div>
@@ -361,11 +361,11 @@
     <div class="divider-line"></div>
 
     <!-- YUKLASH -->
-    <div class="upload-section-title">📤 Faylni yuklang</div>
+    <div class="upload-section-title" id="upload-section-title">Faylni yuklang</div>
 
     <div class="drop-zone" id="drop-zone">
       <input type="file" id="file-input" accept=".txt,.xlsx,.xls,.docx" />
-      <div class="drop-icon">📁</div>
+      <div class="drop-icon" id="drop-icon"></div>
       <div class="drop-title">Faylni shu yerga tashlang yoki bosing</div>
       <div class="drop-sub">Fayl tanlansin va so'zlar ko'rinadi</div>
       <div class="drop-formats">
@@ -381,13 +381,13 @@
     <!-- PREVIEW -->
     <div class="preview-section" id="preview-section">
       <div class="preview-header">
-        <div class="preview-title">👁 Ko'rib chiqing</div>
+        <div class="preview-title" id="preview-title">Ko'rib chiqing</div>
         <div class="preview-count" id="preview-count"></div>
       </div>
       <div class="preview-list" id="preview-list"></div>
       <div class="save-row">
         <div class="save-info" id="save-info"></div>
-        <button class="btn-save" id="save-btn" onclick="saveWords()">✅ Saqlash</button>
+        <button class="btn-save" id="save-btn" onclick="saveWords()">Saqlash</button>
       </div>
     </div>
 
@@ -401,6 +401,34 @@
     import {
       collection, addDoc, getDocs, serverTimestamp, updateDoc, doc, increment, query, where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { icon, starIcon, fromEmoji, PATHS } from './icons.js';
+
+    const folderSvg = icon('folder', { size: 22, color: 'var(--purple-light)', strokeWidth: 2 });
+    const fileTextSvg = icon('file-text', { size: 20, color: '#a78bfa', strokeWidth: 2 });
+    const excelSvg = icon('circle-dot', { size: 20, color: '#22c55e', fill: '#22c55e', strokeWidth: 2 });
+    const wordSvg = icon('circle-dot', { size: 20, color: '#3b82f6', fill: '#3b82f6', strokeWidth: 2 });
+    const uploadSvg = icon('upload', { size: 20, color: 'var(--purple-light)', strokeWidth: 2 });
+    const dropFolderSvg = icon('folder-open', { size: 56, color: 'var(--text-muted)', strokeWidth: 1.5 });
+    const checkSvg = icon('circle-check', { size: 18, color: 'var(--success)', strokeWidth: 2 });
+    const previewSvg = icon('layout-dashboard', { size: 18, color: 'var(--text-main)', strokeWidth: 2 });
+    const checkBtnSvg = icon('circle-check', { size: 18, strokeWidth: 2 });
+
+    const pt = document.getElementById('page-title');
+    if (pt) pt.innerHTML = `${folderSvg} ${pt.textContent}`;
+    const it = document.getElementById('icon-txt');
+    if (it) it.innerHTML = fileTextSvg;
+    const ix = document.getElementById('icon-xlsx');
+    if (ix) ix.innerHTML = excelSvg;
+    const idc = document.getElementById('icon-docx');
+    if (idc) idc.innerHTML = wordSvg;
+    const ust = document.getElementById('upload-section-title');
+    if (ust) ust.innerHTML = `${uploadSvg} ${ust.textContent}`;
+    const di = document.getElementById('drop-icon');
+    if (di) di.innerHTML = dropFolderSvg;
+    const prvT = document.getElementById('preview-title');
+    if (prvT) prvT.innerHTML = `${previewSvg} ${prvT.textContent}`;
+    const svBtn = document.getElementById('save-btn');
+    if (svBtn) svBtn.innerHTML = `${checkBtnSvg} Saqlash`;
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -617,7 +645,7 @@
       if (!parsedWords.length) return;
       const btn = document.getElementById('save-btn');
       btn.disabled = true;
-      btn.textContent = 'Tekshirilmoqda...';
+      btn.innerHTML = `${checkBtnSvg} Tekshirilmoqda...`;
 
       try {
         const wordsRef = collection(db, 'folders', folderId, 'words');
@@ -640,7 +668,7 @@
         if (newWords.length === 0) {
           showError(`Barcha ${parsedWords.length} ta so'z sizning lug'atlarda allaqachon mavjud!`);
           btn.disabled = false;
-          btn.textContent = '✅ Saqlash';
+          btn.innerHTML = `${checkBtnSvg} Saqlash`;
           return;
         }
 
@@ -650,10 +678,11 @@
         }
 
         // Faqat yangi so'zlarni AI bilan boyitib saqlash
-        btn.textContent = `🤖 AI misol yozmoqda... (0/${newWords.length})`;
+        const botSvg = icon('bot', { size: 18, strokeWidth: 2 });
+        btn.innerHTML = `${botSvg} AI misol yozmoqda... (0/${newWords.length})`;
         for (let i = 0; i < newWords.length; i++) {
           const word = newWords[i];
-          btn.textContent = `🤖 AI misol yozmoqda... (${i + 1}/${newWords.length})`;
+          btn.innerHTML = `${botSvg} AI misol yozmoqda... (${i + 1}/${newWords.length})`;
           if (!word.example) {
             word.example = await generateExample(word.en, word.uz);
           }
@@ -670,20 +699,21 @@
           wordCount: increment(newWords.length)
         });
 
-        showToast(`${newWords.length} ta yangi so'z qo'shildi! ✅`);
+        const succSvg = icon('circle-check', { size: 16, strokeWidth: 2 });
+        showToast(`${newWords.length} ta yangi so'z qo'shildi! ${succSvg}`);
         setTimeout(() => window.location.href = `folder.html?id=${folderId}`, 1500);
 
       } catch(e) {
         showError("Saqlashda xato: " + e.message);
         btn.disabled = false;
-        btn.textContent = '✅ Saqlash';
+        btn.innerHTML = `${checkBtnSvg} Saqlash`;
       }
     };
 
     // ── HELPERS ──
     function showError(msg) {
       const el = document.getElementById('parse-error');
-      el.textContent = '⚠️ ' + msg;
+      el.innerHTML = icon('alert-triangle', { size: 16, strokeWidth: 2.2 }) + ' ' + msg;
       el.style.display = 'block';
     }
 
@@ -693,7 +723,7 @@
 
     function showToast(msg, isError = false) {
       const t = document.getElementById('toast');
-      t.textContent = msg;
+      t.innerHTML = msg;
       t.className = 'toast' + (isError ? ' error' : '');
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3000);

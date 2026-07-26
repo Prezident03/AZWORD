@@ -221,7 +221,7 @@
     <div id="results-list"></div>
 
     <div class="results-actions">
-      <button class="btn-retry" onclick="retry()">🔄 Qaytadan ishlash</button>
+      <button class="btn-retry" onclick="retry()"><span id="retry-icon-wrap" style="display:inline-flex;vertical-align:middle;margin-right:6px">🔄</span>Qaytadan ishlash</button>
       <button class="btn-home" onclick="window.location.href='dashboard.html'">🏠 Bosh sahifa</button>
     </div>
 
@@ -290,6 +290,9 @@
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { doc, getDoc, setDoc, increment, collection, getDocs, updateDoc, addDoc, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { icon, starIcon, fromEmoji } from './icons.js';
+
+    document.getElementById('retry-icon-wrap').innerHTML = icon('activity', {size:18,color:'var(--purple-light)'});
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -377,7 +380,7 @@
             const streakBanner = document.createElement('div');
             streakBanner.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(251,146,60,0.1);border:1.5px solid rgba(251,146,60,0.3);border-radius:14px;padding:14px 20px;margin:0 auto 20px;max-width:400px';
             streakBanner.innerHTML = `
-              <span style="font-size:1.6rem">🔥</span>
+              ${icon('flame',{size:28,color:'#fb923c'})}
               <div>
                 <div style="font-weight:700;font-size:1.1rem;color:#fb923c">${currentStreak} kunlik streak!</div>
                 <div style="font-size:0.78rem;color:var(--text-muted)">Ajoyib, davom eting!</div>
@@ -464,13 +467,13 @@
           rewardBox.className = 'reward-box';
           rewardBox.innerHTML = `
             <div class="reward-item">
-              <div class="reward-icon">⭐</div>
+              <div class="reward-icon">${starIcon(22)}</div>
               <div class="reward-amount star">+${newlyRewarded}</div>
               <div class="reward-label">Yulduzcha</div>
             </div>
             <div class="reward-divider"></div>
             <div class="reward-item">
-              <div class="reward-icon">🪙</div>
+              <div class="reward-icon">${icon('coins',{size:22,color:'#34d399'})}</div>
               <div class="reward-amount coin">+${newlyRewarded}</div>
               <div class="reward-label">Tanga</div>
             </div>
@@ -483,7 +486,7 @@
           infoBox.style.opacity = '0.6';
           infoBox.innerHTML = `
             <div style="text-align:center;color:var(--text-muted);font-size:0.9rem;">
-              🏅 Bu so'zlar uchun mukofot oldin berilgan
+              ${icon('medal',{size:16,color:'#fbbf24'})} Bu so'zlar uchun mukofot oldin berilgan
             </div>
           `;
           document.querySelector('.results-hero').appendChild(infoBox);
@@ -497,19 +500,19 @@
     // Emoji & title
     const pct = perfectWords / totalWords;
     if (pct === 1) {
-      document.getElementById('result-emoji').textContent = '🏆';
+      document.getElementById('result-emoji').innerHTML = icon('trophy',{size:64,color:'#fbbf24'});
       document.getElementById('result-title').textContent = 'Mukammal natija!';
       document.getElementById('result-subtitle').textContent = "Barcha so'zlarni to'liq o'zlashtirdingiz!";
     } else if (pct >= 0.7) {
-      document.getElementById('result-emoji').textContent = '🎉';
+      document.getElementById('result-emoji').innerHTML = icon('party-popper',{size:64,color:'var(--purple-light)'});
       document.getElementById('result-title').textContent = "Zo'r natija!";
       document.getElementById('result-subtitle').textContent = 'Juda yaxshi, davom eting!';
     } else if (pct >= 0.4) {
-      document.getElementById('result-emoji').textContent = '💪';
+      document.getElementById('result-emoji').innerHTML = icon('dumbbell',{size:64,color:'var(--purple-light)'});
       document.getElementById('result-title').textContent = 'Yaxshi urinish!';
       document.getElementById('result-subtitle').textContent = 'Yana bir marta ishlasangiz yanada yaxshi bo\'ladi.';
     } else {
-      document.getElementById('result-emoji').textContent = '📚';
+      document.getElementById('result-emoji').innerHTML = icon('book-open',{size:64,color:'var(--purple-light)'});
       document.getElementById('result-title').textContent = "O'rganishda davom eting!";
       document.getElementById('result-subtitle').textContent = 'Qaytadan ishlash tavsiya etiladi.';
     }
@@ -529,7 +532,7 @@
             <div class="result-uz">${word.uz}</div>
             <div class="result-mistakes">Xato bosqichlar: ${r.mistakes.map(s => STAGE_NAMES[s]).join(', ')}</div>
             <div class="correct-answer-box">
-              <div class="correct-answer-label">✏️ To'g'ri javob</div>
+              <div class="correct-answer-label">${icon('pen-line',{size:14,color:'var(--success)'})} To'g'ri javob</div>
               <div class="correct-answer-row">
                 <span class="correct-en">${word.en}</span>
                 <span class="correct-arrow">→</span>

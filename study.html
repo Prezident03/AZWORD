@@ -420,7 +420,7 @@
       </div>
     </div>
 
-    <div class="stage-badge" id="stage-badge">📖 Tanishish</div>
+    <div class="stage-badge" id="stage-badge"></div>
 
     <div class="study-card" id="study-card">
       <div style="color:var(--text-muted)">Yuklanmoqda...</div>
@@ -539,13 +539,14 @@
     import {
       collection, getDocs, query, orderBy, doc, setDoc, updateDoc, increment, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { icon, starIcon, fromEmoji, PATHS } from './icons.js';
 
     const STAGES = [
-      { id: 1, name: "Tanishish",    emoji: "📖" },
-      { id: 2, name: "Variantlar",   emoji: "🔤" },
-      { id: 3, name: "Bo'laklash",   emoji: "🧩" },
-      { id: 4, name: "Moslashtirish",emoji: "🔗" },
-      { id: 5, name: "Yozish",       emoji: "✍️" },
+      { id: 1, name: "Tanishish",    iconKey: "book-marked" },
+      { id: 2, name: "Variantlar",   iconKey: "languages" },
+      { id: 3, name: "Bo'laklash",   iconKey: "puzzle" },
+      { id: 4, name: "Moslashtirish",iconKey: "link" },
+      { id: 5, name: "Yozish",       iconKey: "pen-line" },
     ];
 
     const params = new URLSearchParams(window.location.search);
@@ -613,7 +614,7 @@
       }
       document.getElementById('stage-text').textContent = `${currentStage}-bosqich`;
       const s = STAGES[currentStage - 1];
-      document.getElementById('stage-badge').textContent = `${s.emoji} ${s.name}`;
+      document.getElementById('stage-badge').innerHTML = `${icon(s.iconKey, { size: 14 })} ${s.name}`;
     }
 
     function renderStage() {
@@ -635,17 +636,19 @@
     // ── STAGE 1: Tanishtirish — barcha so'zlar ──
     function renderStage1(word, card) {
       const exStr = word.example ? word.example.replace(/\\/g, '\\\\').replace(/'/g, "\\'") : '';
+      const speakSvg = icon('bot', { size: 16, strokeWidth: 2.2 });
+      const globeSvg = icon('languages', { size: 14, strokeWidth: 2.2 });
       card.innerHTML = `
         <div class="word-display">${word.en}</div>
         <div class="intro-translation">${word.uz}</div>
         <button class="speak-btn" id="speak-btn" onclick="speakWord('${word.en.replace(/'/g, "\\'")}')">
-          🔊 Tinglash
+          ${speakSvg} Tinglash
         </button>
         ${word.example ? `
           <div class="example-wrap">
             <div class="word-example-text" id="example-text">"${word.example}"</div>
             <button class="translate-btn" id="translate-btn" onclick="translateExample('${exStr}')">
-              🌐 Tarjima
+              ${globeSvg} Tarjima
             </button>
             <div class="example-translation" id="example-translation" style="display:none"></div>
           </div>
@@ -684,7 +687,8 @@
       window.speechSynthesis.cancel();
 
       const btn = document.getElementById('speak-btn');
-      if (btn) { btn.classList.add('speaking'); btn.innerHTML = '🔊 ...'; }
+      const speakSvg = icon('bot', { size: 16, strokeWidth: 2.2 });
+      if (btn) { btn.classList.add('speaking'); btn.innerHTML = `${speakSvg} ...`; }
 
       const utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'en-GB';
@@ -693,10 +697,10 @@
       if (gbVoice) utter.voice = gbVoice;
 
       utter.onend = () => {
-        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
+        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = `${speakSvg} Tinglash`; }
       };
       utter.onerror = () => {
-        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = '🔊 Tinglash'; }
+        if (btn) { btn.classList.remove('speaking'); btn.innerHTML = `${speakSvg} Tinglash`; }
       };
 
       window.speechSynthesis.speak(utter);
@@ -708,8 +712,9 @@
       const translationEl = document.getElementById('example-translation');
       if (!btn || !translationEl) return;
 
+      const globeSvg = icon('languages', { size: 14, strokeWidth: 2.2 });
       btn.disabled = true;
-      btn.textContent = '⏳ ...';
+      btn.innerHTML = `${globeSvg} ...`;
 
       try {
         const res = await fetch("/api/generate", {
@@ -719,12 +724,12 @@
         });
         const data = await res.json();
         const translation = (data.choices?.[0]?.message?.content || '').trim().replace(/^["'"]|["'"]$/g, '');
-        translationEl.textContent = '🇺🇿 ' + translation;
+        translationEl.innerHTML = `<span style="font-size:0.75rem;padding:1px 6px;border-radius:4px;background:rgba(34,197,94,0.15);color:#4ade80;margin-right:6px;">UZ</span>` + translation;
         translationEl.style.display = 'block';
         btn.style.display = 'none';
       } catch(e) {
         btn.disabled = false;
-        btn.textContent = '🌐 Tarjima';
+        btn.innerHTML = `${globeSvg} Tarjima`;
       }
     };
 
@@ -820,13 +825,13 @@
       if (allUsed) {
         if (assembled === correct) {
           display.style.color = 'var(--success)';
-          display.textContent = assembled + ' ✓';
+          display.innerHTML = assembled + ' ' + icon('check', { size: 16, strokeWidth: 3 });
           playSound('correct');
           if (undoBtn) undoBtn.style.display = 'none';
           document.getElementById('next-btn').disabled = false;
         } else {
           display.style.color = 'var(--danger)';
-          display.textContent = assembled + ' ✗';
+          display.innerHTML = assembled + ' ' + icon('x', { size: 16, strokeWidth: 3 });
           playSound('wrong');
           markMistake(3);
           setTimeout(() => {
@@ -885,11 +890,13 @@
         rowsHtml += `</div>`;
       }
 
+      const enLabel = `<span style="font-size:0.65rem;padding:1px 6px;border-radius:4px;background:rgba(59,130,246,0.15);color:#60a5fa">EN</span>`;
+      const uzLabel = `<span style="font-size:0.65rem;padding:1px 6px;border-radius:4px;background:rgba(34,197,94,0.15);color:#4ade80">UZ</span>`;
       card.innerHTML = `
         <div class="word-sub" style="margin-bottom:8px">Inglizcha va o'zbekcha so'zlarni moslashtiring:</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;padding:0 4px">
-          <div style="font-size:0.72rem;color:var(--text-dim);text-align:center;font-weight:600;letter-spacing:1px">🇬🇧 INGLIZCHA</div>
-          <div style="font-size:0.72rem;color:var(--text-dim);text-align:center;font-weight:600;letter-spacing:1px">🇺🇿 O'ZBEKCHA</div>
+          <div style="font-size:0.72rem;color:var(--text-dim);text-align:center;font-weight:600;letter-spacing:1px">${enLabel} INGLIZCHA</div>
+          <div style="font-size:0.72rem;color:var(--text-dim);text-align:center;font-weight:600;letter-spacing:1px">${uzLabel} O'ZBEKCHA</div>
         </div>
         <div class="match-area">${rowsHtml}</div>
       `;
@@ -929,7 +936,7 @@
         const total = Math.min(words.length, 8);
         if (matchedPairs === total) {
           document.getElementById('next-btn').disabled = false;
-          showToast("Hammasi to'g'ri! 🎉");
+          showToast(`Hammasi to'g'ri! ${icon('party-popper', { size: 16 })}`);
         }
       } else {
         matchSelected.classList.remove('selected');
@@ -975,7 +982,7 @@
         if (val === correct) {
           input.classList.add('correct-input');
           document.getElementById('next-btn').disabled = false;
-          document.getElementById('type-hint').textContent = "✓ To'g'ri!";
+          document.getElementById('type-hint').innerHTML = icon('check', { size: 14, strokeWidth: 3 }) + " To'g'ri!";
           document.getElementById('type-hint').style.color = 'var(--success)';
         } else {
           input.classList.remove('correct-input', 'wrong-input');
@@ -1180,9 +1187,10 @@
     function showRoundBanner(count) {
       const card = document.getElementById('study-card');
       if (card) {
+        const sparkleSvg = icon('sparkles', { size: 48, color: 'var(--purple-light)', strokeWidth: 2 });
         card.innerHTML = `
           <div style="text-align:center;padding:20px 10px;">
-            <div style="font-size:3rem;margin-bottom:16px;">🔄</div>
+            <div style="margin-bottom:16px;">${sparkleSvg}</div>
             <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:10px;color:var(--text-main)">2-urinish!</div>
             <div style="color:var(--text-muted);font-size:0.9rem;">${count} ta xato bosqich qaytadan ishlanadi</div>
           </div>

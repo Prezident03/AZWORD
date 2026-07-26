@@ -120,8 +120,8 @@
   <div class="nav-logo">AzWord</div>
   <div class="nav-user">
     <div class="nav-badges">
-      <div class="nav-badge star"><span class="badge-icon">⭐</span><span class="badge-val" id="nav-stars">0</span></div>
-      <div class="nav-badge coin"><span class="badge-icon">🪙</span><span class="badge-val" id="nav-coins">0</span></div>
+      <div class="nav-badge star"><span class="badge-icon" id="stats-star-icon"></span><span class="badge-val" id="nav-stars">0</span></div>
+      <div class="nav-badge coin"><span class="badge-icon" id="stats-coin-icon"></span><span class="badge-val" id="nav-coins">0</span></div>
     </div>
     <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer">A</div>
   </div>
@@ -131,39 +131,39 @@
   <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
 
   <div class="stats-header">
-    <h1>📊 Statistika</h1>
+    <h1><span id="stats-title-icon" style="display:inline-flex;align-items:center;margin-right:8px;vertical-align:middle"></span>Statistika</h1>
     <p>O'rganish safaringizdagi natijalar va tahlillar</p>
   </div>
 
   <!-- Overview -->
   <div class="overview-grid">
     <div class="ov-card">
-      <div class="ov-icon">📝</div>
+      <div class="ov-icon"><span id="ov-icon-sessions"></span></div>
       <div class="ov-num" id="ov-sessions">0</div>
       <div class="ov-label">Jami mashqlar</div>
     </div>
     <div class="ov-card">
-      <div class="ov-icon">✅</div>
+      <div class="ov-icon"><span id="ov-icon-accuracy"></span></div>
       <div class="ov-num" id="ov-accuracy">0%</div>
       <div class="ov-label">O'rtacha natija</div>
     </div>
     <div class="ov-card">
-      <div class="ov-icon">📚</div>
+      <div class="ov-icon"><span id="ov-icon-words"></span></div>
       <div class="ov-num" id="ov-words">0</div>
       <div class="ov-label">O'rganilgan so'zlar</div>
     </div>
     <div class="ov-card">
-      <div class="ov-icon">🔥</div>
+      <div class="ov-icon"><span id="ov-icon-streak"></span></div>
       <div class="ov-num" id="ov-streak">0</div>
       <div class="ov-label">Kunlik streak</div>
     </div>
     <div class="ov-card">
-      <div class="ov-icon">⭐</div>
+      <div class="ov-icon"><span id="ov-icon-stars"></span></div>
       <div class="ov-num" id="ov-stars">0</div>
       <div class="ov-label">Yulduzlar</div>
     </div>
     <div class="ov-card">
-      <div class="ov-icon">🪙</div>
+      <div class="ov-icon"><span id="ov-icon-coins"></span></div>
       <div class="ov-num" id="ov-coins">0</div>
       <div class="ov-label">Tangalar</div>
     </div>
@@ -171,7 +171,7 @@
 
   <!-- Accuracy chart (last 14 sessions) -->
   <div class="chart-card">
-    <div class="chart-title">📈 So'nggi 14 mashq natijalari</div>
+    <div class="chart-title"><span id="chart-title-accuracy" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>So'nggi 14 mashq natijalari</div>
     <div class="chart-wrap"><canvas id="chart-accuracy"></canvas></div>
   </div>
 
@@ -188,7 +188,7 @@
 
     <!-- Folder stats -->
     <div class="chart-card" style="margin-bottom:0">
-      <div class="chart-title">📁 Bo'limlar bo'yicha</div>
+      <div class="chart-title"><span id="chart-title-folders" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Bo'limlar bo'yicha</div>
       <div class="folder-stats-list" id="folder-stats-list">
         <div class="stats-empty">Yuklanmoqda...</div>
       </div>
@@ -198,7 +198,7 @@
 
   <!-- Category donut chart -->
   <div class="chart-card">
-    <div class="chart-title">🎯 Bo'limlar nisbati (so'zlar soni)</div>
+    <div class="chart-title"><span id="chart-title-pie" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Bo'limlar nisbati (so'zlar soni)</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center">
       <div class="chart-wrap" style="height:200px"><canvas id="chart-folders-pie"></canvas></div>
       <div id="pie-legend" style="display:flex;flex-direction:column;gap:8px;font-size:0.82rem"></div>
@@ -209,6 +209,7 @@
 
 <script type="module">
 import { auth, db } from './firebase.js';
+import { icon, fromEmoji, starIcon, coinIcon, PATHS, folderIcon } from './icons.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   collection, getDocs, doc, getDoc,
@@ -219,6 +220,19 @@ let charts = {};
 
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
+
+  document.getElementById('stats-star-icon').innerHTML = starIcon(14);
+  document.getElementById('stats-coin-icon').innerHTML = icon('coins',{size:14,color:'#34d399'});
+  document.getElementById('stats-title-icon').innerHTML = icon('bar-chart',{size:24});
+  document.getElementById('ov-icon-sessions').innerHTML = icon('file-text',{size:22});
+  document.getElementById('ov-icon-accuracy').innerHTML = icon('circle-check',{size:22,color:'#34d399'});
+  document.getElementById('ov-icon-words').innerHTML = icon('book-open',{size:22});
+  document.getElementById('ov-icon-streak').innerHTML = icon('flame',{size:22,color:'#fb923c'});
+  document.getElementById('ov-icon-stars').innerHTML = starIcon(22);
+  document.getElementById('ov-icon-coins').innerHTML = icon('coins',{size:22,color:'#34d399'});
+  document.getElementById('chart-title-accuracy').innerHTML = icon('bar-chart',{size:18,color:'#9d5cf6'});
+  document.getElementById('chart-title-folders').innerHTML = icon('folder',{size:18,color:'#fbbf24'});
+  document.getElementById('chart-title-pie').innerHTML = icon('sparkles',{size:18,color:'#c084fc'});
 
   // User data
   try {
@@ -397,7 +411,7 @@ function renderFolderStats(folders) {
     const div = document.createElement('div');
     div.className = 'fs-item';
     div.innerHTML = `
-      <div class="fs-emoji">${f.emoji||'📁'}</div>
+      <div class="fs-emoji">${folderIcon(f.emoji||'folder')}</div>
       <div class="fs-info">
         <div class="fs-name">${f.name}</div>
         <div class="fs-meta">${wc} ta soz</div>

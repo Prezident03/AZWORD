@@ -569,8 +569,8 @@
       <input type="text" id="folder-name" placeholder="Masalan: IELTS Vocabulary" onkeydown="if(event.key==='Enter') createFolder()"/>
     </div>
     <div class="form-group">
-      <label>Emoji</label>
-      <input type="text" id="folder-emoji" placeholder="📚" maxlength="2"/>
+      <label>Icon</label>
+      <div id="icon-picker-wrap"></div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Bekor</button>
@@ -588,6 +588,7 @@ import {
   collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc,
   query, where, orderBy, limit, serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { icon, fromEmoji, folderIcon, starIcon, coinIcon, iconPickerHtml, FOLDER_ICONS, PATHS } from './icons.js';
 
 const ADMIN_EMAIL = "abdurasul1406z@gmail.com";
 let currentUser = null;
@@ -685,7 +686,7 @@ function renderFolders(snap, containerId, isAdmin) {
       ${!isAdmin ? `<button class="folder-delete" onclick="deleteFolder(event,'${id}')">
         <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>` : ''}
-      <div class="folder-icon">${f.emoji || '📁'}</div>
+      <div class="folder-icon">${folderIcon(f.emoji || 'folder')}</div>
       <div class="folder-name">${f.name}</div>
       <div class="folder-meta">${wc} ta soz</div>
       <div class="folder-progress">
@@ -711,12 +712,16 @@ function renderFolders(snap, containerId, isAdmin) {
   }
 }
 
-window.openModal = () => { document.getElementById('folder-modal').classList.add('open'); setTimeout(()=>document.getElementById('folder-name').focus(),100); };
-window.closeModal = () => { document.getElementById('folder-modal').classList.remove('open'); document.getElementById('folder-name').value=''; document.getElementById('folder-emoji').value=''; };
+window.openModal = () => { document.getElementById('folder-modal').classList.add('open'); setTimeout(()=>document.getElementById('folder-name').focus(),100);
+  const wrap = document.getElementById('icon-picker-wrap');
+  if (!wrap.innerHTML) wrap.innerHTML = iconPickerHtml('folder', 'folder-icon');
+  window.selectIcon?.('folder-icon','folder');
+};
+window.closeModal = () => { document.getElementById('folder-modal').classList.remove('open'); document.getElementById('folder-name').value=''; };
 
 window.createFolder = async () => {
   const name = document.getElementById('folder-name').value.trim();
-  const emoji = document.getElementById('folder-emoji').value.trim() || '📁';
+  const emoji = document.getElementById('folder-icon')?.value?.trim() || 'folder';
   if (!name) return;
   const existing = await getDocs(query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false)));
   if ([...existing.docs].find(d => d.data().name.toLowerCase() === name.toLowerCase())) {
@@ -744,12 +749,14 @@ async function loadAnnouncements() {
     const banner = document.getElementById('announce-banner');
     if (!banner || snap.empty) return;
     banner.innerHTML = '';
-    const typeClass = {'🎉':'type-yangilik','⚠️':'type-ogohlantirish','🎁':'type-sovga','🔔':'type-eslatma','🚀':'type-yangilanish'};
+    const typeClass = {'party-popper':'type-yangilik','alert-triangle':'type-ogohlantirish','gift':'type-sovga','bell':'type-eslatma','rocket':'type-yangilanish'};
+    const typeMap = {'🎉':'party-popper','⚠️':'alert-triangle','🎁':'gift','🔔':'bell','🚀':'rocket','📢':'megaphone'};
     snap.forEach(d => {
       const dat = d.data();
+      const iconName = typeMap[dat.emoji] || (PATHS[dat.emoji] ? dat.emoji : 'megaphone');
       const div = document.createElement('div');
-      div.className = `announce-item-banner ${typeClass[dat.emoji]||'type-yangilik'}`;
-      div.innerHTML = `<span class="announce-emoji">${dat.emoji||'📢'}</span><span>${dat.text}</span><button class="announce-close" onclick="this.parentElement.remove()">✕</button>`;
+      div.className = `announce-item-banner ${typeClass[iconName]||'type-yangilik'}`;
+      div.innerHTML = `<span class="announce-emoji" style="display:inline-flex;align-items:center">${icon(iconName,{size:18})}</span><span>${dat.text}</span><button class="announce-close" onclick="this.parentElement.remove()">${icon('x',{size:14})}</button>`;
       banner.appendChild(div);
     });
   } catch(e) {}
