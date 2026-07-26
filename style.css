@@ -14,6 +14,16 @@
   --warning: #fbbf24;
   --glass-bg: rgba(26, 22, 37, 0.7);
   --glass-border: rgba(255, 255, 255, 0.06);
+
+  /* ── TYPOGRAPHY SCALE ── */
+  --font-size-xs: 0.7rem;      /* 11.2px — Caption */
+  --font-size-sm: 0.82rem;     /* 13px — Small text */
+  --font-size-md: 0.95rem;     /* 15px — Body */
+  --font-size-lg: 1.1rem;      /* 17.6px — Subheading */
+  --font-size-xl: 1.3rem;      /* 20.8px — Small heading */
+  --font-size-2xl: 1.6rem;     /* 25.6px — Medium heading */
+  --font-size-3xl: 2rem;       /* 32px — Large heading */
+  --font-size-4xl: 2.5rem;     /* 40px — Hero heading */
 }
 
 * {
@@ -26,9 +36,228 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--bg-deep);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.6;
   position: relative;
   min-height: 100vh;
+  font-size: var(--font-size-md);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── TYPOGRAPHY ── */
+
+/* 1. HEADING — Space Grotesk 700 */
+h1, .h1,
+.page-title,
+.hero-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+h2, .h2,
+.section-heading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+h3, .h3,
+.subheading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-main);
+}
+
+h4, .h4,
+.card-title,
+.folder-name,
+.ach-name,
+.lb-name,
+.item-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-main);
+}
+
+/* 2. BODY — Inter 400 */
+body,
+p,
+.body-text,
+.nav-item,
+.btn-text,
+.option-btn,
+.match-btn,
+.piece-btn,
+.type-input,
+.sentence-input,
+.form-group input,
+.form-group textarea,
+.form-group select,
+.drop-title,
+.sample-code {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-md);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+
+/* 3. CAPTION — Inter 500 */
+.caption,
+.card-meta,
+.folder-meta,
+.word-count,
+.ach-desc,
+.lb-sub,
+.result-uz,
+.result-mistakes,
+.hw-uz,
+.fs-meta,
+.preview-example,
+.ann-date,
+.history-date,
+.stat-label,
+.progress-label,
+.hint-text,
+.field-note,
+.sample-note,
+.drop-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* 4. SMALL CAPTION — Inter 500 */
+.small-caption,
+.text-xs,
+.badge-text,
+.ach-progress-text,
+.week-info,
+.lb-rank,
+.streak-stat-label,
+.goal-tag,
+.fs-acc {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+}
+
+/* 5. NUMBERS — Space Grotesk 700 */
+.number,
+.stat-num,
+.score-num,
+.streak-num,
+.coin-amount,
+.price-tag,
+.ach-ring-num,
+.lb-score,
+.folder-score,
+.reward-amount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-main);
+}
+
+.number-sm {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.number-lg {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-4xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 6. UPPERCASE LABELS */
+.label-uppercase {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* 7. GRADIENT TEXT */
+.gradient-text {
+  font-family: 'Space Grotesk', sans-serif;
+  background: linear-gradient(135deg, #9d5cf6, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 8. LINK */
+a {
+  color: var(--purple-light);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--purple-main);
+}
+
+/* 9. LIST */
+ul, ol {
+  padding-left: 1.5rem;
+  color: var(--text-muted);
+}
+
+li {
+  margin-bottom: 0.25rem;
+}
+
+/* 10. BLOCKQUOTE */
+blockquote {
+  border-left: 3px solid var(--purple-main);
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* 11. CODE */
+code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85em;
+  background: var(--bg-deep);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  color: var(--purple-light);
+}
+
+/* 12. SELECTION */
+::selection {
+  background: var(--purple-main);
+  color: #fff;
+}
+
+::-moz-selection {
+  background: var(--purple-main);
+  color: #fff;
 }
 
 /* ── Gradient blurlar (purple, blue, pink) ── */
@@ -103,8 +332,10 @@ body::after {
 }
 
 .auth-logo p {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
   color: var(--text-muted);
-  font-size: 0.85rem;
   margin-top: 4px;
 }
 
@@ -124,9 +355,9 @@ body::after {
   border-radius: 9px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.9rem;
-  font-weight: 600;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -147,7 +378,8 @@ body::after {
   border-radius: 10px;
   padding: 10px 14px;
   color: var(--danger);
-  font-size: 0.85rem;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
   margin-bottom: 16px;
 }
 
@@ -157,8 +389,11 @@ body::after {
 
 .form-group label {
   display: block;
-  font-size: 0.82rem;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
   font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 5px;
 }
@@ -172,8 +407,8 @@ body::after {
   border: 1.5px solid var(--border);
   border-radius: 10px;
   color: var(--text-main);
-  font-size: 0.9rem;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-md);
   outline: none;
   transition: border-color 0.2s;
 }
@@ -196,9 +431,9 @@ body::after {
   border: none;
   border-radius: 10px;
   color: #fff;
-  font-size: 0.95rem;
-  font-weight: 600;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-md);
+  font-weight: 600;
   cursor: pointer;
   transition: opacity 0.2s;
 }
@@ -212,7 +447,8 @@ body::after {
   align-items: center;
   gap: 14px;
   color: var(--text-dim);
-  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
   margin: 18px 0;
 }
 
@@ -231,9 +467,9 @@ body::after {
   border: 1.5px solid var(--border);
   border-radius: 10px;
   color: var(--text-main);
-  font-size: 0.9rem;
-  font-weight: 500;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-md);
+  font-weight: 500;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -297,7 +533,8 @@ body::after {
   gap: 4px;
   padding: 4px 10px;
   border-radius: 99px;
-  font-size: 0.78rem;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
   font-weight: 600;
 }
 
@@ -320,6 +557,7 @@ body::after {
 
 .badge-val {
   font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
 }
 
 .profile-avatar {
@@ -330,9 +568,10 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: var(--font-size-md);
   cursor: pointer;
   overflow: hidden;
   border: 2px solid rgba(124, 58, 237, 0.3);
@@ -356,9 +595,9 @@ body::after {
   border: 1.5px solid var(--border);
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 500;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -391,6 +630,20 @@ body::after {
   display: block;
 }
 
+.sb-user-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.sb-user-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
 /* ── TOPBAR ── */
 .dash-topbar {
   background: rgba(15, 13, 26, 0.85);
@@ -405,6 +658,25 @@ body::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.topbar-left h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.topbar-left h1 span {
+  color: var(--purple-light);
+}
+
+.topbar-left p {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 2px;
 }
 
 /* ── KARTALAR (Depth + Glass + Shadow + Glow) ── */
@@ -426,8 +698,7 @@ body::after {
 .word-item,
 .preview-item,
 .history-item,
-.afc,
-.streak-stat-card {
+.afc {
   background: var(--bg-card);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
@@ -438,7 +709,7 @@ body::after {
   transition: all 0.3s ease;
 }
 
-/* ── HOVERDA glow va shadow kuchayishi ── */
+/* HOVERDA glow va shadow kuchayishi */
 .folder-card:hover,
 .ach-card:hover,
 .shop-item:hover,
@@ -465,9 +736,9 @@ body::after {
   border: 1.5px solid var(--purple-main);
   border-radius: 10px;
   color: var(--purple-light);
-  font-size: 0.85rem;
-  font-weight: 600;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -488,9 +759,9 @@ body::after {
   border: 1.5px solid var(--border);
   background: transparent;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  font-weight: 600;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -506,9 +777,9 @@ body::after {
   border: none;
   background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
   color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
   font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -528,10 +799,10 @@ body::after {
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-md);
   font-weight: 600;
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
   transition: all 0.2s;
   box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
 }
@@ -582,10 +853,11 @@ body::after {
 }
 
 .modal h3 {
-  margin: 0 0 16px;
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
   color: var(--text-main);
+  margin: 0 0 16px;
 }
 
 .modal-actions {
@@ -606,7 +878,8 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 12px 20px;
   border-radius: 12px;
-  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-md);
   font-weight: 500;
   color: var(--text-main);
   opacity: 0;
@@ -652,6 +925,82 @@ body::after {
   cursor: pointer;
   width: 100%;
   height: 100%;
+}
+
+.drop-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.drop-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── FOLDER CARD ── */
+.folder-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* ── WORD ITEM ── */
+.word-en {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.word-uz {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.word-example {
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  color: var(--text-dim);
+  font-style: italic;
 }
 
 /* ── Qo'shimcha: harakatlanuvchi blurlar ── */
