@@ -177,7 +177,7 @@
   <button class="back-btn" onclick="window.location.href='dashboard.html'">← Orqaga</button>
 
   <div class="ach-header">
-    <h1>🏅 Mukofotlar</h1>
+    <h1><span id="ach-title-icon"></span> Mukofotlar</h1>
     <p>O'rganish safaringizdagi yutuqlaringiz</p>
   </div>
 
@@ -202,7 +202,7 @@
 
   <div class="ach-tabs">
     <button class="ach-tab active" onclick="filterAch('all')">Hammasi</button>
-    <button class="ach-tab" onclick="filterAch('unlocked')">✅ Olingan</button>
+    <button class="ach-tab" onclick="filterAch('unlocked')"><span id="unlocked-tab-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Olingan</button>
     <button class="ach-tab" onclick="filterAch('locked')"><span id="locked-tab-icon" style="display:inline-flex;vertical-align:middle;margin-right:4px"></span>Qolgan</button>
   </div>
 
@@ -230,6 +230,7 @@ document.getElementById('badge-star-icon').innerHTML = starIcon(14);
 document.getElementById('badge-coin-icon').innerHTML = icon('coins',{size:14, color:'#34d399'});
 document.getElementById('ach-title-icon').innerHTML = icon('medal',{size:24});
 document.getElementById('locked-tab-icon').innerHTML = icon('lock',{size:14});
+document.getElementById('unlocked-tab-icon').innerHTML = icon('circle-check',{size:14,color:'#34d399'});
 
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';

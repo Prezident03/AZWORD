@@ -361,7 +361,7 @@
           <div class="avatar-circle" id="avatar-circle">
             <span id="avatar-letter">A</span>
           </div>
-          <div class="avatar-edit-btn" title="Rasm o'zgartirish" onclick="document.getElementById('photo-input').click()">📷</div>
+          <div class="avatar-edit-btn" title="Rasm o'zgartirish" onclick="document.getElementById('photo-input').click()"><span id="avatar-edit-icon"></span></div>
         </div>
         <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" />
         <h2 id="profile-name">Yuklanmoqda...</h2>
@@ -401,7 +401,7 @@
         </div>
 
         <button class="btn-save" id="btn-save" onclick="saveName()">
-          💾 Saqlash
+          <span id="save-icon"></span> Saqlash
         </button>
 
         <div class="divider-line"></div>
@@ -409,16 +409,16 @@
         <div class="section-title">Parolni o'zgartirish</div>
 
         <button class="btn-password" onclick="resetPassword()">
-          🔑 Parolni o'zgartirish
+          <span id="password-icon"></span> Parolni o'zgartirish
         </button>
 
         <div class="reset-success" id="reset-success">
-          ✅ Emailingizga parolni tiklash havolasi yuborildi!
+          <span id="reset-success-icon"></span> Emailingizga parolni tiklash havolasi yuborildi!
         </div>
 
         <div class="divider-line"></div>
 
-        <div class="notif-section-title" id="notif-section-title">🔔 Eslatma sozlamalari</div>
+        <div class="notif-section-title" id="notif-section-title"><span id="notif-title-icon"></span> Eslatma sozlamalari</div>
 
         <div id="notif-status-box" class="notif-status off">
           Yuklanmoqda...
@@ -441,7 +441,7 @@
         <div class="divider-line"></div>
 
         <button class="btn-logout" onclick="logoutUser()">
-          🚪 Hisobdan chiqish
+          <span id="logout-icon"></span> Hisobdan chiqish
         </button>
 
       </div>
@@ -468,6 +468,18 @@
     if (notifSectionTitle) {
       notifSectionTitle.innerHTML = `${icon('bell',{size:16,color:'var(--purple-light)'})} Eslatma sozlamalari`;
     }
+    const avatarEditIcon = document.getElementById('avatar-edit-icon');
+    if (avatarEditIcon) avatarEditIcon.innerHTML = icon('camera',{size:14});
+    const saveIcon = document.getElementById('save-icon');
+    if (saveIcon) saveIcon.innerHTML = icon('save',{size:14});
+    const passwordIcon = document.getElementById('password-icon');
+    if (passwordIcon) passwordIcon.innerHTML = icon('key',{size:14});
+    const resetSuccessIcon = document.getElementById('reset-success-icon');
+    if (resetSuccessIcon) resetSuccessIcon.innerHTML = icon('circle-check',{size:14,color:'var(--success)'});
+    const notifTitleIcon = document.getElementById('notif-title-icon');
+    if (notifTitleIcon) notifTitleIcon.innerHTML = icon('bell',{size:16,color:'var(--purple-light)'});
+    const logoutIcon = document.getElementById('logout-icon');
+    if (logoutIcon) logoutIcon.innerHTML = icon('log-out',{size:14});
 
     let currentUser = null;
 

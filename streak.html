@@ -270,14 +270,14 @@
 
   <div class="streak-stats-row">
     <div class="streak-stat-card">
-      <div class="streak-stat-icon orange">✅</div>
+      <div class="streak-stat-icon orange" id="check-stat-icon"></div>
       <div>
         <div class="streak-stat-num" id="stat-days-practiced">0</div>
         <div class="streak-stat-label">Bu oy mashq qilingan kunlar</div>
       </div>
     </div>
     <div class="streak-stat-card">
-      <div class="streak-stat-icon blue" id="trophy-stat-icon">🏆</div>
+      <div class="streak-stat-icon blue" id="trophy-stat-icon"></div>
       <div>
         <div class="streak-stat-num" id="stat-longest">0</div>
         <div class="streak-stat-label">Eng uzun streak</div>
@@ -301,7 +301,7 @@
   </div>
 
   <div class="goal-card">
-    <div class="goal-title" id="goal-title">🎯 Streak maqsadi</div>
+    <div class="goal-title" id="goal-title">Streak maqsadi</div>
     <div class="goal-bar-wrap">
       <div class="goal-tag" id="goal-tag-start">0</div>
       <div class="goal-progress-track"><div class="goal-progress-fill" id="goal-fill" style="width:0%"></div></div>
@@ -329,6 +329,7 @@ onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
 
   document.getElementById('trophy-stat-icon').innerHTML = icon('trophy', {size:22,color:'#60a5fa'});
+  document.getElementById('check-stat-icon').innerHTML = icon('circle-check', {size:22,color:'#34d399'});
   document.getElementById('goal-title').innerHTML = icon('sparkles', {size:18,color:'#fbbf24'}) + ' Streak maqsadi';
 
   try {

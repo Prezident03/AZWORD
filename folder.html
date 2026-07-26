@@ -290,7 +290,7 @@
 
     <div class="folder-page-header">
       <div class="folder-title">
-        <div class="fi" id="folder-emoji">📁</div>
+        <div class="fi" id="folder-emoji"></div>
         <div>
           <h1 id="folder-name">...</h1>
           <div class="word-count" id="word-count">0 ta so'z</div>
@@ -320,7 +320,7 @@
           <path d="M82 82 L82 88 M82 88 L82 94" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
           <path d="M79 91 L82 94 L85 91" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <div class="emoji" id="empty-emoji-1">📝</div>
+        <div class="emoji" id="empty-emoji-1"></div>
         <p>Hali so'z yo'q. Birinchi so'zingizni qo'shing!</p>
       </div>
     </div>
@@ -341,7 +341,7 @@
       </div>
       <!-- AI misol gap -->
       <div class="ai-example-box" id="ai-example-box" style="display:none">
-        <div class="ai-example-label">🤖 AI misol gap:</div>
+        <div class="ai-example-label"><span id="ai-example-icon"></span> AI misol gap:</div>
         <div class="ai-example-text" id="ai-example-text"></div>
       </div>
       <div class="modal-actions">
@@ -354,7 +354,7 @@
   <!-- AI Generator Modal -->
   <div class="modal-overlay" id="ai-gen-modal">
     <div class="modal ai-gen-modal">
-      <h3>🤖 AI Word Generator</h3>
+      <h3><span id="ai-gen-title-icon"></span> AI Word Generator</h3>
       <div id="ai-gen-step1">
         <div class="ai-gen-form">
           <div>
@@ -419,6 +419,10 @@
     if (emptyEmoji1) emptyEmoji1.innerHTML = icon('file-text', {size:32,color:'var(--purple-light)'});
     const agSparkles = document.getElementById('ag-sparkles-icon');
     if (agSparkles) agSparkles.innerHTML = icon('sparkles', {size:14});
+    const aiExampleIcon = document.getElementById('ai-example-icon');
+    if (aiExampleIcon) aiExampleIcon.innerHTML = icon('bot', {size:14,color:'var(--purple-light)'});
+    const aiGenTitleIcon = document.getElementById('ai-gen-title-icon');
+    if (aiGenTitleIcon) aiGenTitleIcon.innerHTML = icon('bot', {size:18,color:'var(--purple-light)'});
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');

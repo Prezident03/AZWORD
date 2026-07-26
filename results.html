@@ -200,7 +200,7 @@
   <div class="results-wrap">
 
     <div class="results-hero">
-      <div class="results-emoji" id="result-emoji">🎉</div>
+      <div class="results-emoji" id="result-emoji"></div>
       <h1 id="result-title">Mashq yakunlandi!</h1>
       <p id="result-subtitle">Natijalaringiz quyida</p>
 
@@ -212,17 +212,17 @@
 
     <!-- Xato so'zlar — to'g'ri javoblar bilan -->
     <div id="mistakes-section" style="display:none" class="mistakes-section">
-      <div class="section-label" style="color:var(--danger)">❌ Xato qilingan so'zlar — to'g'ri javoblar</div>
+      <div class="section-label" style="color:var(--danger)"><span id="mistakes-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Xato qilingan so'zlar — to'g'ri javoblar</div>
       <div id="mistakes-list"></div>
     </div>
 
     <!-- Barcha so'zlar natijalari -->
-    <div class="section-label">📋 Barcha so'zlar natijalari</div>
+    <div class="section-label"><span id="all-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Barcha so'zlar natijalari</div>
     <div id="results-list"></div>
 
     <div class="results-actions">
-      <button class="btn-retry" onclick="retry()"><span id="retry-icon-wrap" style="display:inline-flex;vertical-align:middle;margin-right:6px">🔄</span>Qaytadan ishlash</button>
-      <button class="btn-home" onclick="window.location.href='dashboard.html'">🏠 Bosh sahifa</button>
+      <button class="btn-retry" onclick="retry()"><span id="retry-icon-wrap" style="display:inline-flex;vertical-align:middle;margin-right:6px"></span>Qaytadan ishlash</button>
+      <button class="btn-home" onclick="window.location.href='dashboard.html'"><span id="home-icon-wrap" style="display:inline-flex;vertical-align:middle;margin-right:6px"></span>Bosh sahifa</button>
     </div>
 
   </div>
@@ -293,6 +293,10 @@
     import { icon, starIcon, fromEmoji } from './icons.js';
 
     document.getElementById('retry-icon-wrap').innerHTML = icon('activity', {size:18,color:'var(--purple-light)'});
+    document.getElementById('home-icon-wrap').innerHTML = icon('home', {size:18,color:'var(--purple-light)'});
+    document.getElementById('result-emoji').innerHTML = icon('party-popper', {size:48,color:'#fbbf24'});
+    document.getElementById('mistakes-label-icon').innerHTML = icon('x-circle', {size:16,color:'var(--danger)'});
+    document.getElementById('all-label-icon').innerHTML = icon('clipboard-list', {size:16,color:'var(--purple-light)'});
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');

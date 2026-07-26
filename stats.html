@@ -180,7 +180,7 @@
 
     <!-- Hard words -->
     <div class="chart-card" style="margin-bottom:0">
-      <div class="chart-title">❌ Eng qiyin so'zlar</div>
+      <div class="chart-title"><span id="hard-words-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Eng qiyin so'zlar</div>
       <div class="hard-words-list" id="hard-words-list">
         <div class="stats-empty">Yuklanmoqda...</div>
       </div>
@@ -233,6 +233,7 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('chart-title-accuracy').innerHTML = icon('bar-chart',{size:18,color:'#9d5cf6'});
   document.getElementById('chart-title-folders').innerHTML = icon('folder',{size:18,color:'#fbbf24'});
   document.getElementById('chart-title-pie').innerHTML = icon('sparkles',{size:18,color:'#c084fc'});
+  document.getElementById('hard-words-icon').innerHTML = icon('x-circle',{size:18,color:'var(--danger)'});
 
   // User data
   try {
