@@ -1,4 +1,40 @@
 :root {
+  /* ── PRIMARY — Purple ── */
+  --primary: #7c3aed;
+  --primary-light: #a78bfa;
+  --primary-dark: #5b21b6;
+  --primary-glow: rgba(124, 58, 237, 0.15);
+
+  /* ── SUCCESS — Emerald ── */
+  --success: #10b981;
+  --success-light: #34d399;
+  --success-dark: #059669;
+  --success-glow: rgba(16, 185, 129, 0.15);
+
+  /* ── STREAK — Orange ── */
+  --streak: #f97316;
+  --streak-light: #fb923c;
+  --streak-dark: #ea580c;
+  --streak-glow: rgba(249, 115, 22, 0.15);
+
+  /* ── AI — Blue ── */
+  --ai: #3b82f6;
+  --ai-light: #60a5fa;
+  --ai-dark: #2563eb;
+  --ai-glow: rgba(59, 130, 246, 0.15);
+
+  /* ── ACHIEVEMENT — Gold ── */
+  --gold: #f59e0b;
+  --gold-light: #fbbf24;
+  --gold-dark: #d97706;
+  --gold-glow: rgba(245, 158, 11, 0.15);
+
+  /* ── DANGER — Red ── */
+  --danger: #ef4444;
+  --danger-light: #f87171;
+  --danger-glow: rgba(239, 68, 68, 0.15);
+
+  /* ── BACKGROUND ── */
   --bg-deep: #0f0d1a;
   --bg-card: #1a1625;
   --bg-hover: #252033;
@@ -6,16 +42,8 @@
   --text-main: #e8e6ed;
   --text-muted: #9ca3af;
   --text-dim: #6b7280;
-  --purple-main: #7c3aed;
-  --purple-light: #a78bfa;
-  --purple-glow: rgba(124, 58, 237, 0.15);
-  --danger: #ef4444;
-  --success: #34d399;
-  --warning: #fbbf24;
-  --glass-bg: rgba(26, 22, 37, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.06);
 
-  /* ── TYPOGRAPHY SCALE ── */
+  /* ── TYPOGRAPHY ── */
   --font-size-xs: 0.7rem;
   --font-size-sm: 0.82rem;
   --font-size-md: 0.95rem;
@@ -24,6 +52,12 @@
   --font-size-2xl: 1.6rem;
   --font-size-3xl: 2rem;
   --font-size-4xl: 2.5rem;
+
+  /* ── SHADOWS ── */
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 15px 40px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.45);
+  --shadow-xl: 0 30px 80px rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -46,7 +80,6 @@ body {
 
 /* ── TYPOGRAPHY ── */
 
-/* 1. HEADING — Space Grotesk 700 */
 h1, .h1, .page-title, .hero-title {
   font-family: 'Space Grotesk', sans-serif;
   font-size: var(--font-size-3xl);
@@ -81,7 +114,6 @@ h4, .h4, .card-title, .folder-name, .ach-name, .lb-name, .item-name {
   color: var(--text-main);
 }
 
-/* 2. BODY — Inter 400 */
 body, p, .body-text, .nav-item, .btn-text, .option-btn, .match-btn,
 .piece-btn, .type-input, .sentence-input, .form-group input,
 .form-group textarea, .form-group select, .drop-title, .sample-code {
@@ -92,7 +124,6 @@ body, p, .body-text, .nav-item, .btn-text, .option-btn, .match-btn,
   color: var(--text-main);
 }
 
-/* 3. CAPTION — Inter 500 */
 .caption, .card-meta, .folder-meta, .word-count, .ach-desc, .lb-sub,
 .result-uz, .result-mistakes, .hw-uz, .fs-meta, .preview-example,
 .ann-date, .history-date, .stat-label, .progress-label, .hint-text,
@@ -104,7 +135,6 @@ body, p, .body-text, .nav-item, .btn-text, .option-btn, .match-btn,
   color: var(--text-muted);
 }
 
-/* 4. SMALL CAPTION — Inter 500 */
 .small-caption, .text-xs, .badge-text, .ach-progress-text, .week-info,
 .lb-rank, .streak-stat-label, .goal-tag, .fs-acc {
   font-family: 'Inter', sans-serif;
@@ -115,7 +145,6 @@ body, p, .body-text, .nav-item, .btn-text, .option-btn, .match-btn,
   letter-spacing: 0.02em;
 }
 
-/* 5. NUMBERS — Space Grotesk 700 */
 .number, .stat-num, .score-num, .streak-num, .coin-amount, .price-tag,
 .ach-ring-num, .lb-score, .folder-score, .reward-amount {
   font-family: 'Space Grotesk', sans-serif;
@@ -139,7 +168,6 @@ body, p, .body-text, .nav-item, .btn-text, .option-btn, .match-btn,
   line-height: 1;
 }
 
-/* 6. UPPERCASE LABELS */
 .label-uppercase {
   font-family: 'Inter', sans-serif;
   font-size: var(--font-size-xs);
@@ -149,26 +177,23 @@ body, p, .body-text, .nav-item, .btn-text, .option-btn, .match-btn,
   color: var(--text-dim);
 }
 
-/* 7. GRADIENT TEXT */
 .gradient-text {
   font-family: 'Space Grotesk', sans-serif;
-  background: linear-gradient(135deg, #9d5cf6, #c084fc);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* 8. LINK */
 a {
-  color: var(--purple-light);
+  color: var(--primary-light);
   text-decoration: none;
   transition: color 0.2s;
 }
 a:hover {
-  color: var(--purple-main);
+  color: var(--primary);
 }
 
-/* 9. LIST */
 ul, ol {
   padding-left: 1.5rem;
   color: var(--text-muted);
@@ -177,36 +202,33 @@ li {
   margin-bottom: 0.25rem;
 }
 
-/* 10. BLOCKQUOTE */
 blockquote {
-  border-left: 3px solid var(--purple-main);
+  border-left: 3px solid var(--primary);
   padding: 0.5rem 1rem;
   margin: 1rem 0;
   color: var(--text-muted);
   font-style: italic;
 }
 
-/* 11. CODE */
 code {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.85em;
   background: var(--bg-deep);
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
-  color: var(--purple-light);
+  color: var(--primary-light);
 }
 
-/* 12. SELECTION */
 ::selection {
-  background: var(--purple-main);
+  background: var(--primary);
   color: #fff;
 }
 ::-moz-selection {
-  background: var(--purple-main);
+  background: var(--primary);
   color: #fff;
 }
 
-/* ── Gradient blurlar (purple, blue, pink) ── */
+/* ── Gradient blurlar ── */
 body::before {
   content: '';
   position: fixed;
@@ -219,7 +241,6 @@ body::before {
   pointer-events: none;
 }
 
-/* ── Noise texture ── */
 body::after {
   content: '';
   position: fixed;
@@ -259,7 +280,7 @@ body::after {
   position: relative;
   z-index: 2;
   box-shadow:
-    0 0 80px rgba(124, 58, 237, 0.12),
+    0 0 80px var(--primary-glow),
     0 30px 80px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -304,7 +325,7 @@ body::after {
   transition: all 0.2s;
 }
 .auth-tab.active {
-  background: var(--purple-main);
+  background: var(--primary);
   color: #fff;
 }
 .auth-tab:hover:not(.active) {
@@ -313,8 +334,8 @@ body::after {
 
 .auth-error {
   display: none;
-  background: rgba(248, 113, 113, 0.1);
-  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 10px;
   padding: 10px 14px;
   color: var(--danger);
@@ -353,17 +374,13 @@ body::after {
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
-  border-color: var(--purple-main);
-}
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
+  border-color: var(--primary);
 }
 
 .btn-primary {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   border: none;
   border-radius: 10px;
   color: #fff;
@@ -412,8 +429,8 @@ body::after {
   transition: all 0.2s;
 }
 .btn-google:hover {
-  border-color: var(--purple-main);
-  background: var(--purple-glow);
+  border-color: var(--primary);
+  background: var(--primary-glow);
 }
 
 /* ── NAVBAR ── */
@@ -468,14 +485,14 @@ body::after {
   font-weight: 600;
 }
 .nav-badge.star {
-  background: rgba(251, 191, 36, 0.1);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  color: #fbbf24;
+  background: var(--gold-glow);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: var(--gold-light);
 }
 .nav-badge.coin {
-  background: rgba(52, 211, 153, 0.1);
-  border: 1px solid rgba(52, 211, 153, 0.25);
-  color: #34d399;
+  background: var(--success-glow);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: var(--success-light);
 }
 
 .badge-icon {
@@ -491,7 +508,7 @@ body::after {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -505,7 +522,7 @@ body::after {
   transition: border-color 0.2s;
 }
 .profile-avatar:hover {
-  border-color: var(--purple-main);
+  border-color: var(--primary);
 }
 .profile-avatar img {
   width: 100%;
@@ -527,8 +544,8 @@ body::after {
   transition: all 0.2s;
 }
 .btn-sm:hover {
-  border-color: var(--purple-main);
-  color: var(--purple-light);
+  border-color: var(--primary);
+  color: var(--primary-light);
 }
 
 /* ── SIDEBAR ── */
@@ -589,7 +606,7 @@ body::after {
   color: var(--text-main);
 }
 .topbar-left h1 span {
-  color: var(--purple-light);
+  color: var(--primary-light);
 }
 .topbar-left p {
   font-family: 'Inter', sans-serif;
@@ -600,12 +617,10 @@ body::after {
 }
 
 /* ══════════════════════════════════════════════ */
-/* ── VIZUAL IERARXIYA (VISUAL HIERARCHY) ── */
+/* ── VIZUAL IERARXIYA ── */
 /* ══════════════════════════════════════════════ */
 
-/* ── LEVEL 1: HERO CARDS (Eng muhim) ── */
-/* Profil, Statistika, Asosiy kartalar */
-
+/* ── LEVEL 1: HERO CARDS ── */
 .hero-card,
 .profile-card,
 .stat-card,
@@ -617,7 +632,7 @@ body::after {
   border-radius: 20px;
   padding: 28px 32px;
   box-shadow:
-    0 0 80px rgba(124, 58, 237, 0.12),
+    0 0 80px var(--primary-glow),
     0 25px 60px rgba(0, 0, 0, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
   transition: all 0.3s ease;
@@ -625,7 +640,6 @@ body::after {
   overflow: hidden;
 }
 
-/* Hero glow */
 .hero-card::before,
 .profile-card::before,
 .stat-card::before,
@@ -636,7 +650,7 @@ body::after {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(ellipse at center, rgba(124, 58, 237, 0.06), transparent 60%);
+  background: radial-gradient(ellipse at center, var(--primary-glow), transparent 60%);
   pointer-events: none;
   animation: heroGlow 8s ease-in-out infinite alternate;
 }
@@ -646,7 +660,6 @@ body::after {
   100% { transform: translate(10%, 10%) scale(1.2); opacity: 1; }
 }
 
-/* Hero hover */
 .hero-card:hover,
 .profile-card:hover,
 .stat-card:hover,
@@ -654,14 +667,12 @@ body::after {
   transform: translateY(-2px);
   border-color: rgba(124, 58, 237, 0.25);
   box-shadow:
-    0 0 100px rgba(124, 58, 237, 0.18),
+    0 0 100px var(--primary-glow),
     0 30px 70px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* ── LEVEL 2: SECONDARY CARDS (O'rtacha muhim) ── */
-/* Bo'limlar, Shop, Leaderboard, Folder, Word */
-
+/* ── LEVEL 2: SECONDARY CARDS ── */
 .secondary-card,
 .folder-card,
 .ach-card,
@@ -686,7 +697,6 @@ body::after {
   transition: all 0.3s ease;
 }
 
-/* Secondary hover */
 .folder-card:hover,
 .ach-card:hover,
 .shop-item:hover,
@@ -702,9 +712,7 @@ body::after {
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* ── LEVEL 3: WIDGET CARDS (Kichik, eng kam muhim) ── */
-/* Badge, Meta, Kichik kartalar */
-
+/* ── LEVEL 3: WIDGET CARDS ── */
 .widget-card,
 .notif-banner,
 .announce-item-banner,
@@ -718,12 +726,10 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 12px;
   padding: 12px 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
   transition: all 0.25s ease;
 }
 
-/* Widget hover */
-.widget-card:hover,
 .word-item:hover,
 .preview-item:hover,
 .history-item:hover {
@@ -731,21 +737,189 @@ body::after {
   box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
 }
 
-/* ── SPECIAL: GLOW BORDER (porloq chegaralar) ── */
-.glow-border {
-  position: relative;
+/* ══════════════════════════════════════════════ */
+/* ── RANGLI ELEMENTLAR ── */
+/* ══════════════════════════════════════════════ */
+
+/* ── PRIMARY (Purple) ── */
+.btn-primary,
+.btn-add,
+.btn-study,
+.btn-confirm,
+.progress-fill,
+.ach-progress-fill,
+.folder-progress-fill,
+.auth-tab.active,
+.nav-item.active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
 }
-.glow-border::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 20px;
-  padding: 2px;
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(192, 132, 252, 0.1));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+
+.btn-add {
+  background: var(--primary-glow) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-light) !important;
+}
+
+.btn-add:hover {
+  background: rgba(124, 58, 237, 0.25) !important;
+}
+
+/* ── SUCCESS (Emerald) ── */
+.text-success,
+.coin-amount,
+.success-text {
+  color: var(--success-light) !important;
+}
+
+.bg-success {
+  background: var(--success-glow) !important;
+  border-color: var(--success) !important;
+  color: var(--success-light) !important;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success), var(--success-light)) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* ── STREAK (Orange) ── */
+.text-streak,
+.streak-num,
+.streak-text {
+  color: var(--streak-light) !important;
+}
+
+.bg-streak {
+  background: var(--streak-glow) !important;
+  border-color: var(--streak) !important;
+  color: var(--streak-light) !important;
+}
+
+.btn-streak {
+  background: linear-gradient(135deg, var(--streak), var(--streak-light)) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* ── AI (Blue) ── */
+.text-ai,
+.ai-text {
+  color: var(--ai-light) !important;
+}
+
+.bg-ai {
+  background: var(--ai-glow) !important;
+  border-color: var(--ai) !important;
+  color: var(--ai-light) !important;
+}
+
+.btn-ai {
+  background: linear-gradient(135deg, var(--ai), var(--ai-light)) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* ── ACHIEVEMENT (Gold) ── */
+.text-gold,
+.achievement-text,
+.star-text {
+  color: var(--gold-light) !important;
+}
+
+.bg-gold {
+  background: var(--gold-glow) !important;
+  border-color: var(--gold) !important;
+  color: var(--gold-light) !important;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light)) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* ── DANGER (Red) ── */
+.text-danger,
+.danger-text {
+  color: var(--danger) !important;
+}
+
+.bg-danger {
+  background: var(--danger-glow) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger), var(--danger-light)) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* ── BORDER RANGLARI ── */
+.border-primary { border-color: var(--primary) !important; }
+.border-success { border-color: var(--success) !important; }
+.border-streak { border-color: var(--streak) !important; }
+.border-ai { border-color: var(--ai) !important; }
+.border-gold { border-color: var(--gold) !important; }
+.border-danger { border-color: var(--danger) !important; }
+
+/* ── GLOW RANGLARI ── */
+.glow-primary { box-shadow: 0 0 40px var(--primary-glow) !important; }
+.glow-success { box-shadow: 0 0 40px var(--success-glow) !important; }
+.glow-streak { box-shadow: 0 0 40px var(--streak-glow) !important; }
+.glow-ai { box-shadow: 0 0 40px var(--ai-glow) !important; }
+.glow-gold { box-shadow: 0 0 40px var(--gold-glow) !important; }
+.glow-danger { box-shadow: 0 0 40px var(--danger-glow) !important; }
+
+/* ── STREAK SAHIFASI (Orange) ── */
+.streak-hero {
+  background: linear-gradient(135deg, var(--streak), var(--streak-dark)) !important;
+}
+
+.sb-streak {
+  background: var(--streak-glow) !important;
+  border-color: rgba(249, 115, 22, 0.25) !important;
+}
+
+.sb-streak-num {
+  color: var(--streak-light) !important;
+}
+
+.stat-pill.streak {
+  background: var(--streak-glow) !important;
+  border-color: rgba(249, 115, 22, 0.25) !important;
+  color: var(--streak-light) !important;
+}
+
+/* ── ACHIEVEMENT SAHIFASI (Gold) ── */
+.ach-card.unlocked {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  background: linear-gradient(135deg, var(--gold-glow), var(--bg-card) 60%) !important;
+}
+
+.ach-unlocked-badge {
+  background: var(--gold-glow) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: var(--gold-light) !important;
+}
+
+.ach-ring-circle {
+  stroke: var(--gold) !important;
+}
+
+/* ── AI SAHIFASI (Blue) ── */
+.btn-ai-gen {
+  background: var(--ai-glow) !important;
+  border-color: var(--ai) !important;
+  color: var(--ai-light) !important;
+}
+
+.btn-ai-gen:hover {
+  background: rgba(59, 130, 246, 0.25) !important;
 }
 
 /* ── TUGMALAR ── */
@@ -754,10 +928,7 @@ body::after {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: var(--purple-glow);
-  border: 1.5px solid var(--purple-main);
   border-radius: 10px;
-  color: var(--purple-light);
   font-family: 'Inter', sans-serif;
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -765,9 +936,8 @@ body::after {
   transition: all 0.2s;
 }
 .btn-add:hover {
-  background: rgba(124, 58, 237, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 30px var(--primary-glow);
 }
 .btn-add svg {
   flex-shrink: 0;
@@ -790,30 +960,12 @@ body::after {
   color: var(--text-main);
 }
 
-.btn-confirm {
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: none;
-  background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.btn-confirm:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.25);
-}
-
 .btn-study {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 11px 22px;
-  background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -822,12 +974,12 @@ body::after {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 30px var(--primary-glow);
 }
 .btn-study:hover {
   opacity: 0.88;
   transform: translateY(-2px);
-  box-shadow: 0 0 50px rgba(124, 58, 237, 0.25);
+  box-shadow: 0 0 50px var(--primary-glow);
 }
 .btn-study:disabled {
   opacity: 0.4;
@@ -862,7 +1014,7 @@ body::after {
   width: 100%;
   max-width: 420px;
   box-shadow:
-    0 0 60px rgba(124, 58, 237, 0.12),
+    0 0 60px var(--primary-glow),
     0 30px 60px rgba(0, 0, 0, 0.5),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
@@ -923,9 +1075,9 @@ body::after {
 }
 .drop-zone:hover,
 .drop-zone.dragover {
-  border-color: var(--purple-main);
-  background: var(--purple-glow);
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.1);
+  border-color: var(--primary);
+  background: var(--primary-glow);
+  box-shadow: 0 0 40px var(--primary-glow);
 }
 .drop-zone input[type="file"] {
   position: absolute;
@@ -1007,7 +1159,7 @@ body::after {
   font-style: italic;
 }
 
-/* ── Qo'shimcha: harakatlanuvchi blurlar ── */
+/* ── BLURLAR ── */
 .blur-spots {
   position: fixed;
   inset: 0;
@@ -1025,7 +1177,7 @@ body::after {
 .blur-spot.purple {
   width: 400px;
   height: 400px;
-  background: #7c3aed;
+  background: var(--primary);
   top: -100px;
   left: -100px;
   animation-delay: 0s;
@@ -1033,7 +1185,7 @@ body::after {
 .blur-spot.blue {
   width: 350px;
   height: 350px;
-  background: #3b82f6;
+  background: var(--ai);
   bottom: -50px;
   right: -50px;
   animation-delay: -8s;
