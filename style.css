@@ -12,6 +12,8 @@
   --danger: #ef4444;
   --success: #34d399;
   --warning: #fbbf24;
+  --glass-bg: rgba(26, 22, 37, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
 }
 
 * {
@@ -72,17 +74,20 @@ body::after {
 }
 
 .auth-box {
-  background: var(--bg-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(26, 22, 37, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
   border-radius: 24px;
   padding: 40px 36px;
   width: 100%;
   max-width: 420px;
   position: relative;
   z-index: 2;
+  box-shadow:
+    0 0 80px rgba(124, 58, 237, 0.12),
+    0 30px 80px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .auth-logo {
@@ -90,14 +95,11 @@ body::after {
   margin-bottom: 28px;
 }
 
-.auth-logo .logo-text {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.8rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #9d5cf6, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.auth-logo .logo-text img {
+  height: 48px;
+  width: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .auth-logo p {
@@ -252,21 +254,30 @@ body::after {
   justify-content: space-between;
   padding: 12px 24px;
   background: rgba(15, 13, 26, 0.85);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .nav-logo {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #9d5cf6, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.nav-logo img {
+  height: 32px;
+  width: auto;
+  display: block;
+  transition: opacity 0.2s;
+}
+
+.nav-logo img:hover {
+  opacity: 0.85;
 }
 
 .nav-user {
@@ -357,6 +368,93 @@ body::after {
   color: var(--purple-light);
 }
 
+/* ── SIDEBAR ── */
+.sidebar {
+  background: rgba(26, 22, 37, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-logo {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-logo .logo-text img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+/* ── TOPBAR ── */
+.dash-topbar {
+  background: rgba(15, 13, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+  padding: 14px 28px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── KARTALAR (Depth + Glass + Shadow + Glow) ── */
+.folder-card,
+.ach-card,
+.shop-item,
+.stat-card,
+.lb-item,
+.result-item,
+.sample-card,
+.profile-card,
+.calendar-card,
+.goal-card,
+.chart-card,
+.sec,
+.streak-stat-card,
+.notif-banner,
+.announce-item-banner,
+.word-item,
+.preview-item,
+.history-item,
+.afc,
+.streak-stat-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  box-shadow:
+    0 0 40px rgba(124, 58, 237, 0.06),
+    0 15px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: all 0.3s ease;
+}
+
+/* ── HOVERDA glow va shadow kuchayishi ── */
+.folder-card:hover,
+.ach-card:hover,
+.shop-item:hover,
+.stat-card:hover,
+.lb-item:hover,
+.result-item:hover,
+.sample-card:hover,
+.afc:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124, 58, 237, 0.2);
+  box-shadow:
+    0 0 60px rgba(124, 58, 237, 0.15),
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 /* ── TUGMALAR ── */
 .btn-add {
   display: inline-flex;
@@ -377,6 +475,7 @@ body::after {
 .btn-add:hover {
   background: rgba(124, 58, 237, 0.25);
   transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
 }
 
 .btn-add svg {
@@ -417,14 +516,46 @@ body::after {
 .btn-confirm:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.25);
+}
+
+.btn-study {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  background: linear-gradient(135deg, var(--purple-main), var(--purple-light));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.2s;
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+}
+
+.btn-study:hover {
+  opacity: 0.88;
+  transform: translateY(-2px);
+  box-shadow: 0 0 50px rgba(124, 58, 237, 0.25);
+}
+
+.btn-study:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ── MODAL ── */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -436,18 +567,23 @@ body::after {
 }
 
 .modal {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
+  background: rgba(26, 22, 37, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  padding: 28px 32px;
   width: 100%;
   max-width: 420px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    0 0 60px rgba(124, 58, 237, 0.12),
+    0 30px 60px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .modal h3 {
   margin: 0 0 16px;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-main);
 }
@@ -464,10 +600,12 @@ body::after {
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%) translateY(20px);
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
+  background: rgba(26, 22, 37, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 12px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-main);
@@ -475,6 +613,7 @@ body::after {
   pointer-events: none;
   transition: all 0.3s;
   z-index: 1000;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
 }
 
 .toast.show {
@@ -485,6 +624,34 @@ body::after {
 .toast.error {
   border-color: var(--danger);
   color: var(--danger);
+}
+
+/* ── DROP ZONE ── */
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  background: rgba(15, 13, 26, 0.5);
+}
+
+.drop-zone:hover,
+.drop-zone.dragover {
+  border-color: var(--purple-main);
+  background: var(--purple-glow);
+  box-shadow: 0 0 40px rgba(124, 58, 237, 0.1);
+}
+
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
 }
 
 /* ── Qo'shimcha: harakatlanuvchi blurlar ── */
