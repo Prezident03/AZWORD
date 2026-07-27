@@ -1232,3 +1232,201 @@ body::after {
   50% { transform: translate(-30px, 50px) scale(0.9); }
   75% { transform: translate(20px, -40px) scale(1.05); }
 }
+
+/* ════════════════════════════════════════════ */
+/* ── SMOOTH PAGE TRANSITION (PREMIUM) ──      */
+/* ════════════════════════════════════════════ */
+
+:root {
+  --pt-duration-out: 380ms;
+  --pt-duration-in: 520ms;
+  --pt-ease: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* Body animations */
+html {
+  transition:
+    opacity var(--pt-duration-in) var(--pt-ease),
+    transform var(--pt-duration-in) var(--pt-ease),
+    filter var(--pt-duration-in) var(--pt-ease);
+  will-change: opacity, transform, filter;
+}
+
+html.pt-entering {
+  opacity: 0;
+}
+
+html.pt-leaving {
+  opacity: 0 !important;
+  transition:
+    opacity var(--pt-duration-out) var(--pt-ease),
+    transform var(--pt-duration-out) var(--pt-ease),
+    filter var(--pt-duration-out) var(--pt-ease);
+}
+
+html.pt-entered {
+  opacity: 1;
+}
+
+body {
+  transition:
+    opacity var(--pt-duration-in) var(--pt-ease),
+    transform var(--pt-duration-in) var(--pt-ease),
+    filter var(--pt-duration-in) var(--pt-ease);
+  will-change: opacity, transform, filter;
+}
+
+body.pt-leaving, html.pt-leaving body {
+  opacity: 0 !important;
+  transform: scale(0.985) translateY(12px);
+  filter: blur(6px);
+  transition:
+    opacity var(--pt-duration-out) var(--pt-ease),
+    transform var(--pt-duration-out) var(--pt-ease),
+    filter var(--pt-duration-out) var(--pt-ease);
+}
+
+body.pt-entering, html.pt-entering body {
+  opacity: 0;
+  transform: translateY(18px) scale(0.992);
+  filter: blur(8px);
+}
+
+body.pt-entered, html.pt-entered body {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* Gradient sweep overlay — Stripe/Raycast style */
+.pt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    135deg,
+    #7c3aed 0%,
+    #6366f1 25%,
+    #3b82f6 50%,
+    #8b5cf6 75%,
+    #ec4899 100%
+  );
+  background-size: 400% 400%;
+  clip-path: inset(0 100% 0 0);
+  -webkit-clip-path: inset(0 100% 0 0);
+}
+
+.pt-overlay.pt-out {
+  animation: ptSweepOut var(--pt-duration-out) var(--pt-ease) forwards;
+  pointer-events: all;
+}
+
+.pt-overlay.pt-in {
+  animation: ptSweepIn var(--pt-duration-in) var(--pt-ease) forwards;
+  animation-delay: 40ms;
+  pointer-events: all;
+}
+
+@keyframes ptSweepOut {
+  0% {
+    opacity: 1;
+    clip-path: inset(0 100% 0 0);
+    -webkit-clip-path: inset(0 100% 0 0);
+    background-position: 0% 50%;
+  }
+  60% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
+    background-position: 50% 50%;
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes ptSweepIn {
+  0% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
+    background-position: 100% 50%;
+  }
+  40% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    -webkit-clip-path: inset(0 0 0 0);
+    background-position: 50% 50%;
+  }
+  100% {
+    opacity: 0.85;
+    clip-path: inset(0 0 0 100%);
+    -webkit-clip-path: inset(0 0 0 100%);
+    background-position: 0% 50%;
+  }
+}
+
+/* Gradient shimmer over the sweep */
+.pt-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: ptShimmer 1.2s linear infinite;
+}
+
+@keyframes ptShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Logo pulse in center during transition */
+.pt-overlay::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 72px;
+  height: 72px;
+  transform: translate(-50%, -50%) scale(0.8);
+  background-image: url('logo.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.35)) brightness(1.1);
+  opacity: 0;
+  animation: ptLogoPulse 500ms ease-out 160ms forwards;
+}
+
+@keyframes ptLogoPulse {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+  100% {
+    opacity: 0.92;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Disable native scroll during transition */
+html.pt-locked,
+body.pt-locked {
+  overflow: hidden !important;
+  height: 100% !important;
+}
