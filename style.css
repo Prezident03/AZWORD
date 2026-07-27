@@ -563,6 +563,8 @@ body::after {
   display: flex;
   align-items: center;
   gap: 10px;
+  text-decoration: none;
+  cursor: pointer;
 }
 .sidebar-logo .logo-text img {
   height: 28px;
