@@ -2675,3 +2675,79 @@ a:hover svg {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
+
+/* ──────────────────────────────────────────────
+   #19  CURSOR GLOW TRAIL + #2 MOUSE FOLLOW LIGHT
+   ────────────────────────────────────────────── */
+
+:root {
+  --az-mx: -9999px;
+  --az-my: -9999px;
+}
+
+/* Default cursor — saqlaymiz, biz faqat glow qo'shamiz */
+html.az-cursor-glow-on, html.az-cursor-glow-on * {
+  cursor: auto;
+}
+
+/* Touchscreen / no-pointer: hide glow (fallback, JS avval o'chiradi) */
+html.az-no-cursor-glow #az-cursor-trail,
+html.az-no-cursor-glow #az-follow-light {
+  display: none !important;
+}
+@media (pointer: coarse), (hover: none) {
+  #az-cursor-trail, #az-follow-light { display: none !important; }
+}
+
+/* ── Hover state boost — glow bo'lgan cardlar hiddar bo'lsin ── */
+.folder-card, .folder-card-add, .az-stat-card, .hero-card, .hero-secondary-card,
+.result-item, .lb-item, .shop-item, .achievement-card, .profile-card {
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1), box-shadow 0.25s ease, border-color 0.2s ease;
+  isolation: isolate;
+}
+
+/* Hover paytida ichki nur qo'shish (gradient overlay with -mx -my) */
+.az-stat-card::before,
+.folder-card::before,
+.hero-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(240px circle at var(--az-mx) var(--az-my),
+    rgba(139, 92, 246, 0.10) 0%,
+    rgba(99, 102, 241, 0.04) 40%,
+    transparent 70%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: screen;
+}
+.az-stat-card:hover::before,
+.folder-card:hover::before,
+.hero-card:hover::before {
+  opacity: 1;
+}
+
+/* Buttons ichki glow */
+.btn-primary::before, .btn-add::before, .btn-study::before,
+.btn-success::before, .btn-streak::before, .btn-ai::before, .btn-gold::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(180px circle at var(--az-mx) var(--az-my),
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.06) 40%,
+    transparent 65%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 3;
+  mix-blend-mode: overlay;
+}
+.btn-primary:hover::before, .btn-add:hover::before, .btn-study:hover::before,
+.btn-success:hover::before, .btn-streak:hover::before, .btn-ai:hover::before, .btn-gold:hover::before {
+  opacity: 1;
+}
