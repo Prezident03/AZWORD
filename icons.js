@@ -74,6 +74,19 @@ export const EMOJI_TO_ICON = {
   '✕': 'x', '✓': 'check', '✗': 'circle-x', '🚫': 'ban', '🔒': 'lock'
 };
 
+/* Escapes user-controlled strings before inserting into innerHTML templates.
+   Use this around ANY value that came from a user profile (displayName),
+   announcement text, or other free-text field a user could have typed. */
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 export function icon(name, opts = {}) {
   const {
     size = 20,

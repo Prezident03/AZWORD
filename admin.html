@@ -595,7 +595,7 @@ import {
   collection, getDocs, doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc,
   query, where, orderBy, limit, serverTimestamp, increment
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { icon, fromEmoji, starIcon, coinIcon, flameIcon, folderIcon, iconPickerHtml, PATHS } from './icons.js';
+import { icon, fromEmoji, starIcon, coinIcon, flameIcon, folderIcon, iconPickerHtml, PATHS, escapeHtml } from './icons.js';
 
 const ADMIN = "abdurasul1406z@gmail.com";
 let users = [], folders = [], selUid = null, selFolder = null, parsedWords = [];
@@ -1065,13 +1065,14 @@ function renderCharts() {
 }
 
 function userRow(u, rank) {
-  const nm = u.displayName || (u.email||'').split('@')[0] || 'User';
-  const lt = nm.charAt(0).toUpperCase();
+  const nmRaw = u.displayName || (u.email||'').split('@')[0] || 'User';
+  const nm = escapeHtml(nmRaw);
+  const lt = escapeHtml(nmRaw.charAt(0).toUpperCase());
   const av = u.photoBase64 ? `<img src="${u.photoBase64}" alt="a">` : lt;
   const rankHtml = rank !== undefined ? `<span style="color:var(--text-dim);font-weight:700;min-width:24px">#${rank}</span>` : '';
   return `<div class="tbl-row">
     <div class="u-cell">${rankHtml}<div class="u-av">${av}</div><div><div class="u-name">${nm}</div></div></div>
-    <div style="color:var(--text-muted);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email||''}</div>
+    <div style="color:var(--text-muted);font-size:0.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(u.email||'')}</div>
     <div style="font-weight:600;color:#fbbf24;display:inline-flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> ${u.stars||0}</div>
     <div style="font-weight:600;color:#34d399;display:inline-flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg> ${u.coins||0}</div>
     <div><span class="sbadge ${u.blocked?'blocked':'ok'}">${u.blocked?'Bloklangan':'Faol'}</span></div>
