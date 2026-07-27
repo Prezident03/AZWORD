@@ -1,8 +1,6 @@
 (function () {
   'use strict';
 
-  document.documentElement.classList.add('pt-entering');
-
   const PT_OUT_MS = 380;
   const PT_IN_MS = 560;
   const STORAGE_KEY = 'pt_pending';
@@ -53,15 +51,19 @@
     const wasPending = sessionStorage.getItem(STORAGE_KEY) === '1';
     sessionStorage.removeItem(STORAGE_KEY);
 
+    if (!wasPending) {
+      html.classList.add('pt-entered');
+      body.classList.add('pt-entered');
+      return;
+    }
+
     html.classList.add('pt-entering');
     body.classList.add('pt-entering');
     lockScroll(true);
 
-    if (wasPending) {
-      ov.classList.remove('pt-out');
-      void ov.offsetWidth;
-      ov.classList.add('pt-in');
-    }
+    ov.classList.remove('pt-out');
+    void ov.offsetWidth;
+    ov.classList.add('pt-in');
 
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -72,14 +74,13 @@
       });
     });
 
-    const cleanupAfter = wasPending ? PT_IN_MS + 60 : 420;
     setTimeout(() => {
       ov.classList.remove('pt-in', 'pt-out');
       ov.style.cssText = '';
       html.classList.remove('pt-entering', 'pt-leaving');
       body.classList.remove('pt-entering', 'pt-leaving');
       lockScroll(false);
-    }, cleanupAfter);
+    }, PT_IN_MS + 60);
   }
 
   function navigateTo(url) {

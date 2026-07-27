@@ -1244,7 +1244,9 @@ body::after {
 }
 
 /* Body animations */
-html {
+html.pt-entering,
+html.pt-leaving,
+html.pt-entered {
   transition:
     opacity var(--pt-duration-in) var(--pt-ease),
     transform var(--pt-duration-in) var(--pt-ease),
