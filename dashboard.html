@@ -1188,6 +1188,109 @@
     <div class="sb-streak-arrow">›</div>
   </div>
 
+  <!-- ══════════════ PREMIUM SIDEBAR WIDGETS ══════════════ -->
+  <div class="sb-widgets-col">
+
+    <!-- W1: LEVEL XP PROGRESS -->
+    <div class="sb-widget sb-widget-level">
+      <div class="sb-w-head">
+        <div class="sb-w-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Daraja
+        </div>
+        <span class="sb-w-lvl-num" id="sbw-level">LVL 1</span>
+      </div>
+      <div class="sb-w-xp-row">
+        <span id="sbw-xp-current">0</span> / <span id="sbw-xp-total">500</span> XP
+      </div>
+      <div class="sb-w-xp-bar"><div class="sb-w-xp-fill" id="sbw-xp-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- W2: WEEK STREAK HEATMAP MINI -->
+    <div class="sb-widget sb-widget-week" onclick="window.location.href='streak.html'">
+      <div class="sb-w-head">
+        <div class="sb-w-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          Haftalik
+        </div>
+        <span class="sb-w-tag">7 kun</span>
+      </div>
+      <div class="sb-week-bars" id="sb-week-bars"></div>
+    </div>
+
+    <!-- W3: WEEKLY STATS MINI -->
+    <div class="sb-widget sb-widget-stat">
+      <div class="sb-w-head">
+        <div class="sb-w-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+          Bu hafta
+        </div>
+      </div>
+      <div class="sb-w-3stats">
+        <div class="sb-w3-col">
+          <div class="sb-w3-val" id="sbw-week-words">183</div>
+          <div class="sb-w3-lbl">So'z</div>
+        </div>
+        <div class="sb-w3-col">
+          <div class="sb-w3-val" id="sbw-week-hours">9h</div>
+          <div class="sb-w3-lbl">Vaqt</div>
+        </div>
+        <div class="sb-w3-col">
+          <div class="sb-w3-val" id="sbw-week-acc">92%</div>
+          <div class="sb-w3-lbl">Aniqlik</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- W4: AI COACH MINI CARD -->
+    <div class="sb-widget sb-widget-ai" onclick="window.AzDash.openAICoach()">
+      <div class="sb-ai-badge">AI BETA</div>
+      <div class="sb-ai-title">AI Coach</div>
+      <div class="sb-ai-msg" id="sb-ai-msg">
+        Bugun 5 ta yangi gap o'rganaylik?
+      </div>
+      <div class="sb-ai-cta">
+        <span>Boshlash</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+
+    <!-- W5: RECENT ACTIVITY MINI (3 items) -->
+    <div class="sb-widget sb-widget-activity">
+      <div class="sb-w-head">
+        <div class="sb-w-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          So'nggilar
+        </div>
+        <button class="sb-w-link" onclick="window.location.href='stats.html'">Barcha</button>
+      </div>
+      <ol class="sbw-timeline">
+        <li>
+          <div class="sbw-tl-dot tl-s"></div>
+          <div class="sbw-tl-body">
+            <div class="sbw-tl-title">18 so'z</div>
+            <div class="sbw-tl-time">IELTS · 5 daq oldin</div>
+          </div>
+        </li>
+        <li>
+          <div class="sbw-tl-dot tl-g"></div>
+          <div class="sbw-tl-body">
+            <div class="sbw-tl-title">+150 Coins</div>
+            <div class="sbw-tl-time">Streak · 2 soat</div>
+          </div>
+        </li>
+        <li>
+          <div class="sbw-tl-dot tl-a"></div>
+          <div class="sbw-tl-body">
+            <div class="sbw-tl-title">AI maslahat</div>
+            <div class="sbw-tl-time">Phrasal verbs · kecha</div>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+  </div>
+
   <div class="sidebar-bottom">
     <div class="notif-menu-wrap">
       <div class="notif-toggle-row">
@@ -1252,371 +1355,102 @@
   <div class="dash-content">
     <div class="announce-banner" id="announce-banner"></div>
 
-    <!-- ═══════════════════ PREMIUM HERO v2 · Design System ═══════════════════ -->
-    <section class="az-hero az-hero-v2" id="az-hero">
-      <div class="az-hero-glow" aria-hidden="true"></div>
-      <div class="az-hero-grid">
-
-        <!-- ── COLUMN A: GREETING · GOAL · CONTINUE ────────────── -->
-        <div class="az-hero-col az-hero-col-main">
-          <div class="az-greeting-wrap">
-            <div class="az-hero-tag">
-              <span class="az-tag-dot"></span>
-              <span>Premium Session</span>
-            </div>
-            <h2 class="az-hero-greeting" id="hero-welcome-box">
-              <span id="hero-greeting">Hayrli kun,</span>
-              <span class="az-hero-name" id="hero-welcome-name">Do'stim</span>
-              <span class="az-hero-emoji" id="hero-emoji" aria-hidden="true">👋</span>
-            </h2>
-            <p class="az-hero-subtitle" id="hero-subtitle">
-              Davom ettirish — eng qiyin, ammo eng muhim narsa.
-            </p>
+    <!-- ═══════════════════ MINIMAL HERO · avvalgidek vibe + premium ═══════════════════ -->
+    <section class="az-hero-minimal" id="az-hero">
+      <div class="az-hero-minimal-row">
+        <div class="az-hm-left">
+          <div class="az-hm-greet-line">
+            <span id="hm-greeting">Hayrli kech,</span>
+            <strong id="hm-name" style="margin-left:6px;color:var(--text-main)">Do'stim</strong>
+            <span id="hm-emoji" style="margin-left:8px;display:inline-flex;align-items:center">👋</span>
           </div>
+          <p class="az-hm-sub" id="hm-subtitle">Bugun 30 ta yangi so'z bilan o'rganishni davom ettiring</p>
 
-          <!-- SMART TODAY'S GOAL CARD -->
-          <div class="az-goal-card">
-            <div class="az-goal-head">
-              <div class="az-goal-head-title">
-                <div class="az-goal-icon-wrap">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                </div>
-                <div>
-                  <div class="az-goal-title-lg">Bugungi maqsad</div>
-                  <div class="az-goal-subtitle">Kun davomida 30 so'z o'rganing — streakni uzmang</div>
-                </div>
+          <div class="az-hm-kpis">
+            <div class="az-hm-kpi kpi-words" onclick="window.location.href='stats.html'">
+              <div class="az-hm-kpi-ic">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
               </div>
-              <div class="az-goal-pct" id="goal-pct-label">0%</div>
-            </div>
-
-            <!-- Circular Goal Ring + Continue button row -->
-            <div class="az-goal-body">
-              <div class="az-ring-goal"
-                   id="goal-ring"
-                   data-role="az-ring"
-                   data-size="130"
-                   data-stroke="12"
-                   data-percent="0"
-                   data-label="Today Goal"
-                   data-sub="so'z">
-              </div>
-
-              <div class="az-goal-stats">
-                <div class="az-goal-line">
-                  <span class="az-line-label">Bajarilgan</span>
-                  <span class="az-line-value">
-                    <strong id="goal-done">0</strong> / <span id="goal-total">30</span> so'z
-                  </span>
-                </div>
-                <div class="az-goal-bar-lg" aria-label="Progress">
-                  <div class="az-goal-fill-lg" id="goal-fill" style="width:0%"></div>
-                </div>
-
-                <div class="az-goal-line" style="margin-top:8px">
-                  <span class="az-line-label">Tahminiy vaqt</span>
-                  <span class="az-line-value" id="goal-eta">~15 daqiqa</span>
-                </div>
-
-                <button class="btn-primary az-btn-continue" id="btn-continue-study"
-                        onclick="window.AzDash.continueLastFolder()">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                  <span>Davom ettirish: <strong id="continue-folder-name">O'rganishni boshlash</strong></span>
-                </button>
-
-                <button class="btn-ghost az-btn-ai" onclick="window.AzDash.openAICoach()">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1-4-4 4 4 0 0 1 4-4 4 4 0 0 1 4-4z"/><path d="M16 15 19 22"/><path d="M8 15l-3 7"/></svg>
-                  AI Coach bilan suhbat
-                </button>
+              <div>
+                <div class="az-hm-kpi-val"><span id="kpi-words-total">12,840</span></div>
+                <div class="az-hm-kpi-lbl">So'zlar</div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <!-- ── COLUMN B: STREAK · AI COACH · LEVEL ─────────────── -->
-        <div class="az-hero-col az-hero-col-side">
-
-          <!-- WEEK STREAK HEATMAP CARD -->
-          <div class="az-week-card">
-            <div class="az-card-head">
-              <div class="az-card-head-title">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-                <span>Haftalik Streak</span>
+            <div class="az-hm-kpi kpi-time" onclick="window.location.href='stats.html'">
+              <div class="az-hm-kpi-ic">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               </div>
-              <div class="az-week-total">
-                <strong id="week-streak-total">0</strong>
-                <span>kun</span>
+              <div>
+                <div class="az-hm-kpi-val"><span id="kpi-time-total">84</span><span style="font-size:.65em;margin-left:2px;color:var(--text-muted)"> soat</span></div>
+                <div class="az-hm-kpi-lbl">O'qish vaqti</div>
               </div>
             </div>
-            <div class="az-week-bars" id="week-bars"></div>
-            <div class="az-week-legend">
-              <span class="az-week-legend-dot az-legend-missed"></span> O'tkazib yuborilgan
-              <span class="az-week-legend-dot az-legend-partial" style="margin-left:14px"></span> Qisman
-              <span class="az-week-legend-dot az-legend-done" style="margin-left:14px"></span> Bajarilgan
-            </div>
-          </div>
-
-          <!-- AI COACH CTA CARD -->
-          <div class="az-ai-card" onclick="window.AzDash.openAICoach()">
-            <div class="az-ai-orb" aria-hidden="true"></div>
-            <div class="az-ai-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            </div>
-            <div class="az-ai-content">
-              <div class="az-ai-title">
-                <span>AI Coach</span>
-                <span class="az-badge-pill">BETA</span>
+            <div class="az-hm-kpi kpi-acc" onclick="window.location.href='stats.html'">
+              <div class="az-hm-kpi-ic">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               </div>
-              <div class="az-ai-msg" id="ai-coach-preview">
-                "Siz odatda 20:00 da o'qiysiz — bugun IELTS 3-5 bandiga qanday qiyin suyak beraylik?"
-              </div>
-              <div class="az-ai-cta">
-                <span>Batafsil</span>
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              <div>
+                <div class="az-hm-kpi-val"><span id="kpi-acc-total">92</span><span style="font-size:.65em;margin-left:2px;color:var(--text-muted)">%</span></div>
+                <div class="az-hm-kpi-lbl">Aniqlik</div>
               </div>
             </div>
           </div>
 
-          <!-- LEVEL + XP CARD -->
-          <div class="az-level-card">
-            <div class="az-level-ring">
-              <div data-role="az-ring"
-                   data-size="92"
-                   data-stroke="9"
-                   data-percent="65"
-                   data-color="url(#az-ring-grad-ai)"
-                   data-label="Level"
-                   id="level-ring-wrap">
+          <!-- TODAY'S GOAL · single thin progress bar -->
+          <div class="az-hm-goal">
+            <div class="az-hm-goal-row">
+              <div style="display:flex;align-items:center;gap:8px">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#a78bfa"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span class="az-hm-goal-label">Bugungi maqsad</span>
               </div>
-              <div class="az-level-overlay">
-                <span class="az-level-over-num" id="level-num">18</span>
-                <span class="az-level-over-label">LVL</span>
-              </div>
+              <span class="az-hm-goal-pct"><strong id="hm-goal-done">0</strong> / <span id="hm-goal-total">30</span> so'z · <span id="hm-goal-pct-val">0%</span></span>
             </div>
-            <div class="az-level-info">
-              <div class="az-level-info-title">Darajangiz</div>
-              <div class="az-level-info-row">
-                <span>Keyingi darajagacha</span>
-                <span class="az-xp-pct" id="xp-pct">65%</span>
-              </div>
-              <div class="az-level-xpbar">
-                <div class="az-level-xpbar-fill" id="xp-fill" style="width:0%"></div>
-              </div>
-              <div class="az-level-info-row" style="color:var(--text-muted);font-size:.72rem;margin-top:4px">
-                <span id="xp-current">1,240</span> / <span id="xp-total">1,900</span> XP
-              </div>
-            </div>
+            <div class="az-hm-goal-bar"><div class="az-hm-goal-fill" id="hm-goal-fill" style="width:0%"></div></div>
           </div>
-
         </div>
-      </div>
-    </section>
 
-    <!-- ═══════════════════ #18 STATS + #16 PROGRESS RINGS ═══════════════════ -->
-    <section class="az-stat-grid" aria-label="Umumiy statistika">
-      <!-- WORDS -->
-      <article class="az-stat-card">
-        <div class="az-ring"
-             data-role="az-ring"
-             data-size="96"
-             data-stroke="9"
-             data-percent="78"
-             data-color="url(#az-ring-grad-primary)"
-             data-sub="Progress">
-        </div>
-        <div class="az-stat-info">
-          <div class="az-stat-title">
-            <span class="az-stat-title-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-            </span>
-            So'zlar
+        <button class="az-hm-continue" onclick="window.AzDash.continueLastFolder()">
+          <div class="az-hm-continue-play">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
           </div>
-          <div class="az-stat-value">
-            <span data-role="az-counter" data-to="12840" data-suffix="">0</span>
-            <span class="az-stat-trend up">
-              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-              18%
-            </span>
+          <div style="min-width:0;text-align:left">
+            <div class="az-hm-continue-label">Davom ettirish</div>
+            <div class="az-hm-continue-folder" id="hm-continue-folder">O'rganishni boshlash</div>
           </div>
-          <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="78%"></div></div>
-        </div>
-      </article>
-
-      <!-- STUDY TIME -->
-      <article class="az-stat-card type-time">
-        <div class="az-ring"
-             data-role="az-ring"
-             data-size="96"
-             data-stroke="9"
-             data-percent="62"
-             data-color="url(#az-ring-grad-ai)"
-             data-sub="Effort">
-        </div>
-        <div class="az-stat-info">
-          <div class="az-stat-title">
-            <span class="az-stat-title-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            </span>
-            O'qish vaqti
-          </div>
-          <div class="az-stat-value">
-            <span data-role="az-counter" data-to="84" data-suffix="h">0</span>
-            <span class="az-stat-trend up">
-              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-              12%
-            </span>
-          </div>
-          <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="62%"></div></div>
-        </div>
-      </article>
-
-      <!-- ACCURACY -->
-      <article class="az-stat-card type-success">
-        <div class="az-ring"
-             data-role="az-ring"
-             data-size="96"
-             data-stroke="9"
-             data-percent="92"
-             data-color="url(#az-ring-grad-success)"
-             data-sub="Aniqlik">
-        </div>
-        <div class="az-stat-info">
-          <div class="az-stat-title">
-            <span class="az-stat-title-icon" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </span>
-            Aniqlik
-          </div>
-          <div class="az-stat-value">
-            <span data-role="az-counter" data-to="92" data-suffix="%" data-decimals="0">0</span>
-            <span class="az-stat-trend up">
-              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-              4%
-            </span>
-          </div>
-          <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="92%"></div></div>
-        </div>
-      </article>
-    </section>
-
-    <!-- ═══════════════════ ANALYTICS TIMEFRAME TABS ════════════════════ -->
-    <section class="az-analytics-wrap">
-      <header class="az-analytics-head">
-        <div class="az-card-head-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-          <span>Analytika</span>
-        </div>
-        <nav class="az-tf-tabs" role="tablist" aria-label="Timeframe">
-          <button class="az-tf-tab is-active" data-tf="today" role="tab" aria-selected="true" onclick="window.AzDash.switchTimeframe('today', this)">Bugun</button>
-          <button class="az-tf-tab" data-tf="week" role="tab" aria-selected="false" onclick="window.AzDash.switchTimeframe('week', this)">Hafta</button>
-          <button class="az-tf-tab" data-tf="month" role="tab" aria-selected="false" onclick="window.AzDash.switchTimeframe('month', this)">Oy</button>
-          <button class="az-tf-tab" data-tf="all" role="tab" aria-selected="false" onclick="window.AzDash.switchTimeframe('all', this)">Hammasi</button>
-        </nav>
-      </header>
-
-      <div class="az-analytics-kpis">
-        <div class="az-kpi" data-tf-set>
-          <div class="az-kpi-label">O'rganilgan so'zlar</div>
-          <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="26" data-tf-week="183" data-tf-month="684" data-tf-all="12840">0</span></div>
-          <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+8%"></span></div>
-        </div>
-        <div class="az-kpi type-time" data-tf-set>
-          <div class="az-kpi-label">O'qish vaqti</div>
-          <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="45" data-tf-week="840" data-tf-month="3120" data-tf-all="5040" data-suffix=" daq">0</span></div>
-          <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+12%"></span></div>
-        </div>
-        <div class="az-kpi type-success" data-tf-set>
-          <div class="az-kpi-label">Aniqlik</div>
-          <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="94" data-tf-week="92" data-tf-month="90" data-tf-all="92" data-suffix="%">0</span></div>
-          <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+4%"></span></div>
-        </div>
-        <div class="az-kpi type-gold" data-tf-set>
-          <div class="az-kpi-label">Yutuqlar</div>
-          <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="1" data-tf-week="3" data-tf-month="7" data-tf-all="19">0</span></div>
-          <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+2"></span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════ RECENT ACTIVITY TIMELINE ════════════════════ -->
-    <section class="az-activity-wrap">
-      <header class="az-analytics-head" style="margin-bottom: var(--space-4)">
-        <div class="az-card-head-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span>So'nggi faoliyat</span>
-        </div>
-        <button class="az-btn-link" onclick="window.location.href='stats.html'">
-          Barchasi
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-      </header>
+      </div>
 
-      <ol class="az-timeline" id="az-timeline">
-        <li class="az-tl-item tl-type-success">
-          <div class="az-tl-time">5 daqiqa oldin</div>
-          <div class="az-tl-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <!-- 4 QUICK ACTION CARDS · 1 row -->
+      <div class="az-quick-row">
+        <button class="az-quick-card qc-streak" onclick="window.location.href='streak.html'">
+          <div class="az-qc-ic">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
           </div>
-          <div class="az-tl-body">
-            <strong>18 ta so'z o'rgandi</strong>
-            <span>— IELTS Writing folder</span>
+          <div class="az-qc-txt"><div class="az-qc-title">Week Streak</div><div class="az-qc-sub"><strong id="qc-streak-num">0</strong> kun</div></div>
+        </button>
+        <button class="az-quick-card qc-ai" onclick="window.AzDash.openAICoach()">
+          <div class="az-qc-ic">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1-4-4 4 4 0 0 1 4-4 4 4 0 0 1 4-4z"/></svg>
           </div>
-        </li>
-        <li class="az-tl-item tl-type-gold">
-          <div class="az-tl-time">2 soat oldin</div>
-          <div class="az-tl-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <div class="az-qc-txt"><div class="az-qc-title">AI Coach</div><div class="az-qc-sub">Premium yordam</div></div>
+        </button>
+        <button class="az-quick-card qc-report" id="qc-report-btn">
+          <div class="az-qc-ic">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
           </div>
-          <div class="az-tl-body">
-            <strong>+150 Tangalar</strong>
-            <span>— Streak davom ettirildi (4-kun)</span>
+          <div class="az-qc-txt"><div class="az-qc-title">Haftaorat</div><div class="az-qc-sub">Progress</div></div>
+        </button>
+        <button class="az-quick-card qc-shop" onclick="window.location.href='shop.html'">
+          <div class="az-qc-ic">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           </div>
-        </li>
-        <li class="az-tl-item tl-type-primary">
-          <div class="az-tl-time">Kecha 20:15</div>
-          <div class="az-tl-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-          </div>
-          <div class="az-tl-body">
-            <strong>IELTS Folderni yakunladi</strong>
-            <span>— 100/120 so'z, 83% aniqlik</span>
-          </div>
-        </li>
-        <li class="az-tl-item tl-type-ai">
-          <div class="az-tl-time">Kecha 19:42</div>
-          <div class="az-tl-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1-4-4 4 4 0 0 1 4-4 4 4 0 0 1 4-4z"/></svg>
-          </div>
-          <div class="az-tl-body">
-            <strong>AI Coach 4 ta maslahat berdi</strong>
-            <span>— "Phrasal verbs mashqlarini ko'paytiring"</span>
-          </div>
-        </li>
-        <li class="az-tl-item tl-type-streak">
-          <div class="az-tl-time">Dushanba</div>
-          <div class="az-tl-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-          </div>
-          <div class="az-tl-body">
-            <strong>🔥 Streak — 11 kunliklik!</strong>
-            <span>— "7-Day Streak" yutuq ochildi</span>
-          </div>
-        </li>
-      </ol>
+          <div class="az-qc-txt"><div class="az-qc-title">Do'kon</div><div class="az-qc-sub">Sovg'alar</div></div>
+        </button>
+      </div>
     </section>
 
-    <div id="notif-banner" class="notif-banner" style="display:none">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-      <div class="nb-text"><strong>Kunlik eslatma</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
-      <button class="nb-btn" onclick="enableNotifications()">Yoqish</button>
-      <button class="nb-close" onclick="dismissNotifBanner()">✕</button>
-    </div>
-    <div id="notif-enabled-banner" class="notif-banner" style="display:none;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.06)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      <div class="nb-text"><strong>Eslatma yoqilgan!</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
-      <button class="nb-close" onclick="disableNotifications()">O'chirish</button>
-    </div>
-
-
+    <!-- ═══════════════════ FOLDERS · darhol keyingi blok ═══════════════════ -->
+    <div class="section-header">
       <div class="section-title">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
         Umumiy bo'limlar
@@ -1646,8 +1480,156 @@
         </button>
       </div>
     </div>
+
+    <!-- ═══════════════════ ADVANCED STATS · COLLAPSIBLE ═══════════════════ -->
+    <div class="az-advanced-wrap">
+      <button class="az-advanced-toggle" id="az-adv-toggle" aria-expanded="false">
+        <span class="az-adv-toggle-ic">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        </span>
+        <span>Batafsil statistikani ko'rsatish</span>
+        <svg class="az-adv-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+
+      <div class="az-advanced-body" id="az-adv-body" hidden>
+        <!-- ══ Timeframe tabs + 4 KPI ══ -->
+        <section class="az-analytics-wrap">
+          <header class="az-analytics-head">
+            <div class="az-card-head-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+              <span>Analytika</span>
+            </div>
+            <nav class="az-tf-tabs" role="tablist" aria-label="Timeframe">
+              <button class="az-tf-tab is-active" data-tf="today" role="tab" aria-selected="true" onclick="window.AzDash.switchTimeframe('today', this)">Bugun</button>
+              <button class="az-tf-tab" data-tf="week" role="tab" aria-selected="false" onclick="window.AzDash.switchTimeframe('week', this)">Hafta</button>
+              <button class="az-tf-tab" data-tf="month" role="tab" aria-selected="false" onclick="window.AzDash.switchTimeframe('month', this)">Oy</button>
+              <button class="az-tf-tab" data-tf="all" role="tab" aria-selected="false" onclick="window.AzDash.switchTimeframe('all', this)">Hammasi</button>
+            </nav>
+          </header>
+          <div class="az-analytics-kpis">
+            <div class="az-kpi" data-tf-set>
+              <div class="az-kpi-label">O'rganilgan so'zlar</div>
+              <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="26" data-tf-week="183" data-tf-month="684" data-tf-all="12840">0</span></div>
+              <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+8%"></span></div>
+            </div>
+            <div class="az-kpi type-time" data-tf-set>
+              <div class="az-kpi-label">O'qish vaqti</div>
+              <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="45" data-tf-week="840" data-tf-month="3120" data-tf-all="5040" data-suffix=" daq">0</span></div>
+              <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+12%"></span></div>
+            </div>
+            <div class="az-kpi type-success" data-tf-set>
+              <div class="az-kpi-label">Aniqlik</div>
+              <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="94" data-tf-week="92" data-tf-month="90" data-tf-all="92" data-suffix="%">0</span></div>
+              <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+4%"></span></div>
+            </div>
+            <div class="az-kpi type-gold" data-tf-set>
+              <div class="az-kpi-label">Yutuqlar</div>
+              <div class="az-kpi-value"><span data-role="az-counter" data-tf-today="1" data-tf-week="3" data-tf-month="7" data-tf-all="19">0</span></div>
+              <div class="az-kpi-delta up"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg><span data-tf-delta="+2"></span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ══ Old az-stat-grid ══ -->
+        <section class="az-stat-grid" aria-label="Umumiy statistika" style="margin-top:24px">
+          <article class="az-stat-card">
+            <div class="az-ring" data-role="az-ring" data-size="96" data-stroke="9" data-percent="78" data-color="url(#az-ring-grad-primary)" data-sub="Progress"></div>
+            <div class="az-stat-info">
+              <div class="az-stat-title">
+              <span class="az-stat-title-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+              </span>
+              So'zlar
+              </div>
+              <div class="az-stat-value">
+              <span data-role="az-counter" data-to="12840" data-suffix="">0</span>
+              <span class="az-stat-trend up">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                18%
+              </span>
+              </div>
+              <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="78%"></div></div>
+            </div>
+          </article>
+
+          <article class="az-stat-card type-time">
+            <div class="az-ring" data-role="az-ring" data-size="96" data-stroke="9" data-percent="62" data-color="url(#az-ring-grad-ai)" data-sub="Effort"></div>
+            <div class="az-stat-info">
+              <div class="az-stat-title">
+              <span class="az-stat-title-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </span>
+              O'qish vaqti
+              </div>
+              <div class="az-stat-value">
+              <span data-role="az-counter" data-to="84" data-suffix="h">0</span>
+              <span class="az-stat-trend up">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                12%
+              </span>
+              </div>
+              <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="62%"></div></div>
+            </div>
+          </article>
+
+          <article class="az-stat-card type-success">
+            <div class="az-ring" data-role="az-ring" data-size="96" data-stroke="9" data-percent="92" data-color="url(#az-ring-grad-success)" data-sub="Aniqlik"></div>
+            <div class="az-stat-info">
+              <div class="az-stat-title">
+              <span class="az-stat-title-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </span>
+              Aniqlik
+              </div>
+              <div class="az-stat-value">
+              <span data-role="az-counter" data-to="92" data-suffix="%" data-decimals="0">0</span>
+              <span class="az-stat-trend up">
+                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+                4%
+              </span>
+              </div>
+              <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="92%"></div></div>
+            </div>
+          </article>
+        </section>
+
+        <!-- ══ Recent Activity Timeline ══ -->
+        <section class="az-activity-wrap" style="margin-top:24px">
+          <header class="az-analytics-head" style="margin-bottom: var(--space-4)">
+            <div class="az-card-head-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>So'nggi faoliyat</span>
+            </div>
+            <button class="az-btn-link" onclick="window.location.href='stats.html'">
+              Barchasi
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </header>
+          <ol class="az-timeline" id="az-timeline">
+            <li class="az-tl-item tl-type-success"><div class="az-tl-time">5 daqiqa oldin</div><div class="az-tl-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="az-tl-body"><strong>18 so'z o'rgandi</strong><span>— IELTS Writing folder</span></div></li>
+            <li class="az-tl-item tl-type-gold"><div class="az-tl-time">2 soat oldin</div><div class="az-tl-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="az-tl-body"><strong>+150 Tangalar</strong><span>— 4-kunlik streak</span></div></li>
+            <li class="az-tl-item tl-type-primary"><div class="az-tl-time">Kecha 20:15</div><div class="az-tl-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></div><div class="az-tl-body"><strong>IELTS Folderni yakunladi</strong><span>— 100/120 so'z, 83% aniqlik</span></div></li>
+          </ol>
+        </section>
+      </div>
+    </div>
+
+    <div id="notif-banner" class="notif-banner" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <div class="nb-text"><strong>Kunlik eslatma</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
+      <button class="nb-btn" onclick="enableNotifications()">Yoqish</button>
+      <button class="nb-close" onclick="dismissNotifBanner()">✕</button>
+    </div>
+    <div id="notif-enabled-banner" class="notif-banner" style="display:none;border-color:rgba(52,211,153,0.3);background:rgba(52,211,153,0.06)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="nb-text"><strong>Eslatma yoqilgan!</strong><br>Har kuni soat 19:00 da xabar olasiz</div>
+      <button class="nb-close" onclick="disableNotifications()">O'chirish</button>
+    </div>
   </div>
 </main>
+
+<!-- ═══════════════════ PREMIUM SIDEBAR WIDGETS · after sb-streak ═══════════════════ -->
+<!-- Injected via sidebar placeholder will be replaced next -->
 
 <div class="modal-overlay" id="folder-modal">
   <div class="modal">
@@ -1743,18 +1725,29 @@ async function loadUserStats(uid) {
         }
       });
 
-      // ──────────────── HERO GOAL TODAY ────────────────
+      // ──────────────── HERO GOAL TODAY (old ring + new thin bar) ────────────────
       const todayDone = d.todayWordsLearned || 0;
       const goalTotal = d.dailyGoal || 30;
+      const goalPct = Math.min(Math.round((todayDone / goalTotal) * 100), 100);
       const goalDoneEl = document.getElementById('goal-done');
       const goalTotalEl = document.getElementById('goal-total');
       const goalFillEl = document.getElementById('goal-fill');
       if (goalDoneEl) goalDoneEl.textContent = todayDone;
       if (goalTotalEl) goalTotalEl.textContent = goalTotal;
       if (goalFillEl) {
-        const pct = Math.min(Math.round((todayDone / goalTotal) * 100), 100);
-        setTimeout(() => { goalFillEl.style.width = pct + '%'; }, 350);
+        setTimeout(() => { goalFillEl.style.width = goalPct + '%'; }, 350);
       }
+      // → NEW HM minimal goal thin bar
+      const hmDone = document.getElementById('hm-goal-done');
+      const hmTot  = document.getElementById('hm-goal-total');
+      const hmPct  = document.getElementById('hm-goal-pct-val');
+      const hmFill = document.getElementById('hm-goal-fill');
+      if (hmDone && window.AzDash) window.AzDash.animateCount(hmDone, todayDone, { duration: 900 });
+      else if (hmDone) hmDone.textContent = todayDone;
+      if (hmTot)  hmTot.textContent = goalTotal;
+      if (hmPct && window.AzDash) window.AzDash.animateCount(hmPct, goalPct, { duration: 1000, suffix: '%' });
+      else if (hmPct) hmPct.textContent = goalPct + '%';
+      if (hmFill) setTimeout(() => { hmFill.style.width = goalPct + '%'; }, 200);
 
       // ──────────────── HERO LEVEL BADGE ────────────────
       const levelNum = Math.floor(stars / 500) + 1;
@@ -1768,8 +1761,12 @@ async function loadUserStats(uid) {
       if (xpFillEl) {
         setTimeout(() => { xpFillEl.style.width = xpPct + '%'; }, 420);
       }
+      // → NEW Sidebar Level/XP widget + Quick streak card
+      if (window.AzDash && window.AzDash.updateSidebarLevel) {
+        window.AzDash.updateSidebarLevel({ stars: stars, streakDays: streak });
+      }
 
-      // ──────────────── STATS CARDS DYNAMIC DATA ────────────────
+      // ──────────────── STATS CARDS + HERO KPI PILLS + SIDEBAR STAT WIDGET ────────────────
       const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 12840;
       const studyHours = d.studyTimeHours != null ? d.studyTimeHours : 84;
       const accuracy = d.accuracyPercent != null ? d.accuracyPercent : 92;
@@ -1778,7 +1775,22 @@ async function loadUserStats(uid) {
       const timePct = Math.min(62, Math.min(Math.round((studyHours / 140) * 100), 100));
       const accPct = Math.min(92, Math.min(accuracy, 100));
 
-      // → WORDS
+      // → NEW HERO MINIMAL KPI PILLS (3)
+      if (window.AzDash && window.AzDash.updateHeroKpis) {
+        window.AzDash.updateHeroKpis({ words: totalWords, hours: studyHours, accuracy: accuracy });
+      }
+      // → NEW Sidebar weekly-summary mini widget (3 values)
+      const swWords = document.getElementById('sbw-week-words');
+      const swHours = document.getElementById('sbw-week-hours');
+      const swAcc   = document.getElementById('sbw-week-acc');
+      if (swWords && window.AzDash) window.AzDash.animateCount(swWords, totalWords, { duration: 950 });
+      else if (swWords) swWords.textContent = totalWords;
+      if (swHours && window.AzDash) window.AzDash.animateCount(swHours, studyHours, { duration: 950, suffix: 'h' });
+      else if (swHours) swHours.textContent = studyHours + 'h';
+      if (swAcc && window.AzDash) window.AzDash.animateCount(swAcc, accuracy, { duration: 950, suffix: '%' });
+      else if (swAcc) swAcc.textContent = accuracy + '%';
+
+      // → WORDS stat card (advanced)
       const wordCard = document.querySelector('.az-stat-card:not(.type-time):not(.type-success)');
       if (wordCard) {
         const ring = wordCard.querySelector('[data-role="az-ring"]');
@@ -1817,8 +1829,12 @@ async function loadUserStats(uid) {
       // Yangi foydalanuvchi — default qiymatlarni o'rnatish, barlarni animatsiyalash
       const goalFillEl = document.getElementById('goal-fill');
       const xpFillEl = document.getElementById('xp-fill');
+      const hmFillEl = document.getElementById('hm-goal-fill');
+      const sbXpFill  = document.getElementById('sbw-xp-fill');
       if (goalFillEl) setTimeout(()=>goalFillEl.style.width='0%', 350);
       if (xpFillEl) setTimeout(()=>xpFillEl.style.width='0%', 420);
+      if (hmFillEl) setTimeout(()=>hmFillEl.style.width='0%', 380);
+      if (sbXpFill)  setTimeout(()=>sbXpFill.style.width='0%', 440);
       document.querySelectorAll('.az-stat-bar-fill').forEach((bf, i) => {
         const w = bf.getAttribute('data-width') || '0%';
         setTimeout(()=>bf.style.width = w, 480 + i*60);
@@ -1829,8 +1845,12 @@ async function loadUserStats(uid) {
     try {
       const goalFillEl = document.getElementById('goal-fill');
       const xpFillEl = document.getElementById('xp-fill');
+      const hmFillEl = document.getElementById('hm-goal-fill');
+      const sbXpFill  = document.getElementById('sbw-xp-fill');
       if (goalFillEl) setTimeout(()=>goalFillEl.style.width='0%', 350);
       if (xpFillEl) setTimeout(()=>xpFillEl.style.width='65%', 420);
+      if (hmFillEl) setTimeout(()=>hmFillEl.style.width='40%', 380);
+      if (sbXpFill)  setTimeout(()=>sbXpFill.style.width='65%', 440);
       document.querySelectorAll('.az-stat-bar-fill').forEach((bf, i) => {
         const w = bf.getAttribute('data-width') || '0%';
         setTimeout(()=>bf.style.width = w, 480 + i*60);

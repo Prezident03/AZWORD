@@ -371,13 +371,143 @@
     setContinueFolderLabel: function (name) {
       var el = document.getElementById('continue-folder-name');
       if (el) el.textContent = name || "O'rganishni boshlash";
+      var hm = document.getElementById('hm-continue-folder');
+      if (hm) hm.textContent = name || "O'rganishni boshlash";
+    },
+
+    /* ─────────────── 11. TOGGLE ADVANCED STATS ──────────── */
+    toggleAdvancedStats: function (forceState) {
+      var btn = document.getElementById('az-adv-toggle');
+      var body = document.getElementById('az-adv-body');
+      if (!btn || !body) return;
+      var open;
+      if (typeof forceState === 'boolean') open = forceState;
+      else open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', String(open));
+      if (open) {
+        body.hidden = false;
+        // trigger rings/counters first time on reveal
+        requestAnimationFrame(function () {
+          body.querySelectorAll('[data-role="az-ring"]').forEach(function (r) {
+            if (!r.__azRingInited) { renderProgressRing(r); r.__azRingInited = true; }
+          });
+          body.querySelectorAll('[data-role="az-counter"]').forEach(function (c) {
+            if (!c.dataset.initedOnReveal) {
+              c.dataset.initedOnReveal = '1';
+              var to = Number(c.getAttribute('data-to'));
+              if (!isNaN(to) && to > 0) animateCount(c, to);
+            }
+          });
+        });
+        btn.querySelector('span:nth-child(2)').textContent = "Batafsil statistikani yashirish";
+      } else {
+        // allow transition, then hide
+        body.style.maxHeight = body.scrollHeight + 'px';
+        requestAnimationFrame(function () {
+          body.style.maxHeight = '';
+          setTimeout(function () { body.hidden = true; }, reduceMotion ? 0 : 350);
+        });
+        btn.querySelector('span:nth-child(2)').textContent = "Batafsil statistikani ko'rsatish";
+      }
+      try { localStorage.setItem('az:advStatsOpen', String(open)); } catch (e) {}
+      window.AzSound && window.AzSound.play('click');
+    },
+
+    /* ─────────────── 12. RENDER SIDEBAR MINI WIDGETS ────── */
+    renderSidebarWeekStreak: function (weekData) {
+      var container = document.getElementById('sb-week-bars');
+      if (!container) return;
+      var todayIdx = (new Date().getDay() + 6) % 7;
+      if (!weekData) {
+        weekData = [];
+        for (var i = 0; i < 7; i++) {
+          var base = 0.2;
+          if (i < todayIdx - 1) base = 1;
+          else if (i === todayIdx - 1) base = 0.75;
+          else if (i === todayIdx) base = 0.45;
+          weekData.push(base);
+        }
+      }
+      container.innerHTML = '';
+      weekData.forEach(function (val, i) {
+        var cls = 'az-day-miss';
+        if (val >= 0.9) cls = 'az-day-done';
+        else if (val > 0.2) cls = 'az-day-part';
+        var isToday = i === todayIdx;
+        var bar = document.createElement('div');
+        bar.className = 'sb-week-bar';
+        if (isToday) bar.classList.add('az-day-today');
+        else bar.classList.add(cls);
+        bar.style.setProperty('--bar', String(Math.max(0.2, val)));
+        container.appendChild(bar);
+        requestAnimationFrame(function () {
+          setTimeout(function () { bar.classList.add('az-animated'); }, reduceMotion ? 0 : (i * 60 + 120));
+        });
+      });
+    },
+
+    /* ─────────────── 13. UPDATE HERO KPI VALUES (Pills) ── */
+    updateHeroKpis: function (kpi) {
+      kpi = kpi || {};
+      function set(id, val) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (typeof val === 'number') animateCount(el, val, { duration: 900 });
+        else el.textContent = String(val);
+      }
+      set('kpi-words-total', kpi.words);
+      set('kpi-time-total',  kpi.hours);
+      set('kpi-acc-total',   kpi.accuracy);
+    },
+
+    /* ─────────────── 14. UPDATE SIDEBAR LEVEL XP ────────── */
+    updateSidebarLevel: function (opts) {
+      opts = opts || {};
+      var stars = opts.stars != null ? opts.stars : 0;
+      var levelEl = document.getElementById('sbw-level');
+      var xpCurEl = document.getElementById('sbw-xp-current');
+      var xpTotEl = document.getElementById('sbw-xp-total');
+      var xpFill  = document.getElementById('sbw-xp-fill');
+      var qcStreakEl = document.getElementById('qc-streak-num');
+      if (qcStreakEl) {
+        var d = opts.streakDays != null ? opts.streakDays : (Number(localStorage.getItem('az:streakDays')) || 0);
+        animateCount(qcStreakEl, d, { duration: 700 });
+      }
+      var level = Math.floor(stars / 500) + 1;
+      var xpCur = stars % 500;
+      var xpTot = 500;
+      var pct = Math.round((xpCur / xpTot) * 100);
+      if (levelEl) levelEl.textContent = 'LVL ' + level;
+      if (xpCurEl) animateCount(xpCurEl, xpCur, { duration: 800 });
+      if (xpTotEl) xpTotEl.textContent = xpTot;
+      if (xpFill) setTimeout(function () { xpFill.style.width = pct + '%'; }, 250);
     }
   };
 
   /* ─────────────── 11. AUTO INIT ENHANCEMENTS ─────────── */
   function autoInitHero() {
-    // 1) Smart greeting
-    var gNameEl = document.getElementById('hero-welcome-name') || document.getElementById('greeting-name');
+    // 0) ADVANCED STATS toggle + event wiring
+    var advBtn = document.getElementById('az-adv-toggle');
+    if (advBtn) {
+      advBtn.addEventListener('click', function () { window.AzDash.toggleAdvancedStats(); });
+      try {
+        if (localStorage.getItem('az:advStatsOpen') === 'true') {
+          setTimeout(function () { window.AzDash.toggleAdvancedStats(true); }, 350);
+        }
+      } catch (e) {}
+    }
+    // qc-report button → opens advanced
+    var qcRep = document.getElementById('qc-report-btn');
+    if (qcRep) {
+      qcRep.addEventListener('click', function () {
+        window.AzDash.toggleAdvancedStats(true);
+        document.getElementById('az-adv-body') &&
+          document.getElementById('az-adv-body').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+
+    // 1) Smart greeting — new minimal HM IDs first, fallback to old ones
+    var gNameEl = document.getElementById('hero-welcome-name') || document.getElementById('greeting-name') || document.getElementById('hm-name');
     var displayName = 'Do\'stim';
     var raw = null;
     try { raw = JSON.parse(localStorage.getItem('az:lastFolder') || 'null'); } catch (e) {}
@@ -396,12 +526,31 @@
         }
       } catch (e) {}
     }
-    setSmartGreeting({ name: displayName });
+    // HM-contextual setSmartGreeting
+    setSmartGreeting({
+      name: displayName,
+      welcomeName: displayName.split(' ')[0] || displayName,
+      greetingId: 'hero-greeting',
+      welcomeId:  'hero-welcome-name',
+      subtitleId: 'hero-subtitle',
+      emojiId:    'hero-emoji'
+    });
+    // Run again on HM nodes (if exist)
+    setSmartGreeting({
+      name: displayName,
+      welcomeName: displayName.split(' ')[0] || displayName,
+      greetingId: 'hm-greeting',
+      welcomeId:  'hm-name',
+      subtitleId: 'hm-subtitle',
+      emojiId:    'hm-emoji',
+      welcomeWrapId: null
+    });
 
-    // 2) Week streak
+    // 2) Week streak — old & sidebar mini
     window.AzDash.renderWeekStreak();
+    window.AzDash.renderSidebarWeekStreak();
 
-    // 3) Today goal — try to load from stats
+    // 3) Today goal — old ring + new thin HM bar
     var todayWords = 18;
     var total = 30;
     try {
@@ -410,6 +559,16 @@
       if (stats && typeof stats.dailyGoal === 'number') total = stats.dailyGoal;
     } catch (e) {}
     window.AzDash.updateTodayGoal(todayWords, total);
+    // Thin bar update (HM minimal)
+    var hmDone = document.getElementById('hm-goal-done');
+    var hmTot  = document.getElementById('hm-goal-total');
+    var hmPct  = document.getElementById('hm-goal-pct-val');
+    var hmFill = document.getElementById('hm-goal-fill');
+    var pct = Math.min(100, Math.round((todayWords / total) * 100));
+    if (hmDone) animateCount(hmDone, todayWords, { duration: 900 });
+    if (hmTot)  hmTot.textContent = total;
+    if (hmPct)  animateCount(hmPct, pct, { duration: 1000, suffix: '%' });
+    if (hmFill) setTimeout(function () { hmFill.style.width = pct + '%'; }, 200);
   }
 
   var _origEnhance = enhanceAll;
