@@ -11,6 +11,7 @@
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
+  <script src="confetti.js"></script>
   <style>
     .study-wrap { max-width: 680px; margin: 0 auto; padding: 36px 24px; }
 
@@ -731,6 +732,7 @@
       if (selected === correct) {
         btn.classList.add('correct', 'bounce-in');
         playSound('correct');
+        if (window.AzConfetti && Math.random() < 0.45) window.AzConfetti.preset('study-correct');
       } else {
         btn.classList.add('wrong'); btn.classList.add('wrong-shake'); setTimeout(()=>btn.classList.remove('wrong-shake'),400);
         document.querySelectorAll('.option-btn').forEach(b => {
@@ -952,12 +954,13 @@
       input.addEventListener('input', () => {
         const val = input.value.trim().toLowerCase();
         const correct = word.en.toLowerCase();
-        if (val === correct) {
+        if (val === correct && !input.classList.contains('correct-input')) {
           input.classList.add('correct-input');
           document.getElementById('next-btn').disabled = false;
           document.getElementById('type-hint').innerHTML = icon('check', { size: 14, strokeWidth: 3 }) + " To'g'ri!";
           document.getElementById('type-hint').style.color = 'var(--success)';
           playSound('correct');
+          if (window.AzConfetti && Math.random() < 0.5) window.AzConfetti.preset('study-correct');
         } else {
           input.classList.remove('correct-input', 'wrong-input');
           document.getElementById('type-hint').textContent = '';

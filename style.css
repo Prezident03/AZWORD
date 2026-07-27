@@ -2751,3 +2751,20 @@ html.az-no-cursor-glow #az-follow-light {
 .btn-success:hover::before, .btn-streak:hover::before, .btn-ai:hover::before, .btn-gold:hover::before {
   opacity: 1;
 }
+
+/* ──────────────────────────────────────────────
+   #11  CONFETTI BURST (canvas base style)
+   ────────────────────────────────────────────── */
+#az-confetti-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483647;
+  pointer-events: none;
+  display: block;
+  overflow: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  #az-confetti-canvas { display: none !important; }
+}

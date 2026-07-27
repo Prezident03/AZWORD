@@ -11,6 +11,7 @@
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
+  <script src="confetti.js"></script>
   <style>
     .ach-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
 
@@ -316,6 +317,15 @@ async function checkAndUnlockAchievements() {
 
   if (starReward) document.getElementById('nav-stars').textContent = (userStats.stars||0) + starReward;
   if (coinReward) document.getElementById('nav-coins').textContent = (userStats.coins||0) + coinReward;
+
+  // 🎉 Yutuqlar ochilganda confetti
+  if (window.AzConfetti) {
+    setTimeout(() => {
+      if (newlyUnlocked.length >= 3) window.AzConfetti.preset('victory');
+      else if (newlyUnlocked.length >= 2) window.AzConfetti.preset('success');
+      else window.AzConfetti.burst({ count: 100, palette: 'victory', stagger: true });
+    }, 320);
+  }
 
   toast(`🎉 ${newlyUnlocked.length} ta yangi mukofot ochildi!`);
   renderGrid('all');

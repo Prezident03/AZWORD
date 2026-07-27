@@ -11,6 +11,7 @@
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
+  <script src="confetti.js"></script>
   <style>
     .shop-wrap { max-width: 1000px; margin: 0 auto; padding: 36px 24px; }
 
@@ -689,6 +690,13 @@ window.confirmBuy = async () => {
     document.getElementById('balance-coins').textContent = userCoins;
 
     toast(`${pendingItem.name} sotib olindi! 🎉`);
+    // 🎉 Har bir harid uchun confetti
+    if (window.AzConfetti) {
+      setTimeout(() => {
+        if ((pendingItem.price || 0) >= 100) window.AzConfetti.preset('success');
+        else window.AzConfetti.preset('coin');
+      }, 180);
+    }
     closeBuyModal();
     renderItems(allItems);
     await loadHistory();

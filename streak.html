@@ -11,6 +11,7 @@
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
+  <script src="confetti.js"></script>
   <style>
     body { background: var(--bg-deep); }
 
@@ -344,6 +345,14 @@ onAuthStateChanged(auth, async user => {
 
       document.getElementById('streak-number').textContent = streak;
       document.getElementById('stat-longest').textContent = longest;
+
+      // 🎉 Streak milestone uchun confetti
+      if (window.AzConfetti && (streak >= 7 || longest >= 30)) {
+        setTimeout(() => {
+          if (streak >= 30) window.AzConfetti.preset('victory');
+          else if (streak >= 7) window.AzConfetti.preset('success');
+        }, 520);
+      }
 
       if (streak >= 7) {
         const badge = document.getElementById('streak-society-badge');

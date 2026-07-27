@@ -11,6 +11,7 @@
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
+  <script src="confetti.js"></script>
   <style>
     .results-wrap { max-width: 700px; margin: 0 auto; padding: 40px 24px; }
 
@@ -327,6 +328,16 @@
     document.getElementById('score-num').classList.add('score-pop');
     setTimeout(() => playSound('victory'), 500);
     setTimeout(() => playSound('victory'), 500);
+
+    // 🎉 #11 Confetti Burst — natijaga qarab
+    if (window.AzConfetti) {
+      const pctInit = perfectWords / totalWords;
+      setTimeout(() => {
+        if (pctInit === 1) window.AzConfetti.preset('victory');
+        else if (pctInit >= 0.7) window.AzConfetti.preset('success');
+        else if (pctInit >= 0.4) window.AzConfetti.burst({ count: 70, palette: 'primary' });
+      }, 420);
+    }
 
     function floatReward(type, amount, x, y) {
       const el = document.createElement('div');
