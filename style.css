@@ -2666,6 +2666,425 @@ a:hover svg {
 @media (max-width: 820px) {
   .az-stat-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ══════════════════════════════════════════════════
+   #18 · PREMIUM MICRO-INTERACTIONS (Inputs · Checkbox · Radio · Toggle · Select)
+   ══════════════════════════════════════════════════ */
+
+/* ─── Text / Email / Password / Search / Number Inputs ─── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="week"],
+input[type="month"],
+textarea,
+select {
+  width: 100%;
+  background: var(--bg-deep, rgba(20, 18, 35, 0.6));
+  border: 1.5px solid var(--border, rgba(124, 58, 237, 0.15));
+  border-radius: 12px;
+  padding: 12px 15px;
+  color: var(--text-main, #fff);
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition:
+    border-color 0.25s cubic-bezier(.2,.8,.2,1),
+    box-shadow 0.25s cubic-bezier(.2,.8,.2,1),
+    background-color 0.25s ease,
+    transform 0.15s ease;
+  position: relative;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="search"]::placeholder,
+input[type="number"]::placeholder,
+textarea::placeholder {
+  color: var(--text-dim, rgba(139, 127, 184, 0.55));
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="month"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--purple-main, #7c3aed);
+  background: var(--bg-card, rgba(28, 25, 48, 0.8));
+  box-shadow:
+    0 0 0 3px var(--purple-glow, rgba(124, 58, 237, 0.14)),
+    0 0 22px rgba(124, 58, 237, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.02);
+  transform: translateY(-1px);
+}
+
+input[type="text"]:focus::placeholder,
+input[type="email"]:focus::placeholder,
+input[type="password"]:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0;
+  transform: translateX(6px);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+  line-height: 1.55;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 42px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-muted,#8b7fb8) 50%),
+    linear-gradient(135deg, var(--text-muted,#8b7fb8) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 50%,
+    calc(100% - 14px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+select:hover:not(:focus) { border-color: rgba(124, 58, 237, 0.35); }
+
+/* Input field wrapper - label floating */
+.field-wrap {
+  position: relative;
+  margin-bottom: 16px;
+}
+.field-wrap .field-label {
+  position: absolute;
+  top: 13px; left: 15px;
+  font-size: 0.95rem;
+  color: var(--text-muted, #8b7fb8);
+  pointer-events: none;
+  transition: all 0.22s cubic-bezier(.2,.8,.2,1);
+  background: transparent;
+  padding: 0 4px;
+}
+.field-wrap input:focus + .field-label,
+.field-wrap input:not(:placeholder-shown) + .field-label,
+.field-wrap textarea:focus + .field-label,
+.field-wrap textarea:not(:placeholder-shown) + .field-label {
+  top: -8px;
+  left: 10px;
+  font-size: 0.72rem;
+  color: var(--purple-light, #9d5cf6);
+  background: var(--bg-page, #0e0b1f);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Checkbox (premium custom) ─── */
+.pm-checkbox,
+.pm-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--text-main, #fff);
+  font-family: 'Inter', sans-serif;
+  position: relative;
+}
+.pm-checkbox input[type="checkbox"],
+.pm-radio input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+}
+
+.pm-cb-box {
+  width: 20px; height: 20px;
+  border-radius: 6px;
+  border: 1.8px solid var(--border, rgba(124, 58, 237, 0.25));
+  background: var(--bg-deep, rgba(20, 18, 35, 0.7));
+  position: relative;
+  transition: all 0.22s cubic-bezier(.2,.8,.2,1);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.pm-cb-box::after {
+  content: '';
+  position: absolute;
+  left: 5px; top: 1px;
+  width: 5px; height: 10px;
+  border: solid #fff;
+  border-width: 0 2.2px 2.2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
+  opacity: 0;
+}
+.pm-checkbox input[type="checkbox"]:checked ~ .pm-cb-box {
+  background: linear-gradient(135deg, var(--purple-main,#7c3aed), var(--purple-light,#9d5cf6));
+  border-color: var(--purple-light,#9d5cf6);
+  box-shadow:
+    0 0 0 3px var(--purple-glow, rgba(124,58,237,0.15)),
+    0 4px 14px rgba(124, 58, 237, 0.32);
+}
+.pm-checkbox input[type="checkbox"]:checked ~ .pm-cb-box::after {
+  transform: rotate(45deg) scale(1);
+  opacity: 1;
+}
+.pm-checkbox input[type="checkbox"]:indeterminate ~ .pm-cb-box {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+}
+.pm-checkbox input[type="checkbox"]:indeterminate ~ .pm-cb-box::after {
+  left: 4px; top: 8px;
+  width: 10px; height: 2px;
+  border: none;
+  background: #fff;
+  border-radius: 2px;
+  transform: scaleX(1);
+  opacity: 1;
+}
+.pm-checkbox:hover .pm-cb-box { border-color: rgba(124, 58, 237, 0.55); }
+
+/* ─── Radio Buttons ─── */
+.pm-rd-dot {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1.8px solid var(--border, rgba(124, 58, 237, 0.25));
+  background: var(--bg-deep, rgba(20, 18, 35, 0.7));
+  position: relative;
+  transition: all 0.22s cubic-bezier(.2,.8,.2,1);
+  flex-shrink: 0;
+}
+.pm-rd-dot::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple-main,#7c3aed), var(--purple-light,#9d5cf6));
+  transform: scale(0);
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1);
+  opacity: 0;
+}
+.pm-radio input[type="radio"]:checked ~ .pm-rd-dot {
+  border-color: var(--purple-light,#9d5cf6);
+  box-shadow:
+    0 0 0 3px var(--purple-glow, rgba(124,58,237,0.15)),
+    0 4px 14px rgba(124, 58, 237, 0.25);
+}
+.pm-radio input[type="radio"]:checked ~ .pm-rd-dot::after {
+  transform: scale(1);
+  opacity: 1;
+}
+.pm-radio:hover .pm-rd-dot { border-color: rgba(124, 58, 237, 0.55); }
+
+/* ─── Toggle Switch (premium animated) ─── */
+.pm-toggle {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.pm-toggle input {
+  opacity: 0;
+  width: 0; height: 0;
+  position: absolute;
+}
+.pm-toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border, rgba(139, 127, 184, 0.25));
+  border-radius: 99px;
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+  overflow: hidden;
+}
+.pm-toggle-track::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--purple-main,#7c3aed), var(--purple-light,#9d5cf6));
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.pm-toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.pm-toggle-thumb::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: var(--border, rgba(139,127,184,0.35));
+  transition: all 0.35s ease;
+}
+.pm-toggle input:checked + .pm-toggle-track { box-shadow: 0 0 0 3px var(--purple-glow, rgba(124,58,237,0.12)); }
+.pm-toggle input:checked + .pm-toggle-track::before { opacity: 1; }
+.pm-toggle input:checked ~ .pm-toggle-thumb {
+  transform: translateX(24px);
+  box-shadow:
+    0 4px 14px rgba(124, 58, 237, 0.45),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.pm-toggle input:checked ~ .pm-toggle-thumb::before {
+  background: linear-gradient(135deg, var(--purple-main,#7c3aed), var(--purple-light,#9d5cf6));
+}
+.pm-toggle input:focus-visible + .pm-toggle-track {
+  box-shadow: 0 0 0 3px var(--purple-glow, rgba(124,58,237,0.2));
+}
+
+/* Override for existing profile.html toggle switch class */
+.toggle-switch {
+  position: relative;
+  width: 52px; height: 28px;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-switch .toggle-track {
+  position: absolute; inset: 0;
+  background: rgba(139, 127, 184, 0.25);
+  border-radius: 99px;
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+  overflow: hidden;
+}
+.toggle-switch .toggle-track::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--purple-main,#7c3aed), var(--purple-light,#9d5cf6));
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.toggle-switch .toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 22px; height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.6);
+}
+.toggle-switch input:checked + .toggle-track { box-shadow: 0 0 0 3px var(--purple-glow, rgba(124,58,237,0.12)); }
+.toggle-switch input:checked + .toggle-track::before { opacity: 1; }
+.toggle-switch input:checked ~ .toggle-thumb {
+  transform: translateX(24px);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.45), inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* ══════════════════════════════════════════════════
+   #19 · PARALLAX SCROLL STYLES
+   ══════════════════════════════════════════════════ */
+
+#az-parallax-orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.px-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.35;
+  will-change: transform;
+}
+.px-orb-1 {
+  width: 520px; height: 520px;
+  top: -120px; left: -140px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.55), transparent 70%);
+}
+.px-orb-2 {
+  width: 600px; height: 600px;
+  top: 40vh; right: -180px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.35), transparent 70%);
+}
+.px-orb-3 {
+  width: 460px; height: 460px;
+  bottom: -160px; left: 30%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.35), transparent 70%);
+}
+
+/* Parallax section depth hint */
+.px-section {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+}
+
+/* Scroll-reveal entrance */
+.px-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.65s cubic-bezier(.2,.8,.2,1),
+    transform 0.65s cubic-bezier(.2,.8,.2,1);
+  will-change: transform, opacity;
+}
+.px-reveal.px-in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ensure page content is above orbs */
+.navbar, .toast, .study-wrap, .stats-wrap, .profile-page,
+.dash-wrap, .folder-wrap, .shop-wrap, .streak-wrap,
+.achievements-wrap, .leader-wrap, .results-wrap,
+.auth-wrap, .upload-wrap, .admin-wrap {
+  position: relative;
+  z-index: 2;
+}
+
+/* Disabled state for inputs */
+input:disabled, textarea:disabled, select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Input valid / invalid */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):valid:not(:placeholder-shown),
+textarea:valid:not(:placeholder-shown) {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+input:not([type="checkbox"]):not([type="radio"]).is-invalid,
+textarea.is-invalid {
+  border-color: var(--danger, #f87171);
+  background: rgba(248, 113, 113, 0.04);
+  animation: input-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes input-shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
 @media (max-width: 540px) {
   .az-stat-grid { grid-template-columns: 1fr; }
 }

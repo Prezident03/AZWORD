@@ -12,6 +12,8 @@
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
   <script src="confetti.js"></script>
+  <script src="sound.js"></script>
+  <script src="parallax.js"></script>
   <style>
     .study-wrap { max-width: 680px; margin: 0 auto; padding: 36px 24px; }
 
@@ -434,99 +436,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <script>
-  // ── SOUND EFFECTS (Web Audio API) ──
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let _ctx = null;
-
-  function getCtx() {
-    if (!_ctx) _ctx = new AudioCtx();
-    return _ctx;
-  }
-
-  window.playSound = function(type) {
-    try {
-      const ctx = getCtx();
-
-      if (type === 'correct') {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(880, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(1100, ctx.currentTime + 0.1);
-        g.gain.setValueAtTime(0.3, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-        o.start(ctx.currentTime);
-        o.stop(ctx.currentTime + 0.3);
-
-      } else if (type === 'wrong') {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sawtooth';
-        o.frequency.setValueAtTime(300, ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.2);
-        g.gain.setValueAtTime(0.2, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-        o.start(ctx.currentTime);
-        o.stop(ctx.currentTime + 0.2);
-
-      } else if (type === 'coin') {
-        [0, 0.08].forEach((delay, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(i === 0 ? 1047 : 1319, ctx.currentTime + delay);
-          g.gain.setValueAtTime(0.25, ctx.currentTime + delay);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + 0.25);
-          o.start(ctx.currentTime + delay);
-          o.stop(ctx.currentTime + delay + 0.25);
-        });
-
-      } else if (type === 'victory') {
-        const notes = [523, 659, 784, 1047];
-        notes.forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = 'sine';
-          o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
-          g.gain.setValueAtTime(0.25, ctx.currentTime + i * 0.12);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.3);
-          o.start(ctx.currentTime + i * 0.12);
-          o.stop(ctx.currentTime + i * 0.12 + 0.3);
-        });
-
-      } else if (type === 'achievement') {
-        const notes = [784, 988, 1175, 1568];
-        notes.forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
-          o.type = i < 3 ? 'sine' : 'triangle';
-          o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
-          g.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.1);
-          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.5);
-          o.start(ctx.currentTime + i * 0.1);
-          o.stop(ctx.currentTime + i * 0.1 + 0.5);
-        });
-
-      } else if (type === 'click') {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'sine';
-        o.frequency.setValueAtTime(600, ctx.currentTime);
-        g.gain.setValueAtTime(0.1, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-        o.start(ctx.currentTime);
-        o.stop(ctx.currentTime + 0.08);
-      }
-    } catch(e) {}
-  };
-</script>
   <script type="module">
     import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
