@@ -243,6 +243,184 @@
     renderProgressRing: renderProgressRing,
     animateCount: animateCount,
     setSmartGreeting: setSmartGreeting,
-    enhanceAll: enhanceAll
+    enhanceAll: enhanceAll,
+
+    /* ─────────────── 5. WEEK STREAK HEATMAP ─────────────── */
+    renderWeekStreak: function (container, weekData) {
+      if (!container) container = document.getElementById('week-bars');
+      if (!container) return;
+      var days = ['D', 'S', 'Ch', 'P', 'J', 'Sh', 'Y'];
+      var todayIdx = (new Date().getDay() + 6) % 7;
+      if (!weekData) {
+        weekData = [];
+        for (var i = 0; i < 7; i++) {
+          var base = 0.15;
+          if (i < todayIdx - 1) base = 1;
+          else if (i === todayIdx - 1) base = 0.75;
+          else if (i === todayIdx) base = 0.45;
+          weekData.push(base);
+        }
+      }
+      container.innerHTML = '';
+      weekData.forEach(function (val, i) {
+        var cls = 'az-legend-missed';
+        if (val >= 0.9) cls = 'az-legend-done';
+        else if (val > 0.15) cls = 'az-legend-partial';
+        var isToday = i === todayIdx;
+        var h = Math.max(8, Math.round(val * 100));
+        var barWrap = document.createElement('div');
+        barWrap.className = 'az-week-bar' + (isToday ? ' az-today' : '');
+        barWrap.style.animationDelay = (i * 80) + 'ms';
+        var col = document.createElement('div');
+        col.className = 'az-week-bar-col ' + cls + (isToday && val > 0.85 ? ' today' : '');
+        col.style.height = h + '%';
+        col.setAttribute('title', days[i] + ': ' + Math.round(val * 100) + '%');
+        var label = document.createElement('div');
+        label.className = 'az-week-bar-label';
+        label.textContent = days[i];
+        barWrap.appendChild(col);
+        barWrap.appendChild(label);
+        container.appendChild(barWrap);
+      });
+      var doneCount = weekData.filter(function (v) { return v >= 0.9; }).length;
+      var totEl = document.getElementById('week-streak-total');
+      if (totEl) {
+        var start = 0;
+        var dur = 900;
+        var t0 = null;
+        function step(now) {
+          if (!t0) t0 = now;
+          var t = Math.min((now - t0) / dur, 1);
+          var cur = Math.round(start + (doneCount - start) * (1 - Math.pow(1 - t, 3)));
+          totEl.textContent = cur;
+          if (t < 1) raf(step);
+        }
+        raf(step);
+      }
+    },
+
+    /* ─────────────── 6. TIMEFRAME SWITCHER ─────────────── */
+    switchTimeframe: function (tf, btn) {
+      document.querySelectorAll('.az-tf-tab').forEach(function (t) {
+        t.classList.remove('is-active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      if (btn) {
+        btn.classList.add('is-active');
+        btn.setAttribute('aria-selected', 'true');
+      }
+      document.querySelectorAll('[data-tf-set]').forEach(function (set) {
+        var counter = set.querySelector('[data-role="az-counter"]');
+        if (!counter) return;
+        var attr = 'data-tf-' + tf;
+        var to = Number(counter.getAttribute(attr));
+        if (isNaN(to)) return;
+        counter.dataset.to = to;
+        animateCount(counter, to, { duration: 700 });
+      });
+      window.AzSound && window.AzSound.play('click');
+    },
+
+    /* ─────────────── 7. SMART CONTINUE LAST FOLDER ──────── */
+    continueLastFolder: function () {
+      var lastFolder = null;
+      try {
+        lastFolder = JSON.parse(localStorage.getItem('az:lastFolder') || 'null');
+      } catch (e) {}
+      if (lastFolder) {
+        try {
+          sessionStorage.setItem('az:openFolder', JSON.stringify(lastFolder));
+        } catch (e) {}
+      }
+      window.location.href = 'study.html';
+    },
+
+    /* ─────────────── 8. AI COACH ────────────────────────── */
+    openAICoach: function () {
+      window.AzSound && window.AzSound.play('click');
+      window.location.href = 'study.html?ai=coach';
+    },
+
+    /* ─────────────── 9. UPDATE TODAY GOAL ───────────────── */
+    updateTodayGoal: function (done, total) {
+      total = total || 30;
+      done = Math.min(done, total);
+      var pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      var elDone = document.getElementById('goal-done');
+      var elTotal = document.getElementById('goal-total');
+      var elFill = document.getElementById('goal-fill');
+      var elFillLg = document.getElementById('goal-fill-lg') || document.getElementById('goal-fill');
+      var elPct = document.getElementById('goal-pct-label');
+      var elEta = document.getElementById('goal-eta');
+      if (elDone) animateCount(elDone, done, { duration: 900 });
+      if (elTotal) elTotal.textContent = total;
+      if (elFillLg) setTimeout(function () { elFillLg.style.width = pct + '%'; }, 120);
+      if (elPct) animateCount(elPct, pct, { duration: 1000, suffix: '%' });
+      if (elEta) {
+        var left = Math.max(0, total - done);
+        var mins = Math.max(1, Math.round(left * 0.6));
+        elEta.textContent = '~' + mins + ' daqiqa';
+      }
+      var ringEl = document.getElementById('goal-ring');
+      if (ringEl && ringEl.__azRingUpdate) {
+        setTimeout(function () { ringEl.__azRingUpdate(pct, 1100); }, 150);
+      }
+    },
+
+    /* ─────────────── 10. SET CONTINUE FOLDER LABEL ──────── */
+    setContinueFolderLabel: function (name) {
+      var el = document.getElementById('continue-folder-name');
+      if (el) el.textContent = name || "O'rganishni boshlash";
+    }
   };
+
+  /* ─────────────── 11. AUTO INIT ENHANCEMENTS ─────────── */
+  function autoInitHero() {
+    // 1) Smart greeting
+    var gNameEl = document.getElementById('hero-welcome-name') || document.getElementById('greeting-name');
+    var displayName = 'Do\'stim';
+    var raw = null;
+    try { raw = JSON.parse(localStorage.getItem('az:lastFolder') || 'null'); } catch (e) {}
+    if (raw) window.AzDash.setContinueFolderLabel(raw.name || null);
+    else window.AzDash.setContinueFolderLabel("O'rganishni boshlash");
+
+    if (gNameEl) {
+      try {
+        var profile = JSON.parse(localStorage.getItem('az:profile') || 'null');
+        if (profile && profile.name) displayName = profile.name;
+        else if (window.auth && window.auth.currentUser && window.auth.currentUser.displayName) {
+          displayName = window.auth.currentUser.displayName || displayName;
+        } else {
+          var stored = sessionStorage.getItem('az:userName') || localStorage.getItem('userName');
+          if (stored) displayName = stored;
+        }
+      } catch (e) {}
+    }
+    setSmartGreeting({ name: displayName });
+
+    // 2) Week streak
+    window.AzDash.renderWeekStreak();
+
+    // 3) Today goal — try to load from stats
+    var todayWords = 18;
+    var total = 30;
+    try {
+      var stats = JSON.parse(localStorage.getItem('az:todayStats') || 'null');
+      if (stats && typeof stats.wordsLearned === 'number') todayWords = stats.wordsLearned;
+      if (stats && typeof stats.dailyGoal === 'number') total = stats.dailyGoal;
+    } catch (e) {}
+    window.AzDash.updateTodayGoal(todayWords, total);
+  }
+
+  var _origEnhance = enhanceAll;
+  enhanceAll = function () {
+    _origEnhance();
+    autoInitHero();
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoInitHero, { once: true });
+  } else if (!window.__AzHeroInited) {
+    window.__AzHeroInited = true;
+    autoInitHero();
+  }
 })();
