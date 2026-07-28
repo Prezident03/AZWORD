@@ -3884,6 +3884,127 @@ html.az-no-cursor-glow #az-follow-light {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   NAV-EMBEDDED ACCORDION (Statistika) — sidebar navigatsiya ichida
+   ═══════════════════════════════════════════════════════════════ */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.sb-nav-accordion.sb-accordion {
+  border-radius: 0;
+  background: transparent;
+  margin: 0;
+}
+.sb-nav-accordion:hover { background: transparent; }
+.sb-nav-accordion.sb-accordion.is-open {
+  background:
+    linear-gradient(180deg,
+      rgba(124,58,237,0.06) 0%,
+      transparent 40px);
+  border-radius: 12px;
+}
+.sb-nav-toggle.sb-acc-toggle {
+  width: 100%;
+  padding: 10px 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted, #9ca3af);
+  font-size: 0.86rem;
+  font-weight: 500;
+  transition: all var(--dur-fast);
+  text-decoration: none;
+  border: 1px solid transparent;
+  line-height: 1;
+}
+.sb-nav-toggle:hover {
+  background: var(--bg-hover, rgba(255,255,255,0.025));
+  color: var(--text-main);
+  border-color: var(--border, #2e2845);
+  transform: translateX(1px);
+}
+.sb-nav-toggle.sb-acc-toggle:active {
+  transform: scale(0.98);
+}
+.sb-nav-accordion.sb-accordion.is-open .sb-nav-toggle {
+  background: linear-gradient(90deg,
+    rgba(124,58,237,0.12),
+    rgba(124,58,237,0.04) 80%,
+    transparent);
+  border-color: rgba(124,58,237,0.22);
+  color: var(--text-main);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02),
+              0 6px 18px -10px rgba(124,58,237,0.35);
+}
+.sb-nav-icon.sb-acc-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  transition: all var(--dur-normal);
+}
+.sb-nav-accordion.sb-accordion.is-open .sb-nav-icon {
+  background: linear-gradient(135deg,
+    rgba(96,165,250,0.18),
+    rgba(124,58,237,0.14));
+  border-color: rgba(96,165,250,0.32);
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.08),
+              inset 0 0 0 1px rgba(255,255,255,0.04);
+  transform: scale(1.05);
+}
+.sb-nav-title.sb-acc-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  color: inherit;
+  letter-spacing: 0.1px;
+}
+.sb-nav-badges.sb-acc-badges {
+  gap: 5px;
+  margin-right: 1px;
+}
+.sb-nav-chev.sb-acc-chev {
+  color: var(--text-dim, #6b7280);
+  transition: transform var(--dur-normal) var(--ease-standard),
+              color var(--dur-fast);
+}
+.sb-nav-accordion.sb-accordion.is-open .sb-nav-chev {
+  color: var(--primary-light, #a78bfa);
+}
+
+/* Accordion body nav ichida — pastki itemlardan so'ng keyingi nav-item ustiga yopishmaydi, 
+   gap va padding bilan saqlanadi */
+.sb-nav-body.sb-acc-body {
+  padding: 6px 12px 14px 14px;
+  margin-top: 1px;
+  background: linear-gradient(180deg,
+    rgba(124,58,237,0.02),
+    transparent);
+  border-left: 2px solid rgba(124,58,237,0.12);
+  margin-left: 13px;
+  border-radius: 0 0 12px 6px;
+  gap: 9px;
+}
+.sb-nav-body .sb-widget {
+  background: rgba(18,15,31,0.55);
+  backdrop-filter: blur(8px);
+}
+.sb-nav-body .sb-acc-sep {
+  padding-top: 6px;
+  margin: 4px 0 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    SIDEBAR ACCORDIONS · 3 ta bo'lim: Statistika, Mukofotlar, Yangiliklar
    ═══════════════════════════════════════════════════════════════ */
 .sb-accordions-col {
