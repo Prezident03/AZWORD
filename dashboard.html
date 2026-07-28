@@ -1209,8 +1209,8 @@
       Folders
     </a>
 
-    <!-- 6. Statistics (SIMPLE link — old accordion removed, widget moves to main content) -->
-    <a class="nav-item" href="stats.html">
+    <!-- 6. Statistics — endi bosilganda chiroyli modal ochiladi (stats.html hali ham zaxira sifatida ishlaydi) -->
+    <a class="nav-item" href="stats.html" onclick="if (window.openStatsOverview) { window.openStatsOverview(); return false; }">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Statistics
     </a>
@@ -1551,69 +1551,6 @@
           </div>
         </section>
 
-        <!-- ══ Old az-stat-grid ══ -->
-        <section class="az-stat-grid" aria-label="Umumiy statistika" style="margin-top:24px">
-          <article class="az-stat-card">
-            <div class="az-ring" data-role="az-ring" data-size="96" data-stroke="9" data-percent="78" data-color="url(#az-ring-grad-primary)" data-sub="Progress"></div>
-            <div class="az-stat-info">
-              <div class="az-stat-title">
-              <span class="az-stat-title-icon" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
-              </span>
-              So'zlar
-              </div>
-              <div class="az-stat-value">
-              <span data-role="az-counter" data-to="12840" data-suffix="">0</span>
-              <span class="az-stat-trend up">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-                18%
-              </span>
-              </div>
-              <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="78%"></div></div>
-            </div>
-          </article>
-
-          <article class="az-stat-card type-time">
-            <div class="az-ring" data-role="az-ring" data-size="96" data-stroke="9" data-percent="62" data-color="url(#az-ring-grad-ai)" data-sub="Effort"></div>
-            <div class="az-stat-info">
-              <div class="az-stat-title">
-              <span class="az-stat-title-icon" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </span>
-              O'qish vaqti
-              </div>
-              <div class="az-stat-value">
-              <span data-role="az-counter" data-to="84" data-suffix="h">0</span>
-              <span class="az-stat-trend up">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-                12%
-              </span>
-              </div>
-              <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="62%"></div></div>
-            </div>
-          </article>
-
-          <article class="az-stat-card type-success">
-            <div class="az-ring" data-role="az-ring" data-size="96" data-stroke="9" data-percent="92" data-color="url(#az-ring-grad-success)" data-sub="Aniqlik"></div>
-            <div class="az-stat-info">
-              <div class="az-stat-title">
-              <span class="az-stat-title-icon" aria-hidden="true">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              </span>
-              Aniqlik
-              </div>
-              <div class="az-stat-value">
-              <span data-role="az-counter" data-to="92" data-suffix="%" data-decimals="0">0</span>
-              <span class="az-stat-trend up">
-                <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-                4%
-              </span>
-              </div>
-              <div class="az-stat-bar"><div class="az-stat-bar-fill" style="width:0%" data-width="92%"></div></div>
-            </div>
-          </article>
-        </section>
-
         <!-- ══ Recent Activity Timeline ══ -->
         <section class="az-activity-wrap" style="margin-top:24px">
           <header class="az-analytics-head" style="margin-bottom: var(--space-4)">
@@ -1806,65 +1743,21 @@ async function loadUserStats(uid) {
         window.AzDash.updateSidebarLevel({ stars: stars, streakDays: streak });
       }
 
-      // ──────────────── STATS CARDS + HERO KPI PILLS + SIDEBAR STAT WIDGET ────────────────
-      const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 12840;
-      const studyHours = d.studyTimeHours != null ? d.studyTimeHours : 84;
-      const accuracy = d.accuracyPercent != null ? d.accuracyPercent : 92;
-
-      const wordsPct = Math.min(78, Math.min(Math.round((totalWords / 15000) * 100), 100));
-      const timePct = Math.min(62, Math.min(Math.round((studyHours / 140) * 100), 100));
-      const accPct = Math.min(92, Math.min(accuracy, 100));
+      // ──────────────── STATS: HERO KPI PILLS + STATISTIKA MODAL uchun saqlash ────────────────
+      const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 0;
+      const studyHours = d.studyTimeHours != null ? d.studyTimeHours : 0;
+      const accuracy = d.accuracyPercent != null ? d.accuracyPercent : 0;
 
       // → NEW HERO MINIMAL KPI PILLS (3)
       if (window.AzDash && window.AzDash.updateHeroKpis) {
         window.AzDash.updateHeroKpis({ words: totalWords, hours: studyHours, accuracy: accuracy });
       }
-      // → NEW Sidebar weekly-summary mini widget (3 values)
-      const swWords = document.getElementById('sbw-week-words');
-      const swHours = document.getElementById('sbw-week-hours');
-      const swAcc   = document.getElementById('sbw-week-acc');
-      if (swWords && window.AzDash) window.AzDash.animateCount(swWords, totalWords, { duration: 950 });
-      else if (swWords) swWords.textContent = totalWords;
-      if (swHours && window.AzDash) window.AzDash.animateCount(swHours, studyHours, { duration: 950, suffix: 'h' });
-      else if (swHours) swHours.textContent = studyHours + 'h';
-      if (swAcc && window.AzDash) window.AzDash.animateCount(swAcc, accuracy, { duration: 950, suffix: '%' });
-      else if (swAcc) swAcc.textContent = accuracy + '%';
 
-      // → WORDS stat card (advanced)
-      const wordCard = document.querySelector('.az-stat-card:not(.type-time):not(.type-success)');
-      if (wordCard) {
-        const ring = wordCard.querySelector('[data-role="az-ring"]');
-        const counter = wordCard.querySelector('[data-role="az-counter"]');
-        const barFill = wordCard.querySelector('.az-stat-bar-fill');
-        if (ring && ring.__azRingUpdate) ring.__azRingUpdate(wordsPct);
-        else if (ring) { ring.setAttribute('data-percent', wordsPct); if (window.AzDash) window.AzDash.renderProgressRing(ring); }
-        if (counter) { counter.setAttribute('data-to', totalWords); if (window.AzDash) window.AzDash.animateCount(counter, totalWords); }
-        if (barFill) { barFill.setAttribute('data-width', wordsPct + '%'); setTimeout(()=>barFill.style.width = wordsPct+'%', 480); }
-      }
-
-      // → STUDY TIME
-      const timeCard = document.querySelector('.az-stat-card.type-time');
-      if (timeCard) {
-        const ring = timeCard.querySelector('[data-role="az-ring"]');
-        const counter = timeCard.querySelector('[data-role="az-counter"]');
-        const barFill = timeCard.querySelector('.az-stat-bar-fill');
-        if (ring && ring.__azRingUpdate) ring.__azRingUpdate(timePct);
-        else if (ring) { ring.setAttribute('data-percent', timePct); if (window.AzDash) window.AzDash.renderProgressRing(ring); }
-        if (counter) { counter.setAttribute('data-to', studyHours); counter.setAttribute('data-suffix', 'h'); if (window.AzDash) window.AzDash.animateCount(counter, studyHours); }
-        if (barFill) { barFill.setAttribute('data-width', timePct + '%'); setTimeout(()=>barFill.style.width = timePct+'%', 520); }
-      }
-
-      // → ACCURACY
-      const accCard = document.querySelector('.az-stat-card.type-success');
-      if (accCard) {
-        const ring = accCard.querySelector('[data-role="az-ring"]');
-        const counter = accCard.querySelector('[data-role="az-counter"]');
-        const barFill = accCard.querySelector('.az-stat-bar-fill');
-        if (ring && ring.__azRingUpdate) ring.__azRingUpdate(accPct);
-        else if (ring) { ring.setAttribute('data-percent', accPct); if (window.AzDash) window.AzDash.renderProgressRing(ring); }
-        if (counter) { counter.setAttribute('data-to', accuracy); counter.setAttribute('data-suffix', '%'); if (window.AzDash) window.AzDash.animateCount(counter, accuracy); }
-        if (barFill) { barFill.setAttribute('data-width', accPct + '%'); setTimeout(()=>barFill.style.width = accPct+'%', 560); }
-      }
+      // → Sidebar "Statistics" bosilganda ochiladigan modal shu ma'lumotlardan foydalanadi
+      window.__azStats = {
+        levelNum, xpInLevel, xpPct, streak,
+        totalWords, studyHours, accuracy
+      };
     } else {
       // Yangi foydalanuvchi — default qiymatlarni o'rnatish, barlarni animatsiyalash
       const goalFillEl = document.getElementById('goal-fill');
@@ -1989,83 +1882,60 @@ window.openModal = () => { document.getElementById('folder-modal').classList.add
 window.closeModal = () => { document.getElementById('folder-modal').classList.remove('open'); document.getElementById('folder-name').value=''; document.getElementById('folder-emoji').value=''; };
 
 /* ═══════════════ SIDEBAR STATISTIKA → DETAIL MODAL ═══════════════
-   "Daraja", "Haftalik" va "Bu hafta" kartalari bosilganda shu funksiya
-   joriy (allaqachon sahifada ko'rsatilgan) qiymatlarni o'qib, alohida
-   oynada kattaroq va batafsilroq ko'rinishda chiqaradi. */
-const STAT_CARD_ICONS = {
-  level: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
-  week:  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>`,
-  today: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>`
-};
-const STAT_CARD_TITLES = { level: 'Daraja va tajriba', week: 'Haftalik streak', today: "Bu haftalik statistika" };
+   Sidebar'dagi "Statistics" bosilganda shu funksiya loadUserStats() da
+   hisoblangan haqiqiy qiymatlarni (window.__azStats) o'qib, bitta chiroyli
+   umumiy ko'rinishda (daraja/XP + streak + so'z/vaqt/aniqlik) modal
+   ichida ko'rsatadi. */
+const STATS_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`;
 
-function buildLevelStatBody() {
-  const lvl = document.getElementById('sbw-level')?.textContent || 'LVL 1';
-  const cur = document.getElementById('sbw-xp-current')?.textContent || '0';
-  const tot = document.getElementById('sbw-xp-total')?.textContent || '500';
-  const fillEl = document.getElementById('sbw-xp-fill');
-  const pct = fillEl ? (parseFloat(fillEl.style.width) || 0) : 0;
-  const remain = Math.max(0, parseInt(tot, 10) - parseInt(cur, 10));
+function buildStatsOverviewBody() {
+  const s = window.__azStats || { levelNum: 1, xpInLevel: 0, xpPct: 0, streak: 0, totalWords: 0, studyHours: 0, accuracy: 0 };
+  const remain = Math.max(0, 500 - s.xpInLevel);
   return `
     <div class="stat-modal-hero">
-      <div class="stat-modal-badge">${lvl}</div>
+      <div class="stat-modal-badge">LVL ${s.levelNum}</div>
       <div class="stat-modal-hero-txt">
-        <div class="stat-modal-hero-num">${cur} <span>/ ${tot} XP</span></div>
+        <div class="stat-modal-hero-num">${s.xpInLevel} <span>/ 500 XP</span></div>
         <div class="stat-modal-hero-lbl">Keyingi darajagacha ${remain} XP qoldi</div>
       </div>
     </div>
-    <div class="sb-w-xp-bar stat-modal-bar-lg"><div class="sb-w-xp-fill" style="width:${pct}%"></div></div>
-    <p class="stat-modal-note">So'z o'rganish, mashqlarni to'g'ri bajarish va kunlik maqsadga yetish XP beradi. Har 500 XP — yangi daraja.</p>`;
-}
+    <div class="sb-w-xp-bar stat-modal-bar-lg"><div class="sb-w-xp-fill" style="width:${s.xpPct}%"></div></div>
 
-function buildWeekStatBody() {
-  const streak = document.getElementById('sb-streak')?.textContent || '0';
-  const barsHTML = document.getElementById('sb-week-bars')?.innerHTML || '';
-  return `
-    <div class="stat-modal-hero">
-      <div class="stat-modal-badge stat-modal-badge-orange">🔥</div>
-      <div class="stat-modal-hero-txt">
-        <div class="stat-modal-hero-num">${streak} <span>kun</span></div>
-        <div class="stat-modal-hero-lbl">Ketma-ket o'qish streak'i</div>
+    <div class="stat-modal-rows" style="margin-top:14px">
+      <div class="stat-modal-row">
+        <span class="stat-modal-row-lbl">🔥 Streak</span>
+        <span class="stat-modal-row-val" style="color:#fb923c">${s.streak} kun</span>
+      </div>
+      <div class="stat-modal-row">
+        <span class="stat-modal-row-lbl">O'rganilgan so'z</span>
+        <span class="stat-modal-row-val" style="color:#60a5fa">${s.totalWords}</span>
+      </div>
+      <div class="stat-modal-row">
+        <span class="stat-modal-row-lbl">O'qish vaqti</span>
+        <span class="stat-modal-row-val" style="color:#34d399">${s.studyHours}h</span>
+      </div>
+      <div class="stat-modal-row">
+        <span class="stat-modal-row-lbl">Aniqlik</span>
+        <span class="stat-modal-row-val" style="color:#fbbf24">${s.accuracy}%</span>
       </div>
     </div>
-    <div class="sb-week-bars stat-modal-week-bars">${barsHTML}</div>
-    <p class="stat-modal-note">Streak'ni saqlash uchun har kuni kamida bitta mashqni tugating. Streak batafsil sahifasi: <a href="streak.html">streak.html</a>.</p>`;
+    <p class="stat-modal-note">To'liq tarix va grafiklar: <a href="stats.html">Statistika sahifasi</a>da.</p>`;
 }
 
-function buildTodayStatBody() {
-  const words = document.getElementById('sbw-week-words')?.textContent || '0';
-  const hours = document.getElementById('sbw-week-hours')?.textContent || '0h';
-  const acc   = document.getElementById('sbw-week-acc')?.textContent || '0%';
-  const rows = [
-    { label: "O'rganilgan so'z", value: words, color: '#60a5fa' },
-    { label: "O'qish vaqti", value: hours, color: '#34d399' },
-    { label: 'Aniqlik', value: acc, color: '#fbbf24' }
-  ];
-  return `
-    <div class="stat-modal-rows">
-      ${rows.map(r => `
-        <div class="stat-modal-row">
-          <span class="stat-modal-row-lbl">${r.label}</span>
-          <span class="stat-modal-row-val" style="color:${r.color}">${r.value}</span>
-        </div>
-      `).join('')}
-    </div>
-    <p class="stat-modal-note">Ushbu ko'rsatkichlar joriy hafta bo'yicha hisoblangan. To'liq tarixni <a href="stats.html">Statistika</a> sahifasida ko'rishingiz mumkin.</p>`;
-}
-
-const STAT_CARD_BUILDERS = { level: buildLevelStatBody, week: buildWeekStatBody, today: buildTodayStatBody };
-
-window.openStatCard = (type) => {
-  const builder = STAT_CARD_BUILDERS[type];
-  if (!builder) return;
-  document.getElementById('stat-modal-icon').innerHTML = STAT_CARD_ICONS[type] || '';
-  document.getElementById('stat-modal-title').textContent = STAT_CARD_TITLES[type] || 'Statistika';
-  document.getElementById('stat-modal-body').innerHTML = builder();
-  document.getElementById('stat-detail-modal').classList.add('open');
+window.openStatsOverview = () => {
+  const icon = document.getElementById('stat-modal-icon');
+  const title = document.getElementById('stat-modal-title');
+  const body = document.getElementById('stat-modal-body');
+  const modal = document.getElementById('stat-detail-modal');
+  if (!icon || !title || !body || !modal) { window.location.href = 'stats.html'; return; }
+  icon.innerHTML = STATS_ICON;
+  title.textContent = 'Statistika';
+  body.innerHTML = buildStatsOverviewBody();
+  modal.classList.add('open');
 };
-window.closeStatCard = () => { document.getElementById('stat-detail-modal').classList.remove('open'); };
-document.getElementById('stat-detail-modal').addEventListener('click', e => { if (e.target === document.getElementById('stat-detail-modal')) closeStatCard(); });
+window.closeStatCard = () => { document.getElementById('stat-detail-modal')?.classList.remove('open'); };
+document.getElementById('stat-detail-modal')?.addEventListener('click', e => { if (e.target === document.getElementById('stat-detail-modal')) closeStatCard(); });
+
 
 window.createFolder = async () => {
   const name = document.getElementById('folder-name').value.trim();
