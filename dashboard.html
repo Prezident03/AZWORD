@@ -1198,6 +1198,9 @@
         </div>
       </button>
       <div class="sb-acc-body" hidden>
+
+        <!-- ═══ STATISTIKA QISMI ═══ -->
+        <!-- Announcements: type-stats / type-warning -->
         <div class="sb-acc-ann-list" id="sba-stats-ann"></div>
 
         <!-- W1: LEVEL XP PROGRESS -->
@@ -1250,6 +1253,16 @@
             </div>
           </div>
         </div>
+
+        <!-- SEPARATOR: Statistika → Mukofotlar -->
+        <div class="sb-acc-sep" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          <span>Mukofotlar</span>
+        </div>
+
+        <!-- ═══ MUKOFOTLAR QISMI ═══ -->
+        <!-- Announcements: type-rewards / type-gift -->
+        <div class="sb-acc-ann-list" id="sba-rewards-ann"></div>
 
         <!-- W4: STREAK HERO CARD -->
         <div class="sb-widget sb-widget-streak-hero" onclick="window.location.href='streak.html'">
@@ -2027,7 +2040,8 @@ function categorizeAnnouncement(dat) {
 }
 
 function accKeyForCategory(cat) {
-  if (cat === 'stats' || cat === 'rewards' || cat === 'warning' || cat === 'gift') return 'stats';
+  if (cat === 'stats' || cat === 'warning') return 'stats';
+  if (cat === 'rewards' || cat === 'gift') return 'rewards';
   return 'news';
 }
 
@@ -2036,7 +2050,7 @@ async function loadAnnouncements() {
     const snap = await getDocs(query(collection(db,'announcements'), orderBy('createdAt','desc'), limit(10)));
     const banner = document.getElementById('announce-banner');
 
-    const grouped = { stats: [], news: [] };
+    const grouped = { stats: [], rewards: [], news: [] };
 
     snap.forEach(d => {
       const dat = d.data() || {};
@@ -2053,14 +2067,20 @@ async function loadAnnouncements() {
     });
 
     if (window.AzDash && window.AzDash.setSidebarAnnouncements) {
-      window.AzDash.setSidebarAnnouncements('stats', grouped.stats);
-      window.AzDash.setSidebarAnnouncements('news',  grouped.news);
+      window.AzDash.setSidebarAnnouncements('stats',   grouped.stats);
+      window.AzDash.setSidebarAnnouncements('rewards', grouped.rewards);
+      window.AzDash.setSidebarAnnouncements('news',    grouped.news);
+
+      // Statistika accordion BADGE = stats.length + rewards.length (umumiy)
+      const totalCount = grouped.stats.length + grouped.rewards.length;
+      const anyUnread = grouped.stats.some(it => it.unread) || grouped.rewards.some(it => it.unread);
+      window.AzDash.setSidebarBadge('stats', totalCount, anyUnread);
     }
 
     if (banner) {
       banner.innerHTML = '';
       const typeClass = {'🎉':'type-yangilik','⚠️':'type-ogohlantirish','🎁':'type-sovga','🔔':'type-eslatma','🚀':'type-yangilanish'};
-      const topList = [...grouped.stats, ...grouped.news].slice(0, 3);
+      const topList = [...grouped.stats, ...grouped.rewards, ...grouped.news].slice(0, 3);
       topList.forEach(item => {
         const div = document.createElement('div');
         div.className = `announce-item-banner ${typeClass[item._bannerType]||'type-yangilik'}`;
