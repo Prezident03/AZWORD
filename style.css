@@ -1609,12 +1609,33 @@ html {
 }
 .nav-item {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #9ca3af);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: left;
+  border-radius: 11px;
+  cursor: pointer;
+  text-decoration: none;
+  line-height: 1;
   transition:
     transform 0.25s cubic-bezier(.2,.8,.2,1),
     background 0.25s ease,
     color 0.25s ease,
     box-shadow 0.3s ease;
 }
+/* nav-item LOGOUT (qizil hover) */
+.nav-item-logout { color: var(--danger, #f87171); }
+.nav-item-logout:hover { background: rgba(248,113,113,.08) !important; color: var(--danger) !important; }
+/* ADMIN special */
+.nav-item-admin { color: var(--text-muted); opacity: .92; }
 .nav-item::before {
   content: '';
   position: absolute;
@@ -4329,3 +4350,267 @@ html.az-no-cursor-glow #az-follow-light {
   height: 1px;
   background: linear-gradient(270deg, transparent, var(--border, #2e2845), transparent 70%);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM SIDEBAR 2026 UPGRADE (rasmdagi kabi)
+   ═══════════════════════════════════════════════════════════ */
+
+/* 1) Active nav-item: PURPLE GRADIENT + glow */
+.nav-item.active {
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 45%, #a855f7 100%) !important;
+  color: #fff !important;
+  box-shadow:
+    0 10px 30px rgba(124,58,237,0.35),
+    0 2px 0 rgba(255,255,255,0.08) inset,
+    0 0 0 1px rgba(168,85,247,0.35) inset;
+  border: none !important;
+  font-weight: 600;
+}
+.nav-item.active svg {
+  color: #fff !important;
+  filter: drop-shadow(0 0 6px rgba(255,255,255,0.5)) !important;
+}
+.nav-item.active::before {
+  display: none;
+}
+
+/* 2) Nav item hover (not active) — soft fill */
+.nav-item:hover:not(.active):not(.nav-item-logout) {
+  transform: translateX(3px);
+  background: rgba(124,58,237,0.07);
+  color: var(--text-main);
+}
+
+/* 3) SVG inside nav items — uniform */
+.nav-item svg:first-child {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: inherit;
+  opacity: 0.92;
+}
+
+/* 4) NEW pill — AI Assistant (RIGHT side) */
+.nav-item-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.nav-new-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 99px;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #fff;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 12px rgba(16,185,129,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.nav-item.active .nav-new-pill {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+
+/* 5) Vocabulary dropdown (chevron + dropmenu) */
+.nav-item-dropdown {
+  padding: 0 !important;
+  background: transparent !important;
+}
+.nav-item-dropbtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 11px;
+  transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+.nav-item-dropbtn:hover {
+  background: rgba(124,58,237,0.07);
+  color: var(--text-main);
+  transform: translateX(3px);
+}
+.nav-item-chev {
+  margin-left: auto;
+  width: 14px;
+  height: 14px;
+  color: var(--text-dim, #6b7280);
+  transition: transform 0.3s cubic-bezier(.2,.8,.2,1);
+  flex-shrink: 0;
+}
+.nav-item-dropdown[aria-open="true"] .nav-item-chev,
+.nav-item-dropbtn[aria-expanded="true"] .nav-item-chev {
+  transform: rotate(180deg);
+  color: var(--primary-light, #a855f7);
+}
+.nav-item-dropmenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px 10px 44px;
+  overflow: hidden;
+  animation: navDropFade 0.3s cubic-bezier(.2,.8,.2,1);
+}
+.nav-item-dropmenu[hidden] { display: none; }
+.nav-item-dropmenu a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--text-muted, #9ca3af);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  position: relative;
+}
+.nav-item-dropmenu a::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--primary-light, #a855f7);
+  opacity: 0.55;
+}
+.nav-item-dropmenu a:hover {
+  background: rgba(124,58,237,0.08);
+  color: var(--text-main);
+  transform: translateX(3px);
+}
+.nav-item-dropmenu a:hover::before {
+  opacity: 1;
+  box-shadow: 0 0 6px rgba(168,85,247,0.7);
+}
+@keyframes navDropFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 6) AI COACH BETA — Premium sidebar card (pastda) */
+.sb-ai-coach-card {
+  position: relative;
+  margin: 14px 8px 10px;
+  padding: 16px 15px 15px;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  background:
+    radial-gradient(ellipse at 85% -10%, rgba(168,85,247,0.40), transparent 55%),
+    radial-gradient(ellipse at -10% 110%, rgba(59,130,246,0.25), transparent 55%),
+    linear-gradient(160deg, #1e1736 0%, #140f2a 65%, #0e0a1e 100%);
+  border: 1.2px solid rgba(124,58,237,0.28);
+  box-shadow:
+    0 18px 38px rgba(124,58,237,0.22),
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 1px 0 rgba(255,255,255,0.06) inset;
+  transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.sb-ai-coach-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(168,85,247,0.55);
+  box-shadow:
+    0 26px 50px rgba(124,58,237,0.34),
+    0 0 0 1px rgba(255,255,255,0.06) inset,
+    0 1px 0 rgba(255,255,255,0.08) inset;
+}
+.sb-aicc-stars {
+  position: absolute;
+  top: 10px; right: 12px;
+  font-size: 0.62rem;
+  letter-spacing: 3px;
+  color: rgba(196,181,253,0.55);
+  animation: aiccStarTwinkle 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes aiccStarTwinkle {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+.sb-aicc-badge-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sb-aicc-robot {
+  line-height: 0;
+  filter: drop-shadow(0 6px 14px rgba(124,58,237,0.45));
+  animation: aiccRobotBob 4.5s ease-in-out infinite;
+}
+@keyframes aiccRobotBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-3px) rotate(2deg); }
+}
+.sb-aicc-beta {
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #fde68a;
+  background: rgba(251,191,36,0.14);
+  border: 1px solid rgba(251,191,36,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.sb-aicc-title {
+  margin-top: 6px;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.1px;
+  line-height: 1.1;
+}
+.sb-aicc-text {
+  margin: 6px 0 12px;
+  font-size: 0.74rem;
+  line-height: 1.5;
+  color: rgba(226,232,240,0.78);
+  font-weight: 450;
+}
+.sb-aicc-cta {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 11px;
+  font-family: var(--font-display, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 55%, #6366f1 100%);
+  box-shadow:
+    0 10px 22px rgba(124,58,237,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(.2,.8,.2,1), filter 0.25s ease, box-shadow 0.25s ease;
+}
+.sb-aicc-cta:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow:
+    0 14px 28px rgba(124,58,237,0.52),
+    inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.sb-aicc-cta svg { flex-shrink: 0; }
+
+/* 7) Eski nav-label & admin-label — o'chirilganiga ishonch hosil qilish */
+.nav-label { display: none !important; }
+#admin-nav-label { display: none !important; }
