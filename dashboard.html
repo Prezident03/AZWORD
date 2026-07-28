@@ -1705,9 +1705,10 @@ onAuthStateChanged(auth, async user => {
 
   const name = user.displayName || user.email.split('@')[0];
   const shortName = name.split(' ')[0] || name;
-  document.getElementById('greeting-name').textContent = shortName;
-  document.getElementById('sb-user-name').textContent = name;
-  document.getElementById('sb-user-email').textContent = user.email;
+  const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setText('greeting-name', shortName);
+  setText('sb-user-name', name);
+  setText('sb-user-email', user.email);
 
   // Greeting emoji (topbar)
   const hour = new Date().getHours();
@@ -1715,25 +1716,29 @@ onAuthStateChanged(auth, async user => {
   if (hour < 12) emoji = '🌅';
   else if (hour < 18) emoji = '☀️';
   else emoji = '🌙';
-  document.getElementById('greeting-emoji').textContent = emoji;
+  setText('greeting-emoji', emoji);
 
   // ✨ Premium Smart Greeting (Hero) — soatga qarab tong/kun/kech/tun
-  if (window.AzDash && window.AzDash.setSmartGreeting) {
-    window.AzDash.setSmartGreeting({
-      name: name,
-      welcomeName: shortName
-    });
-  }
+  try {
+    if (window.AzDash && window.AzDash.setSmartGreeting) {
+      window.AzDash.setSmartGreeting({
+        name: name,
+        welcomeName: shortName
+      });
+    }
+  } catch (err) { console.error('setSmartGreeting failed', err); }
 
   if (user.email === ADMIN_EMAIL) {
-    document.getElementById('admin-nav-label').style.display = 'block';
-    document.getElementById('admin-nav-item').style.display = 'flex';
+    const adminLabel = document.getElementById('admin-nav-label');
+    if (adminLabel) adminLabel.style.display = 'block';
+    const adminItem = document.getElementById('admin-nav-item');
+    if (adminItem) adminItem.style.display = 'flex';
   }
 
-  await loadUserStats(user.uid);
-  await loadFolders();
-  await loadAnnouncements();
-  checkNotificationStatus();
+  try { await loadUserStats(user.uid); } catch (err) { console.error('loadUserStats failed', err); }
+  try { await loadFolders(); } catch (err) { console.error('loadFolders failed', err); }
+  try { await loadAnnouncements(); } catch (err) { console.error('loadAnnouncements failed', err); }
+  try { checkNotificationStatus(); } catch (err) { console.error('checkNotificationStatus failed', err); }
 });
 
 async function loadUserStats(uid) {
