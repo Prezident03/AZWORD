@@ -1468,7 +1468,16 @@
         Umumiy bo'limlar
       </div>
     </div>
-    <div class="folders-grid" id="admin-folders"></div>
+    <div class="folders-grid" id="admin-folders">
+      <div class="folders-empty" style="min-height:140px">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;margin-bottom:10px">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M8 7h8M8 11h6"/>
+        </svg>
+        <p style="font-weight:600;color:#9d8cc7;font-size:0.85rem">Tez kunda umumiy bo'limlar qo'shiladi</p>
+      </div>
+    </div>
 
     <div class="section-header">
       <div class="section-title">
@@ -1886,9 +1895,16 @@ async function loadUserStats(uid) {
 }
 
 async function loadFolders() {
-  const myQ = query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false));
-  const adminQ = query(collection(db,'folders'), where('isAdmin','==',true));
-  const [mySnap, adminSnap] = await Promise.all([getDocs(myQ), getDocs(adminQ)]);
+  let mySnap = { empty: true, forEach: () => {} };
+  let adminSnap = { empty: true, forEach: () => {} };
+  try {
+    const myQ = query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false));
+    mySnap = await getDocs(myQ);
+  } catch (err) { console.warn('loadFolders: user folders failed', err); }
+  try {
+    const adminQ = query(collection(db,'folders'), where('isAdmin','==',true));
+    adminSnap = await getDocs(adminQ);
+  } catch (err) { console.warn('loadFolders: admin folders failed', err); }
   renderFolders(mySnap, 'my-folders', false);
   renderFolders(adminSnap, 'admin-folders', true);
 }
@@ -1909,6 +1925,15 @@ function renderFolders(snap, containerId, isAdmin) {
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Yangi bolim
         </button>
+      </div>`;
+    } else {
+      container.innerHTML = `<div class="folders-empty" style="min-height:140px">
+        <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;margin-bottom:10px">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M8 7h8M8 11h6"/>
+        </svg>
+        <p style="font-weight:600;color:#9d8cc7;font-size:0.85rem">Tez kunda umumiy bo'limlar qo'shiladi</p>
       </div>`;
     }
     return;
