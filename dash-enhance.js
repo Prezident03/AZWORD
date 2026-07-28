@@ -7,6 +7,9 @@
   /* ───────────────────────────────────────────────────── */
   var raf = (typeof window !== 'undefined' && window.requestAnimationFrame) ||
     function (fn) { return setTimeout(fn, 16); };
+  var reduceMotion = !!(typeof window !== 'undefined' &&
+    window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
   /* ─────────────── 1. PROGRESS RING (Apple Fitness) ───── */
   function renderProgressRing(target, opts) {
@@ -481,11 +484,98 @@
       if (xpCurEl) animateCount(xpCurEl, xpCur, { duration: 800 });
       if (xpTotEl) xpTotEl.textContent = xpTot;
       if (xpFill) setTimeout(function () { xpFill.style.width = pct + '%'; }, 250);
+    },
+
+    /* ─────────────── 15. SIDEBAR ACCORDION TOGGLE ───────── */
+    toggleSidebarAccordion: function (key, forceState) {
+      var acc = document.querySelector('.sb-accordion[data-sb-acc="' + key + '"]');
+      if (!acc) return;
+      var toggle = acc.querySelector('.sb-acc-toggle');
+      var body = acc.querySelector('.sb-acc-body');
+      if (!toggle || !body) return;
+      var open;
+      if (typeof forceState === 'boolean') open = forceState;
+      else open = !acc.classList.contains('is-open');
+      if (open) {
+        acc.classList.add('is-open');
+        toggle.setAttribute('aria-expanded', 'true');
+        body.hidden = false;
+        try { localStorage.setItem('az:sbAcc:' + key, '1'); } catch (e) {}
+      } else {
+        acc.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        setTimeout(function () { if (!acc.classList.contains('is-open')) body.hidden = true; }, reduceMotion ? 0 : 360);
+        try { localStorage.setItem('az:sbAcc:' + key, '0'); } catch (e) {}
+      }
+      window.AzSound && window.AzSound.play('click');
+    },
+
+    /* ─────────────── 16. INIT SIDEBAR ACCORDIONS ────────── */
+    initSidebarAccordions: function () {
+      var accs = document.querySelectorAll('.sb-accordion');
+      accs.forEach(function (acc) {
+        var key = acc.getAttribute('data-sb-acc');
+        if (!key) return;
+        var toggle = acc.querySelector('.sb-acc-toggle');
+        if (!toggle) return;
+        toggle.addEventListener('click', function () {
+          window.AzDash.toggleSidebarAccordion(key);
+        });
+        var open = null;
+        try { open = localStorage.getItem('az:sbAcc:' + key); } catch (e) {}
+        if (open === null) {
+          open = acc.getAttribute('data-open-default') === 'true' ? '1' : '0';
+        }
+        if (open === '1') {
+          window.AzDash.toggleSidebarAccordion(key, true);
+        }
+      });
+    },
+
+    /* ─────────────── 17. SIDEBAR ANNOUNCEMENTS ──────────── */
+    setSidebarAnnouncements: function (key, items) {
+      var list = document.getElementById('sba-' + key + '-ann');
+      if (!list) return;
+      list.innerHTML = '';
+      items = items || [];
+      items.forEach(function (item, i) {
+        if (!item.text) return;
+        var type = item.type || key;
+        var el = document.createElement('div');
+        el.className = 'sb-acc-ann-item type-' + type;
+        el.style.animationDelay = (i * 70) + 'ms';
+        var timeHtml = item.time ? '<span class="sb-ann-time">' + item.time + '</span>' : '';
+        el.innerHTML =
+          '<span class="sb-ann-emoji">' + (item.emoji || '📢') + '</span>' +
+          '<div class="sb-ann-text">' + item.text + timeHtml + '</div>';
+        list.appendChild(el);
+      });
+      window.AzDash.setSidebarBadge(key, items.length, items.some(function (it) { return it.unread; }));
+    },
+
+    /* ─────────────── 18. SIDEBAR BADGE UPDATE ───────────── */
+    setSidebarBadge: function (key, count, hasUnread) {
+      var badge = document.getElementById('sba-' + key + '-badge');
+      var dot = document.getElementById('sba-' + key + '-dot');
+      if (badge) {
+        if (count > 0) {
+          badge.textContent = String(count);
+          badge.style.display = 'inline-flex';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+      if (dot) {
+        dot.style.display = hasUnread ? 'block' : 'none';
+      }
     }
   };
 
   /* ─────────────── 11. AUTO INIT ENHANCEMENTS ─────────── */
   function autoInitHero() {
+    // -1) SIDEBAR ACCORDIONS init (data-open-default + localStorage)
+    try { window.AzDash.initSidebarAccordions(); } catch (e) {}
+
     // 0) ADVANCED STATS toggle + event wiring
     var advBtn = document.getElementById('az-adv-toggle');
     if (advBtn) {

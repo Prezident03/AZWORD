@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8"/>
@@ -1179,114 +1179,179 @@
     </a>
   </nav>
 
-  <div class="sb-streak" onclick="window.location.href='streak.html'">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-    <div>
-      <div class="sb-streak-num"><span id="sb-streak">0</span> kun</div>
-      <div class="sb-streak-label">Ketma-ket streak</div>
-    </div>
-    <div class="sb-streak-arrow">›</div>
-  </div>
+  <!-- ══════════════ PREMIUM SIDEBAR ACCORDIONS ══════════════ -->
+  <div class="sb-accordions-col">
 
-  <!-- ══════════════ PREMIUM SIDEBAR WIDGETS ══════════════ -->
-  <div class="sb-widgets-col">
+    <!-- ACC-1: STATISTIKA (Level XP + Week Streak + 3 Mini Stat) -->
+    <div class="sb-accordion" data-sb-acc="stats" data-open-default="true">
+      <button class="sb-acc-toggle" aria-expanded="false">
+        <div class="sb-acc-icon" style="color:#60a5fa">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        </div>
+        <div class="sb-acc-title">Statistika</div>
+        <div class="sb-acc-badges">
+          <span class="sb-acc-badge b-blue" id="sba-stats-badge">3</span>
+          <span class="sb-acc-ann-dot" id="sba-stats-dot" style="display:none"></span>
+        </div>
+        <div class="sb-acc-chev">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </button>
+      <div class="sb-acc-body" hidden>
+        <div class="sb-acc-ann-list" id="sba-stats-ann"></div>
 
-    <!-- W1: LEVEL XP PROGRESS -->
-    <div class="sb-widget sb-widget-level">
-      <div class="sb-w-head">
-        <div class="sb-w-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Daraja
-        </div>
-        <span class="sb-w-lvl-num" id="sbw-level">LVL 1</span>
-      </div>
-      <div class="sb-w-xp-row">
-        <span id="sbw-xp-current">0</span> / <span id="sbw-xp-total">500</span> XP
-      </div>
-      <div class="sb-w-xp-bar"><div class="sb-w-xp-fill" id="sbw-xp-fill" style="width:0%"></div></div>
-    </div>
-
-    <!-- W2: WEEK STREAK HEATMAP MINI -->
-    <div class="sb-widget sb-widget-week" onclick="window.location.href='streak.html'">
-      <div class="sb-w-head">
-        <div class="sb-w-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
-          Haftalik
-        </div>
-        <span class="sb-w-tag">7 kun</span>
-      </div>
-      <div class="sb-week-bars" id="sb-week-bars"></div>
-    </div>
-
-    <!-- W3: WEEKLY STATS MINI -->
-    <div class="sb-widget sb-widget-stat">
-      <div class="sb-w-head">
-        <div class="sb-w-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
-          Bu hafta
-        </div>
-      </div>
-      <div class="sb-w-3stats">
-        <div class="sb-w3-col">
-          <div class="sb-w3-val" id="sbw-week-words">183</div>
-          <div class="sb-w3-lbl">So'z</div>
-        </div>
-        <div class="sb-w3-col">
-          <div class="sb-w3-val" id="sbw-week-hours">9h</div>
-          <div class="sb-w3-lbl">Vaqt</div>
-        </div>
-        <div class="sb-w3-col">
-          <div class="sb-w3-val" id="sbw-week-acc">92%</div>
-          <div class="sb-w3-lbl">Aniqlik</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- W4: AI COACH MINI CARD -->
-    <div class="sb-widget sb-widget-ai" onclick="window.AzDash.openAICoach()">
-      <div class="sb-ai-badge">AI BETA</div>
-      <div class="sb-ai-title">AI Coach</div>
-      <div class="sb-ai-msg" id="sb-ai-msg">
-        Bugun 5 ta yangi gap o'rganaylik?
-      </div>
-      <div class="sb-ai-cta">
-        <span>Boshlash</span>
-        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </div>
-    </div>
-
-    <!-- W5: RECENT ACTIVITY MINI (3 items) -->
-    <div class="sb-widget sb-widget-activity">
-      <div class="sb-w-head">
-        <div class="sb-w-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          So'nggilar
-        </div>
-        <button class="sb-w-link" onclick="window.location.href='stats.html'">Barcha</button>
-      </div>
-      <ol class="sbw-timeline">
-        <li>
-          <div class="sbw-tl-dot tl-s"></div>
-          <div class="sbw-tl-body">
-            <div class="sbw-tl-title">18 so'z</div>
-            <div class="sbw-tl-time">IELTS · 5 daq oldin</div>
+        <!-- W1: LEVEL XP PROGRESS -->
+        <div class="sb-widget sb-widget-level">
+          <div class="sb-w-head">
+            <div class="sb-w-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Daraja
+            </div>
+            <span class="sb-w-lvl-num" id="sbw-level">LVL 1</span>
           </div>
-        </li>
-        <li>
-          <div class="sbw-tl-dot tl-g"></div>
-          <div class="sbw-tl-body">
-            <div class="sbw-tl-title">+150 Coins</div>
-            <div class="sbw-tl-time">Streak · 2 soat</div>
+          <div class="sb-w-xp-row">
+            <span id="sbw-xp-current">0</span> / <span id="sbw-xp-total">500</span> XP
           </div>
-        </li>
-        <li>
-          <div class="sbw-tl-dot tl-a"></div>
-          <div class="sbw-tl-body">
-            <div class="sbw-tl-title">AI maslahat</div>
-            <div class="sbw-tl-time">Phrasal verbs · kecha</div>
+          <div class="sb-w-xp-bar"><div class="sb-w-xp-fill" id="sbw-xp-fill" style="width:0%"></div></div>
+        </div>
+
+        <!-- W2: WEEK STREAK HEATMAP MINI -->
+        <div class="sb-widget sb-widget-week" onclick="window.location.href='streak.html'">
+          <div class="sb-w-head">
+            <div class="sb-w-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              Haftalik
+            </div>
+            <span class="sb-w-tag">7 kun</span>
           </div>
-        </li>
-      </ol>
+          <div class="sb-week-bars" id="sb-week-bars"></div>
+        </div>
+
+        <!-- W3: WEEKLY STATS MINI -->
+        <div class="sb-widget sb-widget-stat">
+          <div class="sb-w-head">
+            <div class="sb-w-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+              Bu hafta
+            </div>
+          </div>
+          <div class="sb-w-3stats">
+            <div class="sb-w3-col">
+              <div class="sb-w3-val" id="sbw-week-words">183</div>
+              <div class="sb-w3-lbl">So'z</div>
+            </div>
+            <div class="sb-w3-col">
+              <div class="sb-w3-val" id="sbw-week-hours">9h</div>
+              <div class="sb-w3-lbl">Vaqt</div>
+            </div>
+            <div class="sb-w3-col">
+              <div class="sb-w3-val" id="sbw-week-acc">92%</div>
+              <div class="sb-w3-lbl">Aniqlik</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC-2: MUKOFOTLAR (old sb-streak + AI Coach + So'nggi Activity) -->
+    <div class="sb-accordion" data-sb-acc="rewards" data-open-default="false">
+      <button class="sb-acc-toggle" aria-expanded="false">
+        <div class="sb-acc-icon" style="color:#fbbf24">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+        </div>
+        <div class="sb-acc-title">Mukofotlar</div>
+        <div class="sb-acc-badges">
+          <span class="sb-acc-badge b-gold" id="sba-rewards-badge">3</span>
+          <span class="sb-acc-ann-dot" id="sba-rewards-dot" style="display:none"></span>
+        </div>
+        <div class="sb-acc-chev">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </button>
+      <div class="sb-acc-body" hidden>
+        <div class="sb-acc-ann-list" id="sba-rewards-ann"></div>
+
+        <!-- Streak hero card (old sb-streak) -->
+        <div class="sb-widget sb-widget-streak-hero" onclick="window.location.href='streak.html'">
+          <div class="sb-w-sh-row">
+            <div class="sb-w-sh-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+            </div>
+            <div class="sb-w-sh-txt">
+              <div class="sb-w-sh-num"><span id="sb-streak">0</span> kun</div>
+              <div class="sb-w-sh-lbl">Ketma-ket streak</div>
+            </div>
+            <div class="sb-w-sh-arrow">›</div>
+          </div>
+        </div>
+
+        <!-- W4: AI COACH MINI CARD -->
+        <div class="sb-widget sb-widget-ai" onclick="window.AzDash.openAICoach()">
+          <div class="sb-ai-badge">AI BETA</div>
+          <div class="sb-ai-title">AI Coach</div>
+          <div class="sb-ai-msg" id="sb-ai-msg">
+            Bugun 5 ta yangi gap o'rganaylik?
+          </div>
+          <div class="sb-ai-cta">
+            <span>Boshlash</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+
+        <!-- W5: RECENT ACTIVITY MINI (3 items) -->
+        <div class="sb-widget sb-widget-activity">
+          <div class="sb-w-head">
+            <div class="sb-w-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              So'nggilar
+            </div>
+            <button class="sb-w-link" onclick="window.location.href='stats.html'">Barcha</button>
+          </div>
+          <ol class="sbw-timeline">
+            <li>
+              <div class="sbw-tl-dot tl-s"></div>
+              <div class="sbw-tl-body">
+                <div class="sbw-tl-title">18 so'z</div>
+                <div class="sbw-tl-time">IELTS · 5 daq oldin</div>
+              </div>
+            </li>
+            <li>
+              <div class="sbw-tl-dot tl-g"></div>
+              <div class="sbw-tl-body">
+                <div class="sbw-tl-title">+150 Coins</div>
+                <div class="sbw-tl-time">Streak · 2 soat</div>
+              </div>
+            </li>
+            <li>
+              <div class="sbw-tl-dot tl-a"></div>
+              <div class="sbw-tl-body">
+                <div class="sbw-tl-title">AI maslahat</div>
+                <div class="sbw-tl-time">Phrasal verbs · kecha</div>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACC-3: YANGILIKLAR (joyiga qolgan turdagi xabarlar) -->
+    <div class="sb-accordion" data-sb-acc="news" data-open-default="false">
+      <button class="sb-acc-toggle" aria-expanded="false">
+        <div class="sb-acc-icon" style="color:#a78bfa">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </div>
+        <div class="sb-acc-title">Yangiliklar</div>
+        <div class="sb-acc-badges">
+          <span class="sb-acc-badge b-purple" id="sba-news-badge" style="display:none">0</span>
+          <span class="sb-acc-ann-dot" id="sba-news-dot" style="display:none"></span>
+        </div>
+        <div class="sb-acc-chev">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </button>
+      <div class="sb-acc-body" hidden>
+        <div class="sb-acc-ann-list" id="sba-news-ann"></div>
+      </div>
     </div>
 
   </div>
@@ -1956,20 +2021,75 @@ window.deleteFolder = async (e, id) => {
   await loadFolders();
 };
 
+function formatTimeAgo(ts) {
+  try {
+    const t = (ts && (ts.toDate ? ts.toDate() : new Date(ts))) || null;
+    if (!t || isNaN(t.getTime())) return '';
+    const diff = Math.max(0, (Date.now() - t.getTime()) / 1000);
+    if (diff < 60) return 'Hozir';
+    if (diff < 3600) return Math.floor(diff / 60) + ' daqiqa oldin';
+    if (diff < 86400) return Math.floor(diff / 3600) + ' soat oldin';
+    if (diff < 7 * 86400) return Math.floor(diff / 86400) + ' kun oldin';
+    return t.toLocaleDateString('uz-UZ', { day: '2-digit', month: 'short' });
+  } catch (e) { return ''; }
+}
+
+function categorizeAnnouncement(dat) {
+  if (dat && dat.category && ['stats','rewards','news','warning','gift','update'].includes(dat.category)) {
+    return dat.category;
+  }
+  const e = (dat && (dat.emoji || '') + ' ' + (dat.text || '')).toLowerCase();
+  if (/[🎁🏆🎖️⭐🌟💎🪙]|mukofot|yutuq|sovg[’\']|tangalar?|coin|star|streak|lvl|level|xp|badge|trophy/i.test(e)) return 'rewards';
+  if (/[📊📈📉⏱️🕒⏰]|statistik|progress|aniqlik|soat|vaqt|hafta|oy|topshir|ko[’\']rsatkich|kpi|study|o[qg]ilgan|so[’\']z/i.test(e)) return 'stats';
+  if (/[⚠️❗❕🔔]|eslatma|ogohlantirish|tavsiya|holati|avval|eslat/i.test(e)) return 'warning';
+  if (/[🚀✨🎉🎊🔥💡]|yangilanish|yangilik|yangi|narsa|hozirgina|chiqdi|qo[’\']shildi|versiya|beta/i.test(e)) return 'update';
+  return 'news';
+}
+
+function accKeyForCategory(cat) {
+  if (cat === 'stats' || cat === 'warning') return 'stats';
+  if (cat === 'rewards' || cat === 'gift') return 'rewards';
+  return 'news';
+}
+
 async function loadAnnouncements() {
   try {
-    const snap = await getDocs(query(collection(db,'announcements'), orderBy('createdAt','desc'), limit(5)));
+    const snap = await getDocs(query(collection(db,'announcements'), orderBy('createdAt','desc'), limit(10)));
     const banner = document.getElementById('announce-banner');
-    if (!banner || snap.empty) return;
-    banner.innerHTML = '';
-    const typeClass = {'🎉':'type-yangilik','⚠️':'type-ogohlantirish','🎁':'type-sovga','🔔':'type-eslatma','🚀':'type-yangilanish'};
+
+    const grouped = { stats: [], rewards: [], news: [] };
+
     snap.forEach(d => {
-      const dat = d.data();
-      const div = document.createElement('div');
-      div.className = `announce-item-banner ${typeClass[dat.emoji]||'type-yangilik'}`;
-      div.innerHTML = `<span class="announce-emoji">${dat.emoji||'📢'}</span><span>${dat.text}</span><button class="announce-close" onclick="this.parentElement.remove()">✕</button>`;
-      banner.appendChild(div);
+      const dat = d.data() || {};
+      const cat = categorizeAnnouncement(dat);
+      const accKey = accKeyForCategory(cat);
+      grouped[accKey].push({
+        emoji: dat.emoji || '📢',
+        text: dat.text || '',
+        type: cat,
+        time: formatTimeAgo(dat.createdAt),
+        unread: dat.unread !== false,
+        _bannerType: dat.emoji
+      });
     });
+
+    if (window.AzDash && window.AzDash.setSidebarAnnouncements) {
+      window.AzDash.setSidebarAnnouncements('stats',   grouped.stats);
+      window.AzDash.setSidebarAnnouncements('rewards', grouped.rewards);
+      window.AzDash.setSidebarAnnouncements('news',    grouped.news);
+    }
+
+    if (banner) {
+      banner.innerHTML = '';
+      const typeClass = {'🎉':'type-yangilik','⚠️':'type-ogohlantirish','🎁':'type-sovga','🔔':'type-eslatma','🚀':'type-yangilanish'};
+      const topList = [...grouped.rewards, ...grouped.stats, ...grouped.news].slice(0, 3);
+      topList.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `announce-item-banner ${typeClass[item._bannerType]||'type-yangilik'}`;
+        div.innerHTML = `<span class="announce-emoji">${item.emoji}</span><span>${item.text}</span><button class="announce-close" onclick="this.parentElement.remove()">✕</button>`;
+        banner.appendChild(div);
+      });
+    }
   } catch(e) {}
 }
 
