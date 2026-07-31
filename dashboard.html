@@ -2009,6 +2009,7 @@ onAuthStateChanged(auth, async user => {
   }
 
   try { await loadUserStats(user.uid); } catch (err) { console.error('loadUserStats failed', err); }
+  try { await loadBooks(); } catch (err) { console.error('loadBooks failed', err); }
   try { await loadFolders(); } catch (err) { console.error('loadFolders failed', err); }
   try { await loadAnnouncements(); } catch (err) { console.error('loadAnnouncements failed', err); }
   try { checkNotificationStatus(); } catch (err) { console.error('checkNotificationStatus failed', err); }
