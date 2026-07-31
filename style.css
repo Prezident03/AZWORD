@@ -3346,19 +3346,25 @@ html.az-no-cursor-glow #az-follow-light {
   align-items: baseline;
   flex-wrap: wrap;
   font-family: var(--font-display, 'Space Grotesk', sans-serif);
-  font-size: 1.05rem;
-  color: var(--text-muted, #9ca3af);
-  font-weight: 600;
+  font-size: 1.55rem;
+  color: var(--text-main, #e7e7ff);
+  font-weight: 800;
   margin-bottom: 3px;
+}
+#hm-greeting {
+  opacity: 0.95;
 }
 #hm-name {
   margin-left: 6px;
   font-weight: 800;
-  font-size: 1.12rem;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  letter-spacing: 0.1px;
+  display: inline-block;
   color: var(--primary-light, #a78bfa);
-  text-shadow: 0 10px 30px rgba(124,58,237,0.35);
+  text-shadow: 0 14px 32px rgba(124,58,237,0.32);
 }
-#hm-emoji { font-size: 1.2rem; filter: drop-shadow(0 2px 6px rgba(251,191,36,0.4)); }
+#hm-emoji { font-size: 2rem; filter: drop-shadow(0 10px 24px rgba(251,191,36,0.35)); }
 .az-hm-sub {
   margin: 0 0 14px;
   font-size: 0.82rem;
