@@ -2148,7 +2148,7 @@ async function loadBooks() {
     const snap = await getDocs(query(collection(db, 'books'), orderBy('order', 'asc')));
     const grid = document.getElementById('books-grid');
     if (snap.empty) {
-      grid.innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Hozircha kitoblar yo''q</p></div>';
+      grid.innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Hozircha kitoblar yo\'q</p></div>';
       return;
     }
     grid.innerHTML = '';
@@ -2157,12 +2157,12 @@ async function loadBooks() {
       const card = document.createElement('div');
       card.className = 'book-card';
       card.onclick = function() { window.location.href = 'book.html?id=' + d.id; };
-      card.innerHTML = '<img class="book-cover-img" src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=''logo.png''"/>' +
+      card.innerHTML = '<img class="book-cover-img" src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=\'logo.png\'"/>' +
         '<div class="book-card-info">' +
         '<div class="book-card-title">' + (b.title || 'Kitob') + '</div>' +
         '<div class="book-card-meta">' + (b.topicCount || 0) + ' ta mavzu</div>' +
         '</div>' +
-        '<div class="book-card-badge">' + (b.wordCount || 0) + ' so''z</div>';
+        '<div class="book-card-badge">' + (b.wordCount || 0) + ' so\'z</div>';
       grid.appendChild(card);
     });
   } catch(e) {
