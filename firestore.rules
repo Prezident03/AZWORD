@@ -131,6 +131,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // ---------------- BOOKS (kitoblar: mavzular va so'zlar) ----------------
+    match /books/{bookId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+
+      match /topics/{topicId} {
+        allow read: if isSignedIn();
+        allow write: if isAdmin();
+
+        match /words/{wordId} {
+          allow read: if isSignedIn();
+          allow write: if isAdmin();
+        }
+      }
+    }
+
     // Standart: hech narsaga ruxsat yo'q
     match /{document=**} {
       allow read, write: if false;
