@@ -197,12 +197,12 @@
     var emojiEl = nameOpts.emojiEl || document.getElementById(nameOpts.emojiId || 'hero-emoji');
     var welcomeEl = nameOpts.welcomeEl || document.getElementById(nameOpts.welcomeId || 'hero-welcome-name');
 
-    var time = 'Hayrli tong,';
+    var time = 'Good morning,';
     var emoji = '🌅';
-    if (hour >= 5 && hour < 12) { time = 'Hayrli tong,'; emoji = '🌅'; }
-    else if (hour >= 12 && hour < 16) { time = 'Hayrli kun,'; emoji = '☀️'; }
-    else if (hour >= 16 && hour < 20) { time = 'Hayrli kech,'; emoji = '🌆'; }
-    else { time = 'Hayrli tun,'; emoji = '🌙'; }
+    if (hour >= 5 && hour < 12) { time = 'Good morning,'; emoji = '🌅'; }
+    else if (hour >= 12 && hour < 16) { time = 'Good afternoon,'; emoji = '☀️'; }
+    else if (hour >= 16 && hour < 20) { time = 'Good evening,'; emoji = '🌆'; }
+    else { time = 'Good day,'; emoji = '🌙'; }
 
     if (greetingEl) greetingEl.textContent = time;
     if (emojiEl) { emojiEl.textContent = emoji; emojiEl.setAttribute('aria-label', ''); }

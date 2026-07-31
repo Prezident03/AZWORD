@@ -3351,7 +3351,13 @@ html.az-no-cursor-glow #az-follow-light {
   font-weight: 600;
   margin-bottom: 3px;
 }
-#hm-name { font-weight: 700; font-size: 1.12rem; }
+#hm-name {
+  margin-left: 6px;
+  font-weight: 800;
+  font-size: 1.12rem;
+  color: var(--primary-light, #a78bfa);
+  text-shadow: 0 10px 30px rgba(124,58,237,0.35);
+}
 #hm-emoji { font-size: 1.2rem; filter: drop-shadow(0 2px 6px rgba(251,191,36,0.4)); }
 .az-hm-sub {
   margin: 0 0 14px;
