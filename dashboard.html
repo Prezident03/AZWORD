@@ -1466,6 +1466,50 @@
     .az-tl-body span { color: var(--text-muted); }
     .az-tl-item:hover .az-tl-body { transform: translateX(3px); border-color: rgba(124,58,237,0.28); box-shadow: var(--elev-card); }
 
+    /* BOOK CARD premium */
+    .book-card {
+      background: linear-gradient(145deg, rgba(38,32,56,0.75), rgba(26,22,37,0.6));
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 0;
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .book-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      border-color: rgba(167,139,250,0.3);
+      box-shadow: 0 0 50px rgba(124,58,237,0.2), 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .book-cover-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      display: block;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .book-card-info { padding: 14px 16px 16px; }
+    .book-card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .book-card-meta { font-size: 0.75rem; color: var(--text-muted); }
+    .book-card-badge {
+      position: absolute; top: 10px; right: 10px;
+      padding: 4px 10px; border-radius: 99px;
+      background: rgba(124,58,237,0.2);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(124,58,237,0.3);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.68rem; font-weight: 700; color: var(--primary-light);
+    }
   </style>
 </head>
 <body>
@@ -1792,7 +1836,19 @@
       </div>
     </section>
 
-    <!-- ═══════════════════ FOLDERS · darhol keyingi blok ═══════════════════ -->
+        <!-- BOOKS premium kitob kartochkalari -->
+    <div class="section-header" style="margin-top:28px">
+      <div class="section-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        Kitoblar
+      </div>
+    </div>
+    <div class="folders-grid" id="books-grid">
+      <div class="folders-empty" style="min-height:100px">
+        <p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Kitoblar yuklanmoqda...</p>
+      </div>
+    </div>
+<!-- FOLDERS · darhol keyingi blok ═══════════════════ -->
     <div class="section-header">
       <div class="section-title">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
@@ -2085,6 +2141,34 @@ async function loadFolders() {
   } catch (err) { console.warn('loadFolders: admin folders failed', err); }
   renderFolders(mySnap, 'my-folders', false);
   renderFolders(adminSnap, 'admin-folders', true);
+}
+
+async function loadBooks() {
+  try {
+    const snap = await getDocs(query(collection(db, 'books'), orderBy('order', 'asc')));
+    const grid = document.getElementById('books-grid');
+    if (snap.empty) {
+      grid.innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Hozircha kitoblar yo''q</p></div>';
+      return;
+    }
+    grid.innerHTML = '';
+    snap.forEach(d => {
+      const b = d.data();
+      const card = document.createElement('div');
+      card.className = 'book-card';
+      card.onclick = function() { window.location.href = 'book.html?id=' + d.id; };
+      card.innerHTML = '<img class="book-cover-img" src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=''logo.png''"/>' +
+        '<div class="book-card-info">' +
+        '<div class="book-card-title">' + (b.title || 'Kitob') + '</div>' +
+        '<div class="book-card-meta">' + (b.topicCount || 0) + ' ta mavzu</div>' +
+        '</div>' +
+        '<div class="book-card-badge">' + (b.wordCount || 0) + ' so''z</div>';
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    console.error('loadBooks:', e);
+    document.getElementById('books-grid').innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Kitoblar yuklanmadi</p></div>';
+  }
 }
 
 function renderFolders(snap, containerId, isAdmin) {

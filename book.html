@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AzWord — Kitob</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
+  <script src="transition.js"></script>
+  <script src="ripple.js"></script>
+  <script src="cursor-glow.js"></script>
+  <script src="brand.js"></script>
+  <script src="confetti.js"></script>
+  <script src="sound.js"></script>
+  <script src="effects.js"></script>
+  <script src="parallax.js"></script>
+  <style>
+    body { display: flex; min-height: 100vh; background: var(--bg-deep); }
+
+    /* ── SIDEBAR (same as dashboard) ── */
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, rgba(20,17,35,0.98), rgba(15,13,26,0.98));
+      border-right: 1px solid rgba(124,58,237,0.15);
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0;
+      height: 100vh; z-index: 200;
+      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
+      box-shadow: 4px 0 30px rgba(0,0,0,0.3);
+    }
+    .sidebar::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 200px;
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.12), transparent 70%);
+      pointer-events: none;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); border-radius: 99px; }
+    .sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(124,58,237,0.1);
+      display: flex; align-items: center; gap: 10px;
+      position: relative; text-decoration: none;
+    }
+    .sidebar-logo::after {
+      content: ''; position: absolute; bottom: -1px; left: 20px; right: 20px;
+      height: 1px; background: linear-gradient(90deg, transparent, rgba(124,58,237,0.3), transparent);
+    }
+    .sidebar-logo img { height: 28px; width: auto; transition: filter 0.3s; }
+    .sidebar-logo:hover img { filter: drop-shadow(0 0 8px rgba(157,92,246,0.5)); }
+    .sidebar-user {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(124,58,237,0.08);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .sb-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;
+      font-size: 0.95rem; flex-shrink: 0; overflow: hidden;
+      border: 2px solid rgba(124,58,237,0.3);
+    }
+    .sb-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .sb-user-info { flex: 1; min-width: 0; }
+    .sb-user-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-user-sub { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
+    .nav-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); padding: 14px 12px 6px; display: flex; align-items: center; gap: 8px; }
+    .nav-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(139,127,184,0.15), transparent); }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border: none; background: transparent;
+      color: var(--text-muted); font-family: 'Inter', sans-serif;
+      font-size: 0.88rem; font-weight: 500; text-align: left;
+      border-radius: 11px; cursor: pointer; text-decoration: none;
+      line-height: 1; transition: transform 0.25s, background 0.25s, color 0.25s;
+      width: 100%; margin-bottom: 2px;
+    }
+    .nav-item:hover:not(.active) { transform: translateX(4px); background: rgba(124,58,237,0.07); color: var(--text-main); }
+    .nav-item.active { background: linear-gradient(135deg, #6d28d9, #7c3aed, #a855f7); color: #fff; box-shadow: 0 10px 30px rgba(124,58,237,0.35); font-weight: 600; }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .sidebar-bottom { padding: 10px; border-top: 1px solid rgba(124,58,237,0.08); }
+
+    /* ── MAIN ── */
+    .book-main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .book-topbar {
+      padding: 14px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(15,13,26,0.85);
+      backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-left h1 { font-size: 1.3rem; font-weight: 700; }
+    .topbar-left p { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    .stat-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 99px;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700;
+      border: 1.5px solid;
+    }
+    .stat-pill.star { background: var(--gold-glow); border-color: rgba(245,158,11,0.25); color: var(--gold-light); }
+    .stat-pill.coin { background: var(--success-glow); border-color: rgba(16,185,129,0.25); color: var(--success-light); }
+    .profile-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #fff;
+      font-size: 0.95rem; cursor: pointer; overflow: hidden;
+      border: 2px solid rgba(124,58,237,0.3);
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    /* ── BOOK CONTENT ── */
+    .book-content { padding: 32px 28px; max-width: 900px; margin: 0 auto; width: 100%; position: relative; z-index: 2; }
+
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: var(--text-muted); font-size: 0.875rem; cursor: pointer;
+      border: 1.5px solid var(--border); background: rgba(26,22,37,0.5);
+      backdrop-filter: blur(8px); padding: 8px 14px; border-radius: 10px;
+      margin-bottom: 28px; font-family: 'Inter', sans-serif;
+      transition: all 0.25s cubic-bezier(.2,.8,.2,1);
+    }
+    .back-btn:hover { border-color: var(--primary); background: var(--primary-glow); color: var(--primary-light); transform: translateX(-3px); }
+
+    /* ── BOOK HERO ── */
+    .book-hero {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 28px;
+      align-items: start;
+      margin-bottom: 36px;
+      padding: 28px;
+      background: linear-gradient(135deg, rgba(38,32,60,0.8), rgba(22,19,36,0.85));
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(167,139,250,0.18);
+      border-radius: 22px;
+      box-shadow: 0 0 60px rgba(124,58,237,0.15), 0 20px 50px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+    .book-hero::before {
+      content: ''; position: absolute; top: -50%; right: -20%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(124,58,237,0.12), transparent 60%);
+      filter: blur(20px); pointer-events: none;
+    }
+    .book-cover {
+      width: 200px; height: 280px;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .book-cover::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+      animation: bookShine 3s ease-in-out infinite;
+    }
+    @keyframes bookShine { 0%,100% { transform: translateX(-100%); } 50% { transform: translateX(100%); } }
+
+    .book-info { position: relative; z-index: 1; }
+    .book-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem; font-weight: 800;
+      background: linear-gradient(135deg, #fff, #a78bfa 60%, #ec4899);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+    .book-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px; }
+    .book-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .book-stat {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 12px;
+      background: rgba(10,8,20,0.5);
+      border: 1px solid var(--border);
+    }
+    .book-stat-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.2);
+    }
+    .book-stat-val { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text-main); }
+    .book-stat-lbl { font-size: 0.68rem; color: var(--text-dim); font-weight: 600; }
+
+    /* ── TOPICS GRID ── */
+    .topics-section { margin-bottom: 32px; }
+    .topics-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .topics-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .topic-card {
+      background: linear-gradient(145deg, rgba(38,32,56,0.75), rgba(26,22,37,0.6));
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 20px;
+      transition: all 0.35s cubic-bezier(.2,.8,.2,1);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .topic-card::after {
+      content: ''; position: absolute; inset: -1px; z-index: -1;
+      border-radius: inherit; padding: 1.2px;
+      background: conic-gradient(from var(--cb-angle, 0deg), transparent, rgba(124,58,237,0.4), rgba(59,130,246,0.5), rgba(236,72,153,0.4), transparent);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity 0.4s; pointer-events: none;
+    }
+    .topic-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      border-color: rgba(167,139,250,0.3);
+      box-shadow: 0 0 50px rgba(124,58,237,0.2), 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .topic-card:hover::after { opacity: 1; animation: cardBorderRotate 3.6s linear infinite; }
+    @keyframes cardBorderRotate { 0% { --cb-angle: 0deg; } 50% { --cb-angle: 180deg; } 100% { --cb-angle: 360deg; } }
+    @property --cb-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+    .topic-num {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.1));
+      border: 1px solid rgba(124,58,237,0.2);
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem;
+      color: var(--primary-light); margin-bottom: 12px;
+    }
+    .topic-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      color: var(--text-main); margin-bottom: 6px;
+    }
+    .topic-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 14px; }
+    .topic-progress { height: 5px; background: rgba(255,255,255,0.04); border-radius: 99px; overflow: hidden; margin-bottom: 14px; }
+    .topic-progress-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, #7c3aed, #a78bfa, #ec4899);
+      background-size: 200% 100%;
+      animation: tpGlide 3s ease-in-out infinite;
+      width: 0%; transition: width 0.8s cubic-bezier(.2,.8,.2,1);
+    }
+    @keyframes tpGlide { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
+    .topic-btn {
+      width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 16px; border: none; border-radius: 11px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: #fff; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem; font-weight: 700; cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 14px rgba(124,58,237,0.3);
+    }
+    .topic-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); filter: brightness(1.08); }
+    .topic-btn:active { transform: translateY(0); }
+
+    .book-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .book-empty svg { margin-bottom: 16px; opacity: 0.3; }
+    .book-loading { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+
+    /* ── MOBILE ── */
+    .sb-mobile-toggle { display: none; }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .book-main { margin-left: 0; }
+      .sb-mobile-toggle {
+        display: flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px; border: 1.5px solid var(--border);
+        border-radius: 9px; background: transparent; cursor: pointer;
+        color: var(--text-muted);
+      }
+      .book-hero { grid-template-columns: 1fr; text-align: center; }
+      .book-cover { margin: 0 auto; }
+      .book-stats { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a class="sidebar-logo" href="dashboard.html">
+    <img src="logo.png" alt="AzWord">
+  </a>
+  <div class="sidebar-user">
+    <div class="sb-avatar" id="sb-avatar">A</div>
+    <div class="sb-user-info">
+      <div class="sb-user-name" id="sb-name">Foydalanuvchi</div>
+      <div class="sb-user-sub" id="sb-email">email@example.com</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Asosiy</div>
+    <a class="nav-item" href="dashboard.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Bosh sahifa
+    </a>
+    <a class="nav-item" href="folders.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+      Mening bo'limlarim
+    </a>
+    <a class="nav-item active" href="vocabulary.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Umumiy bo'lim
+    </a>
+    <a class="nav-item" href="flashcards.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+      Flesh-kartalar
+    </a>
+
+    <div class="nav-label">Tahlil</div>
+    <a class="nav-item" href="stats.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Statistika
+    </a>
+    <a class="nav-item" href="streak.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+      Streak
+    </a>
+    <a class="nav-item" href="leaderboard.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+      Reyting
+    </a>
+
+    <div class="nav-label">Boshqa</div>
+    <a class="nav-item" href="shop.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      Do'kon
+    </a>
+    <a class="nav-item" href="ai.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></svg>
+      AI Yordamchi
+    </a>
+    <a class="nav-item" href="profile.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+      Profil
+    </a>
+    <a class="nav-item" href="settings.html">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Sozlamalar
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <button class="nav-item" onclick="window.location.href='index.html'" style="color: var(--danger);">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Chiqish
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="book-main">
+  <div class="book-topbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button class="sb-mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <div class="topbar-left">
+        <h1 id="topbar-title">Kitob</h1>
+        <p id="topbar-sub">Mavzular va so'zlar</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="stat-pill star">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="nav-stars">0</span>
+      </div>
+      <div class="stat-pill coin">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+        <span id="nav-coins">0</span>
+      </div>
+      <div class="profile-avatar" id="nav-avatar" onclick="window.location.href='profile.html'" style="cursor:pointer">A</div>
+    </div>
+  </div>
+
+  <div class="book-content">
+    <button class="back-btn" onclick="window.location.href='vocabulary.html'">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+      Umumiy bo'limga qaytish
+    </button>
+
+    <div id="book-loading" class="book-loading">
+      <p>Kitob yuklanmoqda...</p>
+    </div>
+
+    <div id="book-content" style="display:none">
+      <!-- BOOK HERO -->
+      <div class="book-hero">
+        <div class="book-cover">
+          <img id="book-image" src="" alt="Kitob">
+        </div>
+        <div class="book-info">
+          <h1 class="book-title" id="book-title">Kitob nomi</h1>
+          <p class="book-desc" id="book-desc">Tavsif</p>
+          <div class="book-stats">
+            <div class="book-stat">
+              <div class="book-stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+              </div>
+              <div>
+                <div class="book-stat-val" id="book-topic-count">0</div>
+                <div class="book-stat-lbl">Mavzular</div>
+              </div>
+            </div>
+            <div class="book-stat">
+              <div class="book-stat-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+              </div>
+              <div>
+                <div class="book-stat-val" id="book-word-count">0</div>
+                <div class="book-stat-lbl">So'zlar</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOPICS -->
+      <div class="topics-section">
+        <div class="topics-header">
+          <div class="topics-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            Mavzular
+          </div>
+        </div>
+        <div class="topics-grid" id="topics-grid">
+          <!-- Topics will be loaded here -->
+        </div>
+      </div>
+    </div>
+
+    <div id="book-empty" class="book-empty" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+      <p>Kitob topilmadi yoki mavzular yo'q.</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { auth, db } from './firebase.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, getDocs, doc, getDoc,
+  query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const params = new URLSearchParams(window.location.search);
+const bookId = params.get('id');
+
+onAuthStateChanged(auth, async user => {
+  if (!user) return location.href = 'index.html';
+
+  // Load user data
+  try {
+    const ud = await getDoc(doc(db, 'users', user.uid));
+    if (ud.exists()) {
+      const d = ud.data();
+      document.getElementById('nav-stars').textContent = d.stars || 0;
+      document.getElementById('nav-coins').textContent = d.coins || 0;
+      document.getElementById('sb-name').textContent = user.displayName || 'Foydalanuvchi';
+      document.getElementById('sb-email').textContent = user.email || '';
+      if (d.photoBase64) {
+        document.getElementById('nav-avatar').innerHTML = `<img src="${d.photoBase64}">`;
+        document.getElementById('sb-avatar').innerHTML = `<img src="${d.photoBase64}">`;
+      } else {
+        const initial = (user.displayName || user.email || 'A').charAt(0).toUpperCase();
+        document.getElementById('nav-avatar').textContent = initial;
+        document.getElementById('sb-avatar').textContent = initial;
+      }
+    }
+  } catch(e) {}
+
+  if (!bookId) {
+    document.getElementById('book-loading').style.display = 'none';
+    document.getElementById('book-empty').style.display = 'block';
+    return;
+  }
+
+  try {
+    // Load book data
+    const bookDoc = await getDoc(doc(db, 'books', bookId));
+    if (!bookDoc.exists()) {
+      document.getElementById('book-loading').style.display = 'none';
+      document.getElementById('book-empty').style.display = 'block';
+      return;
+    }
+
+    const book = bookDoc.data();
+    document.getElementById('book-title').textContent = book.title || 'Kitob';
+    document.getElementById('book-desc').textContent = book.description || '';
+    document.getElementById('book-image').src = book.imageUrl || 'logo.png';
+    document.getElementById('topbar-title').textContent = book.title || 'Kitob';
+    document.getElementById('topbar-sub').textContent = book.description || 'Mavzular va so\'zlar';
+
+    // Load topics
+    const topicsSnap = await getDocs(query(
+      collection(db, 'books', bookId, 'topics'),
+      orderBy('order', 'asc')
+    ));
+
+    const topics = [];
+    let totalWords = 0;
+    topicsSnap.forEach(d => {
+      topics.push({ id: d.id, ...d.data() });
+    });
+
+    document.getElementById('book-topic-count').textContent = topics.length;
+    document.getElementById('book-word-count').textContent = book.wordCount || totalWords;
+
+    document.getElementById('book-loading').style.display = 'none';
+    document.getElementById('book-content').style.display = 'block';
+
+    // Render topics
+    const grid = document.getElementById('topics-grid');
+    if (topics.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)">Hozircha mavzular yo\'q</div>';
+      return;
+    }
+
+    grid.innerHTML = '';
+    topics.forEach((topic, i) => {
+      const card = document.createElement('div');
+      card.className = 'topic-card';
+      card.innerHTML = `
+        <div class="topic-num">${i + 1}</div>
+        <div class="topic-name">${topic.title || 'Mavzu ' + (i+1)}</div>
+        <div class="topic-meta">${topic.wordCount || 0} ta so'z</div>
+        <div class="topic-progress"><div class="topic-progress-fill" style="width:0%"></div></div>
+        <button class="topic-btn" onclick="window.location.href='study.html?book=${bookId}&topic=${topic.id}'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          Practice
+        </button>
+      `;
+      grid.appendChild(card);
+    });
+  } catch(e) {
+    console.error('Book load error:', e);
+    document.getElementById('book-loading').style.display = 'none';
+    document.getElementById('book-empty').style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

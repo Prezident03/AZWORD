@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
@@ -128,6 +128,27 @@
     .modal-overlay.open{display:flex}
     #maintenance-toggle:checked + #toggle-track { background: var(--danger); }
     #maintenance-toggle:checked ~ #toggle-thumb { transform: translateX(20px); }
+        .book-card-admin{background:var(--bg-deep);border:1.5px solid var(--border);border-radius:12px;padding:0;transition:border-color 0.2s,transform 0.15s;cursor:pointer;overflow:hidden}
+    .book-card-admin:hover{border-color:var(--purple-main);transform:translateY(-2px)}
+    .book-card-admin img{width:100%;height:140px;object-fit:cover;display:block;border-bottom:1px solid var(--border)}
+    .book-card-admin .bca-info{padding:14px 16px}
+    .book-card-admin .bca-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.95rem;margin-bottom:4px}
+    .book-card-admin .bca-meta{font-size:0.78rem;color:var(--text-muted)}
+    .book-card-admin .bca-badge{display:inline-flex;margin-top:6px;font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:var(--purple-light)}
+    .topic-card-admin{background:var(--bg-deep);border:1.5px solid var(--border);border-radius:12px;padding:16px;transition:border-color 0.2s;cursor:pointer}
+    .topic-card-admin:hover{border-color:var(--purple-main)}
+    .topic-card-admin .tca-name{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.9rem;margin-bottom:4px}
+    .topic-card-admin .tca-meta{font-size:0.78rem;color:var(--text-muted)}
+    .topic-card-admin .tca-actions{display:flex;gap:6px;margin-top:10px}
+    .word-row-admin{display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--border);font-size:0.875rem}
+    .word-row-admin:last-child{border-bottom:none}
+    .word-row-admin:hover{background:var(--bg-hover)}
+    .wra-num{color:var(--text-dim);font-size:0.75rem;min-width:30px}
+    .wra-en{font-family:'Space Grotesk',sans-serif;font-weight:600;min-width:120px}
+    .wra-uz{color:var(--text-muted);flex:1}
+    .wra-ex{font-size:0.78rem;color:var(--text-dim);font-style:italic;flex:1}
+    .wra-del{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+    .wra-del:hover{border-color:var(--danger);color:var(--danger)}
     @media(max-width:768px){.sidebar{transform:translateX(-100%)}.admin-main{margin-left:0}.charts-grid{grid-template-columns:1fr}.tbl-head,.tbl-row{grid-template-columns:2fr 1fr 1fr 1fr}}
   </style>
 </head>
@@ -151,6 +172,9 @@
     <div class="sb-label">Kontent</div>
     <button class="nav-item" onclick="showPage('folders')">
       <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span> Umumiy bolimlar
+    </button>
+        <button class="nav-item" onclick="showPage('books')">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg></span> Kitoblar
     </button>
     <button class="nav-item" onclick="showPage('aigenerator')">
       <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></span> AI Generator
@@ -196,12 +220,12 @@
     <!-- DASHBOARD -->
     <div id="page-dashboard">
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-users">—</div><div class="stat-label">Foydalanuvchilar</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg></span><span class="stat-tag">bugun</span></div><div class="stat-num" id="s-active">—</div><div class="stat-label">Bugun faol</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-folders">—</div><div class="stat-label">Bolimlar</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-words">—</div><div class="stat-label">Sozlar</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-stars">—</div><div class="stat-label">Yulduzlar</div></div>
-        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-coins">—</div><div class="stat-label">Tangalar</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-users">�</div><div class="stat-label">Foydalanuvchilar</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg></span><span class="stat-tag">bugun</span></div><div class="stat-num" id="s-active">�</div><div class="stat-label">Bugun faol</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-folders">�</div><div class="stat-label">Bolimlar</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-words">�</div><div class="stat-label">Sozlar</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-stars">�</div><div class="stat-label">Yulduzlar</div></div>
+        <div class="stat-card"><div class="stat-top"><span class="stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span><span class="stat-tag">jami</span></div><div class="stat-num" id="s-coins">�</div><div class="stat-label">Tangalar</div></div>
       </div>
       <div class="charts-grid">
         <div class="chart-card"><div class="chart-title"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Top foydalanuvchilar</div><div class="chart-wrap"><canvas id="ch-users"></canvas></div></div>
@@ -250,11 +274,11 @@
           <textarea id="ann-text" placeholder="Elon matnini kiriting..."></textarea>
           <div class="arow">
             <select class="ann-sel" id="ann-emoji">
-              <option value="🎉">🎉 Yangilik</option>
-              <option value="⚠️">⚠️ Ogohlantirish</option>
-              <option value="🎁">🎁 Sovga</option>
-              <option value="🔔">🔔 Eslatma</option>
-              <option value="🚀">🚀 Yangilanish</option>
+              <option value="??">?? Yangilik</option>
+              <option value="??">?? Ogohlantirish</option>
+              <option value="??">?? Sovga</option>
+              <option value="??">?? Eslatma</option>
+              <option value="??">?? Yangilanish</option>
             </select>
             <button class="btn-confirm" onclick="postAnn()" style="padding:8px 20px">Yuborish</button>
           </div>
@@ -269,6 +293,42 @@
         <div class="sec-head"><h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg> Leaderboard</h3></div>
         <div class="tbl-head" style="grid-template-columns:60px 2fr 1fr 1fr 1fr 1fr"><span>#</span><span>Foydalanuvchi</span><span>Stars</span><span>Coins</span><span>Haftalik</span><span>Amal</span></div>
         <div id="lb-list"></div>
+      </div>
+    </div>
+
+        <!-- BOOKS -->
+    <div id="page-books" style="display:none">
+      <div class="sec">
+        <div class="sec-head">
+          <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg> Kitoblar</h3>
+          <button class="btn-add" onclick="openBookModal()" style="padding:8px 16px;font-size:0.85rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Yangi kitob</button>
+        </div>
+        <div class="folder-grid-admin" id="admin-books-grid"></div>
+      </div>
+
+      <!-- Topics section (shown when a book is selected) -->
+      <div id="book-topics-section" class="sec" style="display:none;margin-top:16px">
+        <div class="sec-head">
+          <h3 id="book-topics-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg> Mavzular</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-sm" onclick="closeBookTopics()" style="color:var(--text-muted)">Orqaga</button>
+            <button class="btn-add" onclick="openTopicModal()" style="padding:8px 16px;font-size:0.85rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Mavzu qoshish</button>
+          </div>
+        </div>
+        <div class="folder-grid-admin" id="admin-topics-grid"></div>
+      </div>
+
+      <!-- Words section (shown when a topic is selected) -->
+      <div id="topic-words-section" class="sec" style="display:none;margin-top:16px">
+        <div class="sec-head">
+          <h3 id="topic-words-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Sozlar</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-sm" onclick="closeTopicWords()" style="color:var(--text-muted)">Orqaga</button>
+            <button class="btn-add" onclick="openWordModal()" style="padding:8px 16px;font-size:0.85rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Soz qoshish</button>
+          </div>
+        </div>
+        <div class="tbl-head" style="grid-template-columns:40px 1fr 1fr 1fr 60px"><span>#</span><span>English</span><span>Uzbek</span><span>Example</span><span>Amal</span></div>
+        <div id="admin-words-list"></div>
       </div>
     </div>
 
@@ -510,6 +570,78 @@
   </div>
 </div>
 
+<!-- Book Modal -->
+<div class="modal-overlay" id="book-modal">
+  <div class="modal">
+    <h3 id="book-modal-title">Yangi kitob</h3>
+    <input type="hidden" id="book-id"/>
+    <div class="form-group">
+      <label>Kitob nomi</label>
+      <input type="text" id="book-title" placeholder="English Essential Words 4000"/>
+    </div>
+    <div class="form-group">
+      <label>Tavsif</label>
+      <input type="text" id="book-desc" placeholder="4000 ta eng muhim sozlar"/>
+    </div>
+    <div class="form-group">
+      <label>Rasm URL</label>
+      <input type="text" id="book-image-url" placeholder="https://example.com/cover.jpg"/>
+    </div>
+    <div class="form-group">
+      <label>Tartib (order)</label>
+      <input type="number" id="book-order" placeholder="1" min="1" value="1"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBookModal()">Bekor</button>
+      <button class="btn-confirm" onclick="saveBook()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Topic Modal -->
+<div class="modal-overlay" id="topic-modal">
+  <div class="modal">
+    <h3 id="topic-modal-title">Yangi mavzu</h3>
+    <input type="hidden" id="topic-id"/>
+    <div class="form-group">
+      <label>Mavzu nomi</label>
+      <input type="text" id="topic-title" placeholder="Unit 1 Daily Life"/>
+    </div>
+    <div class="form-group">
+      <label>Tartib (order)</label>
+      <input type="number" id="topic-order" placeholder="1" min="1" value="1"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeTopicModal()">Bekor</button>
+      <button class="btn-confirm" onclick="saveTopic()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
+<!-- Word Modal -->
+<div class="modal-overlay" id="word-modal">
+  <div class="modal">
+    <h3 id="word-modal-title">Yangi soz</h3>
+    <input type="hidden" id="word-id"/>
+    <div class="form-group">
+      <label>English</label>
+      <input type="text" id="word-en" placeholder="abandon"/>
+    </div>
+    <div class="form-group">
+      <label>Uzbek</label>
+      <input type="text" id="word-uz" placeholder="tark etmoq"/>
+    </div>
+    <div class="form-group">
+      <label>Example (ixtiyoriy)</label>
+      <input type="text" id="word-example" placeholder="He abandoned his car"/>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeWordModal()">Bekor</button>
+      <button class="btn-confirm" onclick="saveWord()">Saqlash</button>
+    </div>
+  </div>
+</div>
+
 <!-- Shop Item Modal -->
 <div class="modal-overlay" id="shop-item-modal">
   <div class="modal">
@@ -613,6 +745,214 @@ import {
 import { icon, fromEmoji, starIcon, coinIcon, flameIcon, folderIcon, iconPickerHtml, PATHS, escapeHtml } from './icons.js';
 
 const ADMIN = "abdurasul1406z@gmail.com";
+// BOOKS
+let selBookId = null, selTopicId = null;
+
+async function loadBooks() {
+  const grid = document.getElementById('admin-books-grid');
+  try {
+    const snap = await getDocs(query(collection(db, 'books'), orderBy('order', 'asc')));
+    if (snap.empty) {
+      grid.innerHTML = '<div class="afc" style="grid-column:1/-1;text-align:center;padding:30px;cursor:default;opacity:0.6"><p style="font-size:1rem;margin-bottom:6px">Hozircha kitoblar yo\'q</p><p style="font-size:0.85rem;color:var(--text-muted)">Yangi kitob qo\'shish uchun yuqoridagi tugmani bosing</p></div>';
+      return;
+    }
+    grid.innerHTML = '';
+    snap.forEach(d => {
+      const b = d.data();
+      const card = document.createElement('div');
+      card.className = 'book-card-admin';
+      card.innerHTML = '<img src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=\'logo.png\'"/>' +
+        '<div class="bca-info">' +
+        '<div class="bca-name">' + (b.title || 'Kitob') + '</div>' +
+        '<div class="bca-meta">' + (b.description || '') + '</div>' +
+        '<div><span class="bca-badge">' + (b.topicCount || 0) + ' mavzu</span> <span class="bca-badge">' + (b.wordCount || 0) + ' so\'z</span></div>' +
+        '</div>';
+      card.onclick = function() { openBookTopics(d.id, b.title); };
+      grid.appendChild(card);
+    });
+  } catch(e) { console.error('loadBooks:', e); }
+}
+
+window.openBookModal = function() {
+  document.getElementById('book-id').value = '';
+  document.getElementById('book-title').value = '';
+  document.getElementById('book-desc').value = '';
+  document.getElementById('book-image-url').value = '';
+  document.getElementById('book-order').value = '1';
+  document.getElementById('book-modal-title').textContent = 'Yangi kitob';
+  document.getElementById('book-modal').classList.add('open');
+};
+
+window.closeBookModal = function() {
+  document.getElementById('book-modal').classList.remove('open');
+};
+
+window.saveBook = async function() {
+  const id = document.getElementById('book-id').value;
+  const data = {
+    title: document.getElementById('book-title').value.trim(),
+    description: document.getElementById('book-desc').value.trim(),
+    imageUrl: document.getElementById('book-image-url').value.trim(),
+    order: parseInt(document.getElementById('book-order').value) || 1,
+    updatedAt: serverTimestamp()
+  };
+  if (!data.title) { toast('Kitob nomini kiriting', true); return; }
+  try {
+    if (id) { await updateDoc(doc(db, 'books', id), data); toast('Kitob yangilandi'); }
+    else { await addDoc(collection(db, 'books'), { ...data, topicCount: 0, wordCount: 0, createdAt: serverTimestamp() }); toast('Kitob qoshildi'); }
+    closeBookModal();
+    loadBooks();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+};
+
+window.openBookTopics = async function(bookId, title) {
+  selBookId = bookId;
+  document.getElementById('book-topics-title').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg> ' + title + ' - Mavzular';
+  document.getElementById('book-topics-section').style.display = 'block';
+  document.getElementById('topic-words-section').style.display = 'none';
+  await loadTopics();
+};
+
+window.closeBookTopics = function() {
+  selBookId = null;
+  document.getElementById('book-topics-section').style.display = 'none';
+  document.getElementById('topic-words-section').style.display = 'none';
+};
+
+async function loadTopics() {
+  const grid = document.getElementById('admin-topics-grid');
+  if (!selBookId) { grid.innerHTML = ''; return; }
+  try {
+    const snap = await getDocs(query(collection(db, 'books', selBookId, 'topics'), orderBy('order', 'asc')));
+    if (snap.empty) {
+      grid.innerHTML = '<div class="afc" style="grid-column:1/-1;text-align:center;padding:30px;cursor:default;opacity:0.6"><p style="font-size:0.9rem;color:var(--text-muted)">Hozircha mavzular yo\'q</p></div>';
+      return;
+    }
+    grid.innerHTML = '';
+    snap.forEach(d => {
+      const t = d.data();
+      const card = document.createElement('div');
+      card.className = 'topic-card-admin';
+      card.innerHTML = '<div class="tca-name">' + (t.title || 'Mavzu') + '</div>' +
+        '<div class="tca-meta">' + (t.wordCount || 0) + ' ta so\'z</div>' +
+        '<div class="tca-actions">' +
+        '<button class="abtn" onclick="event.stopPropagation();openTopicTopics(\'' + d.id + '\',\'' + (t.title || '') + '\')" title="Sozlar"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></button>' +
+        '<button class="abtn red" onclick="event.stopPropagation();deleteTopic(\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>' +
+        '</div>';
+      card.onclick = function() { openTopicTopics(d.id, t.title); };
+      grid.appendChild(card);
+    });
+  } catch(e) { console.error('loadTopics:', e); }
+}
+
+window.openTopicModal = function() {
+  document.getElementById('topic-id').value = '';
+  document.getElementById('topic-title').value = '';
+  document.getElementById('topic-order').value = '1';
+  document.getElementById('topic-modal-title').textContent = 'Yangi mavzu';
+  document.getElementById('topic-modal').classList.add('open');
+};
+
+window.closeTopicModal = function() {
+  document.getElementById('topic-modal').classList.remove('open');
+};
+
+window.saveTopic = async function() {
+  const id = document.getElementById('topic-id').value;
+  const data = {
+    title: document.getElementById('topic-title').value.trim(),
+    order: parseInt(document.getElementById('topic-order').value) || 1,
+    wordCount: 0
+  };
+  if (!data.title || !selBookId) { toast('Mavzu nomini kiriting', true); return; }
+  try {
+    if (id) { await updateDoc(doc(db, 'books', selBookId, 'topics', id), data); toast('Mavzu yangilandi'); }
+    else { await addDoc(collection(db, 'books', selBookId, 'topics'), { ...data, createdAt: serverTimestamp() }); toast('Mavzu qoshildi'); }
+    closeTopicModal();
+    loadTopics();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+};
+
+window.deleteTopic = async function(topicId) {
+  if (!confirm('Mavzuni ochirishni istaysizmi?')) return;
+  try { await deleteDoc(doc(db, 'books', selBookId, 'topics', topicId)); loadTopics(); toast('Mavzu ochirildi'); }
+  catch(e) { toast('Xato: ' + e.message, true); }
+};
+
+// WORDS
+window.openTopicTopics = async function(topicId, title) {
+  selTopicId = topicId;
+  document.getElementById('topic-words-title').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> ' + (title || '') + ' - Sozlar';
+  document.getElementById('topic-words-section').style.display = 'block';
+  await loadWords();
+};
+
+window.closeTopicWords = function() {
+  selTopicId = null;
+  document.getElementById('topic-words-section').style.display = 'none';
+};
+
+async function loadWords() {
+  const list = document.getElementById('admin-words-list');
+  if (!selBookId || !selTopicId) { list.innerHTML = ''; return; }
+  try {
+    const snap = await getDocs(query(collection(db, 'books', selBookId, 'topics', selTopicId, 'words'), orderBy('order', 'asc')));
+    if (snap.empty) {
+      list.innerHTML = '<div class="word-row-admin" style="justify-content:center;padding:20px;color:var(--text-muted)">Hozircha sozlar yoq</div>';
+      return;
+    }
+    list.innerHTML = '';
+    let i = 0;
+    snap.forEach(d => {
+      const w = d.data();
+      const row = document.createElement('div');
+      row.className = 'word-row-admin';
+      row.innerHTML = '<div class="wra-num">' + (++i) + '</div>' +
+        '<div class="wra-en">' + (w.en || '') + '</div>' +
+        '<div class="wra-uz">' + (w.uz || '') + '</div>' +
+        '<div class="wra-ex">' + (w.example || '') + '</div>' +
+        '<button class="wra-del" onclick="deleteWord(\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>';
+      list.appendChild(row);
+    });
+  } catch(e) { console.error('loadWords:', e); }
+}
+
+window.openWordModal = function() {
+  document.getElementById('word-id').value = '';
+  document.getElementById('word-en').value = '';
+  document.getElementById('word-uz').value = '';
+  document.getElementById('word-example').value = '';
+  document.getElementById('word-modal-title').textContent = 'Yangi soz';
+  document.getElementById('word-modal').classList.add('open');
+};
+
+window.closeWordModal = function() {
+  document.getElementById('word-modal').classList.remove('open');
+};
+
+window.saveWord = async function() {
+  const id = document.getElementById('word-id').value;
+  const data = {
+    en: document.getElementById('word-en').value.trim(),
+    uz: document.getElementById('word-uz').value.trim(),
+    example: document.getElementById('word-example').value.trim()
+  };
+  if (!data.en || !data.uz) { toast('English va Uzbek kiriting', true); return; }
+  if (!selBookId || !selTopicId) { toast('Mavzu tanlanmagan', true); return; }
+  try {
+    if (id) { await updateDoc(doc(db, 'books', selBookId, 'topics', selTopicId, 'words', id), data); }
+    else { await addDoc(collection(db, 'books', selBookId, 'topics', selTopicId, 'words'), { ...data, order: 0, createdAt: serverTimestamp() }); }
+    closeWordModal();
+    loadWords();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+};
+
+window.deleteWord = async function(wordId) {
+  if (!confirm('Sozni ochirishni istaysizmi?')) return;
+  try { await deleteDoc(doc(db, 'books', selBookId, 'topics', selTopicId, 'words', wordId)); loadWords(); toast('Soz ochirildi'); }
+  catch(e) { toast('Xato: ' + e.message, true); }
+};
+
 let users = [], folders = [], selUid = null, selFolder = null, parsedWords = [];
 let charts = {};
 
@@ -753,7 +1093,7 @@ async function loadShopAdmin() {
       <div style="font-weight:700;font-size:0.95rem;margin-bottom:4px">${item.name}</div>
       <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">${item.description||''}</div>
       <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;color:#34d399;display:inline-flex;align-items:center;gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg> ${item.price}</div>
-      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px">${item.category||''} ${item.isNew?'• Yangi':''} ${item.isHot?'• Hot':''}</div>
+      <div style="font-size:0.72rem;color:var(--text-dim);margin-top:4px">${item.category||''} ${item.isNew?'� Yangi':''} ${item.isHot?'� Hot':''}</div>
     `;
     grid.appendChild(card);
   });
@@ -1046,7 +1386,7 @@ async function loadFolders() {
 
 function renderDash() {
   document.getElementById('s-users').textContent = users.length;
-  document.getElementById('s-active').textContent = '—';
+  document.getElementById('s-active').textContent = '�';
   document.getElementById('s-stars').textContent = users.reduce((s,u)=>s+(u.stars||0),0);
   document.getElementById('s-coins').textContent = users.reduce((s,u)=>s+(u.coins||0),0);
   renderCharts();
