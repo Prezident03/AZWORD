@@ -458,7 +458,10 @@
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
-    if (!folderId) window.location.href = 'dashboard.html';
+    const bookId = params.get('book');
+    const topicId = params.get('topic');
+    const isBookMode = !!(bookId && topicId);
+    if (!folderId && !isBookMode) window.location.href = 'dashboard.html';
 
     let words = [];
     let currentStage = 1;
@@ -480,13 +483,16 @@
     });
 
     async function loadWords() {
-      const q = query(collection(db, 'folders', folderId, 'words'), orderBy('createdAt', 'asc'));
+      const wordsRef = isBookMode
+        ? collection(db, 'books', bookId, 'topics', topicId, 'words')
+        : collection(db, 'folders', folderId, 'words');
+      const q = query(wordsRef, orderBy('createdAt', 'asc'));
       const snap = await getDocs(q);
       words = [];
       snap.forEach(d => words.push({ id: d.id, ...d.data() }));
 
       if (words.length === 0) {
-        window.location.href = `folder.html?id=${folderId}`;
+        window.location.href = isBookMode ? `book.html?id=${bookId}` : `folder.html?id=${folderId}`;
         return;
       }
 
@@ -1021,12 +1027,16 @@
       const earnedStars = perfectWords;
       const earnedCoins = allWords.length;
 
+      const resultDocId = isBookMode
+        ? `${currentUser.uid}_${bookId}_${topicId}_${Date.now()}`
+        : `${currentUser.uid}_${folderId}_${Date.now()}`;
+
       try {
         await setDoc(
-          doc(db, 'studyResults', `${currentUser.uid}_${folderId}_${Date.now()}`),
+          doc(db, 'studyResults', resultDocId),
           {
             uid: currentUser.uid,
-            folderId,
+            ...(isBookMode ? { bookId, topicId } : { folderId }),
             completedAt: serverTimestamp(),
             totalWords: allWords.length,
             perfectWords,
@@ -1045,16 +1055,25 @@
       } catch(e) { console.log('stars/coins:', e); }
 
       try {
-        await updateDoc(doc(db, 'folders', folderId), {
-          lastScore: `${perfectWords}/${allWords.length}`,
-          lastStudied: serverTimestamp()
-        });
-      } catch(e) { console.log('folder:', e); }
+        if (isBookMode) {
+          await updateDoc(doc(db, 'books', bookId, 'topics', topicId), {
+            lastScore: `${perfectWords}/${allWords.length}`,
+            lastStudied: serverTimestamp()
+          });
+        } else {
+          await updateDoc(doc(db, 'folders', folderId), {
+            lastScore: `${perfectWords}/${allWords.length}`,
+            lastStudied: serverTimestamp()
+          });
+        }
+      } catch(e) { console.log('progress update:', e); }
 
       sessionStorage.setItem('earnedStars', earnedStars);
       sessionStorage.setItem('earnedCoins', earnedCoins);
 
-      window.location.href = `results.html?id=${folderId}`;
+      window.location.href = isBookMode
+        ? `results.html?book=${bookId}&topic=${topicId}`
+        : `results.html?id=${folderId}`;
     }
 
     function showRoundBanner(count) {

@@ -549,11 +549,16 @@ onAuthStateChanged(auth, async user => {
     topics.forEach((topic, i) => {
       const card = document.createElement('div');
       card.className = 'topic-card';
+      let pct = 0;
+      if (topic.lastScore) {
+        const [done, total] = String(topic.lastScore).split('/').map(Number);
+        if (total > 0) pct = Math.round((done / total) * 100);
+      }
       card.innerHTML = `
         <div class="topic-num">${i + 1}</div>
         <div class="topic-name">${topic.title || 'Mavzu ' + (i+1)}</div>
-        <div class="topic-meta">${topic.wordCount || 0} ta so'z</div>
-        <div class="topic-progress"><div class="topic-progress-fill" style="width:0%"></div></div>
+        <div class="topic-meta">${topic.wordCount || 0} ta so'z${topic.lastScore ? ' &middot; ' + topic.lastScore : ''}</div>
+        <div class="topic-progress"><div class="topic-progress-fill" style="width:${pct}%"></div></div>
         <button class="topic-btn" onclick="window.location.href='study.html?book=${bookId}&topic=${topic.id}'">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
           Practice

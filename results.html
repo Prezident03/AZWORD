@@ -307,6 +307,9 @@
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
+    const bookId = params.get('book');
+    const topicId = params.get('topic');
+    const isBookMode = !!(bookId && topicId);
 
     const resultsRaw = sessionStorage.getItem('studyResults');
     const wordsRaw = sessionStorage.getItem('studyWords');
@@ -410,7 +413,7 @@
         const accuracy = totalWords > 0 ? Math.round((correctWords / totalWords) * 100) : 0;
 
         await addDoc(collection(db, 'users', user.uid, 'studyLog'), {
-          folderId: params.get('id') || '',
+          ...(isBookMode ? { bookId, topicId } : { folderId: params.get('id') || '' }),
           totalWords,
           correctWords,
           accuracy,
@@ -418,10 +421,14 @@
           dateKey: new Date().toISOString().slice(0, 10)
         });
 
+        const wordDocRef = (wordId) => isBookMode
+          ? doc(db, 'books', bookId, 'topics', topicId, 'words', wordId)
+          : doc(db, 'folders', params.get('id') || '', 'words', wordId);
+
         for (const word of words) {
           const r = results[word.id];
           if (r && r.mistakes.length >= 2) {
-            const wordRef = doc(db, 'folders', params.get('id') || '', 'words', word.id);
+            const wordRef = wordDocRef(word.id);
             try {
               await updateDoc(wordRef, {
                 mistakeCount: increment(r.mistakes.length),
@@ -438,12 +445,13 @@
         const perfectWordsList = words.filter(w => results[w.id] && results[w.id].mistakes.length === 0);
         if (perfectWordsList.length === 0) return;
 
-        const folderId = params.get('id');
-        if (!folderId) return;
+        if (!isBookMode && !params.get('id')) return;
 
         let newlyRewarded = 0;
         for (const word of perfectWordsList) {
-          const wordRef = doc(db, 'folders', folderId, 'words', word.id);
+          const wordRef = isBookMode
+            ? doc(db, 'books', bookId, 'topics', topicId, 'words', word.id)
+            : doc(db, 'folders', params.get('id'), 'words', word.id);
           const wordSnap = await getDoc(wordRef);
           if (wordSnap.exists() && !wordSnap.data().rewarded) {
             await updateDoc(wordRef, { rewarded: true });
@@ -565,7 +573,9 @@
     });
 
     window.retry = () => {
-      window.location.href = `study.html?id=${folderId}`;
+      window.location.href = isBookMode
+        ? `study.html?book=${bookId}&topic=${topicId}`
+        : `study.html?id=${folderId}`;
     };
   </script>
 </body>

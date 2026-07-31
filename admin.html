@@ -861,22 +861,34 @@ window.saveTopic = async function() {
   const id = document.getElementById('topic-id').value;
   const data = {
     title: document.getElementById('topic-title').value.trim(),
-    order: parseInt(document.getElementById('topic-order').value) || 1,
-    wordCount: 0
+    order: parseInt(document.getElementById('topic-order').value) || 1
   };
   if (!data.title || !selBookId) { toast('Mavzu nomini kiriting', true); return; }
   try {
-    if (id) { await updateDoc(doc(db, 'books', selBookId, 'topics', id), data); toast('Mavzu yangilandi'); }
-    else { await addDoc(collection(db, 'books', selBookId, 'topics'), { ...data, createdAt: serverTimestamp() }); toast('Mavzu qoshildi'); }
+    if (id) {
+      await updateDoc(doc(db, 'books', selBookId, 'topics', id), data);
+      toast('Mavzu yangilandi');
+    } else {
+      await addDoc(collection(db, 'books', selBookId, 'topics'), { ...data, wordCount: 0, createdAt: serverTimestamp() });
+      await updateDoc(doc(db, 'books', selBookId), { topicCount: increment(1) });
+      toast('Mavzu qoshildi');
+    }
     closeTopicModal();
     loadTopics();
   } catch(e) { toast('Xato: ' + e.message, true); }
 };
 
 window.deleteTopic = async function(topicId) {
-  if (!confirm('Mavzuni ochirishni istaysizmi?')) return;
-  try { await deleteDoc(doc(db, 'books', selBookId, 'topics', topicId)); loadTopics(); toast('Mavzu ochirildi'); }
-  catch(e) { toast('Xato: ' + e.message, true); }
+  if (!confirm('Mavzuni ochirishni istaysizmi? Ichidagi barcha sozlar ham ochiriladi.')) return;
+  try {
+    const wordsSnap = await getDocs(collection(db, 'books', selBookId, 'topics', topicId, 'words'));
+    const wordCount = wordsSnap.size;
+    await Promise.all(wordsSnap.docs.map(w => deleteDoc(w.ref)));
+    await deleteDoc(doc(db, 'books', selBookId, 'topics', topicId));
+    await updateDoc(doc(db, 'books', selBookId), { topicCount: increment(-1), wordCount: increment(-wordCount) });
+    loadTopics();
+    toast('Mavzu ochirildi');
+  } catch(e) { toast('Xato: ' + e.message, true); }
 };
 
 // WORDS
@@ -896,7 +908,7 @@ async function loadWords() {
   const list = document.getElementById('admin-words-list');
   if (!selBookId || !selTopicId) { list.innerHTML = ''; return; }
   try {
-    const snap = await getDocs(query(collection(db, 'books', selBookId, 'topics', selTopicId, 'words'), orderBy('order', 'asc')));
+    const snap = await getDocs(query(collection(db, 'books', selBookId, 'topics', selTopicId, 'words'), orderBy('createdAt', 'asc')));
     if (snap.empty) {
       list.innerHTML = '<div class="word-row-admin" style="justify-content:center;padding:20px;color:var(--text-muted)">Hozircha sozlar yoq</div>';
       return;
@@ -940,8 +952,13 @@ window.saveWord = async function() {
   if (!data.en || !data.uz) { toast('English va Uzbek kiriting', true); return; }
   if (!selBookId || !selTopicId) { toast('Mavzu tanlanmagan', true); return; }
   try {
-    if (id) { await updateDoc(doc(db, 'books', selBookId, 'topics', selTopicId, 'words', id), data); }
-    else { await addDoc(collection(db, 'books', selBookId, 'topics', selTopicId, 'words'), { ...data, order: 0, createdAt: serverTimestamp() }); }
+    if (id) {
+      await updateDoc(doc(db, 'books', selBookId, 'topics', selTopicId, 'words', id), data);
+    } else {
+      await addDoc(collection(db, 'books', selBookId, 'topics', selTopicId, 'words'), { ...data, createdAt: serverTimestamp() });
+      await updateDoc(doc(db, 'books', selBookId, 'topics', selTopicId), { wordCount: increment(1) });
+      await updateDoc(doc(db, 'books', selBookId), { wordCount: increment(1) });
+    }
     closeWordModal();
     loadWords();
   } catch(e) { toast('Xato: ' + e.message, true); }
@@ -949,7 +966,13 @@ window.saveWord = async function() {
 
 window.deleteWord = async function(wordId) {
   if (!confirm('Sozni ochirishni istaysizmi?')) return;
-  try { await deleteDoc(doc(db, 'books', selBookId, 'topics', selTopicId, 'words', wordId)); loadWords(); toast('Soz ochirildi'); }
+  try {
+    await deleteDoc(doc(db, 'books', selBookId, 'topics', selTopicId, 'words', wordId));
+    await updateDoc(doc(db, 'books', selBookId, 'topics', selTopicId), { wordCount: increment(-1) });
+    await updateDoc(doc(db, 'books', selBookId), { wordCount: increment(-1) });
+    loadWords();
+    toast('Soz ochirildi');
+  }
   catch(e) { toast('Xato: ' + e.message, true); }
 };
 
