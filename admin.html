@@ -1577,7 +1577,7 @@ window.openWords = async fid => {
   const tb = document.getElementById('wm-title');
   tb.innerHTML = fromEmoji(f?.emoji||'folder',{size:18}) + ' ' + (f?.name||'Bolim');
   document.getElementById('wmodal').classList.add('open');
-  await loadWords(fid);
+  await loadFolderWords(fid);
 };
 window.closeWords = () => {
   document.getElementById('wmodal').classList.remove('open');
@@ -1591,7 +1591,7 @@ window.closeWords = () => {
   switchTab('manual');
   selFolder=null; parsedWords=[];
 };
-async function loadWords(fid) {
+async function loadFolderWords(fid) {
   const body = document.getElementById('wm-body');
   body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted)">Yuklanmoqda...</div>';
   const snap = await getDocs(query(collection(db,'folders',fid,'words'),orderBy('createdAt','asc')));
@@ -1623,14 +1623,14 @@ window.addWord = async () => {
     document.getElementById('aw-ex').value='';
     document.getElementById('aw-en').focus();
     toast('Qoshildi');
-    await loadWords(selFolder); await loadAdminFolders();
+    await loadFolderWords(selFolder); await loadAdminFolders();
   } catch(e) { toast('Xato: '+e.message, true); }
   finally { if(btn){btn.disabled=false;btn.textContent='Qoshish';} }
 };
 window.delWord = async (fid,wid) => {
   await deleteDoc(doc(db,'folders',fid,'words',wid));
   await updateDoc(doc(db,'folders',fid),{wordCount:increment(-1)});
-  toast('Ochirildi'); await loadWords(fid); await loadAdminFolders();
+  toast('Ochirildi'); await loadFolderWords(fid); await loadAdminFolders();
 };
 
 window.handleFile = async input => {
