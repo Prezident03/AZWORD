@@ -1748,11 +1748,12 @@ window.delAnn = async id => {
   toast('Ochirildi'); await loadAnns();
 };
 
-const PAGES = ['dashboard','users','folders','aigenerator','announce','leaderboard','achievements','shop','settings'];
+const PAGES = ['dashboard','users','folders','books','aigenerator','announce','leaderboard','achievements','shop','settings'];
 const PAGE_ICONS = {
   dashboard: 'bar-chart',
   users: 'users',
   folders: 'book-open',
+  books: 'book-marked',
   aigenerator: 'bot',
   announce: 'megaphone',
   leaderboard: 'trophy',
@@ -1764,6 +1765,7 @@ const PAGE_TITLES = {
   dashboard: 'Dashboard',
   users: 'Foydalanuvchilar',
   folders: 'Umumiy bolimlar',
+  books: 'Kitoblar',
   aigenerator: 'AI Word Generator',
   announce: 'Elonglar',
   leaderboard: 'Leaderboard',
@@ -1780,6 +1782,7 @@ window.showPage = page => {
   const title = PAGE_TITLES[page] || page;
   tb.innerHTML = icon(icName,{size:18}) + ' ' + title;
   if (page==='folders') loadAdminFolders();
+  if (page==='books') loadBooks();
   if (page==='announce') loadAnns();
   if (page==='shop') loadShopAdmin();
   if (page==='achievements') loadAchAdmin();
