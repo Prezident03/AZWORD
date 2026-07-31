@@ -1,0 +1,328 @@
+/* ═══════════════════════════════════════════════════════════
+   PREMIUM PAGES — Universal upgrade for ALL content pages
+   Auto-applies glassmorphism, gradients, glow, animations
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 1. PAGE CONTAINER ── */
+.stats-wrap, .streak-wrap, .ach-wrap, .shop-wrap, .lb-wrap,
+.profile-wrap, .settings-wrap, .ai-wrap, .vocab-wrap, .fc-wrap,
+.study-wrap, .folder-wrap, .results-wrap, .upload-wrap, .quiz-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 28px;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── 2. PAGE HEADER — gradient text ── */
+.stats-header h1, .streak-header h1, .ach-header h1, .shop-header h1,
+.lb-header h1, .profile-header h1, .settings-header h1, .ai-header h1,
+.vocab-header h1, .fc-header h1, .study-header h1, .folder-header h1,
+.results-header h1, .upload-header h1, .quiz-header h1,
+.page-header h1, .content-header h1 {
+  font-size: 2rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #fff 0%, #a78bfa 50%, #ec4899 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  letter-spacing: -0.02em !important;
+  margin-bottom: 8px !important;
+}
+
+.stats-header p, .streak-header p, .ach-header p, .shop-header p,
+.lb-header p, .profile-header p, .settings-header p, .ai-header p,
+.vocab-header p, .fc-header p, .study-header p, .folder-header p,
+.results-header p, .upload-header p, .quiz-header p,
+.page-header p, .content-header p {
+  font-size: 0.92rem !important;
+  color: var(--text-muted) !important;
+}
+
+/* ── 3. BACK BUTTON — premium ── */
+.back-btn {
+  padding: 8px 14px !important;
+  border-radius: 10px !important;
+  border: 1.5px solid var(--border) !important;
+  background: rgba(26,22,37,0.5) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.25s cubic-bezier(.2,.8,.2,1) !important;
+  margin-bottom: 28px !important;
+}
+.back-btn:hover {
+  border-color: var(--primary) !important;
+  background: var(--primary-glow) !important;
+  color: var(--primary-light) !important;
+  transform: translateX(-3px) !important;
+  box-shadow: 0 4px 20px rgba(124,58,237,0.15);
+}
+
+/* ── 4. GLASS CARDS — universal upgrade ── */
+/* Target common card class patterns across all pages */
+.ov-card, .chart-card, .stat-card, .info-card, .detail-card,
+.ach-card, .shop-item, .lb-item, .result-item, .word-item,
+.history-item, .preview-item, .goal-card, .calendar-card,
+.streak-card, .setting-card, .profile-card, .ai-card,
+.vocab-card, .fc-card, .study-card, .folder-card, .quiz-card,
+.upload-card, .section-card, .panel-card, .content-card {
+  background: linear-gradient(145deg, rgba(38,32,56,0.75), rgba(26,22,37,0.6)) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important;
+  transition: all 0.35s cubic-bezier(.2,.8,.2,1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Hover effect for grid cards */
+.ov-card:hover, .ach-card:hover, .shop-item:hover, .goal-card:hover,
+.calendar-card:hover, .streak-card:hover, .vocab-card:hover,
+.fc-card:hover, .folder-card:hover, .quiz-card:hover {
+  transform: translateY(-6px) scale(1.03) !important;
+  border-color: rgba(167,139,250,0.3) !important;
+  box-shadow: 0 0 50px rgba(124,58,237,0.2), 0 20px 50px rgba(0,0,0,0.4) !important;
+}
+
+/* Hover effect for row items (no scale) */
+.lb-item:hover, .result-item:hover, .word-item:hover,
+.history-item:hover, .preview-item:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(167,139,250,0.22) !important;
+  box-shadow: 0 0 40px rgba(124,58,237,0.12), 0 16px 40px rgba(0,0,0,0.35) !important;
+}
+
+/* Chart cards hover */
+.chart-card:hover, .info-card:hover, .detail-card:hover,
+.setting-card:hover, .section-card:hover, .panel-card:hover {
+  border-color: rgba(167,139,250,0.22) !important;
+  box-shadow: 0 0 40px rgba(124,58,237,0.12), 0 16px 40px rgba(0,0,0,0.35) !important;
+}
+
+/* ── 5. ICON CONTAINERS — premium gradient ── */
+.ov-icon, .stat-icon, .card-icon, .header-icon, .ach-icon,
+.shop-icon, .lb-icon, .streak-icon, .goal-icon, .ai-icon,
+.vocab-icon, .fc-icon, .folder-icon, .quiz-icon {
+  width: 48px !important;
+  height: 48px !important;
+  margin: 0 auto 10px !important;
+  border-radius: 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.1)) !important;
+  border: 1px solid rgba(124,58,237,0.2) !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── 6. NUMBERS — gradient text ── */
+.ov-num, .stat-num, .card-num, .ach-num, .shop-num, .lb-num,
+.streak-num, .goal-num, .ai-num, .vocab-num, .fc-num, .quiz-num,
+.big-num, .counter-num {
+  background: linear-gradient(135deg, #fff, #a78bfa) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-weight: 700 !important;
+}
+
+/* ── 7. LIST ITEMS — premium ── */
+.hw-item, .fs-item, .word-row, .list-item, .row-item,
+.ach-row, .shop-row, .lb-row, .result-row, .history-row,
+.vocab-row, .fc-row, .study-row, .folder-row {
+  background: linear-gradient(90deg, rgba(26,22,37,0.6), rgba(20,18,35,0.4)) !important;
+  border: 1px solid rgba(255,255,255,0.04) !important;
+  border-radius: 12px !important;
+  transition: all 0.25s cubic-bezier(.2,.8,.2,1) !important;
+}
+.hw-item:hover, .fs-item:hover, .word-row:hover, .list-item:hover,
+.row-item:hover, .ach-row:hover, .shop-row:hover, .lb-row:hover,
+.result-row:hover, .history-row:hover, .vocab-row:hover, .fc-row:hover,
+.study-row:hover, .folder-row:hover {
+  border-color: rgba(124,58,237,0.2) !important;
+  background: linear-gradient(90deg, rgba(30,26,43,0.7), rgba(22,19,36,0.5)) !important;
+  transform: translateX(3px) !important;
+}
+
+/* ── 8. PROGRESS BARS — premium gradient ── */
+.stats-xp-fill, .progress-fill, .ach-progress-fill, .folder-progress-fill,
+.bar-fill, .xp-fill, .level-fill, .goal-fill {
+  background: linear-gradient(90deg, #7c3aed, #a78bfa, #ec4899) !important;
+  background-size: 200% 100% !important;
+  animation: premiumBarGlide 3s ease-in-out infinite;
+}
+@keyframes premiumBarGlide {
+  0%, 100% { background-position: 0% 0; }
+  50% { background-position: 100% 0; }
+}
+
+/* ── 9. PILLS & BADGES — premium ── */
+.stats-streak-pill, .streak-pill, .badge-pill, .tag-pill,
+.status-pill, .level-pill, .rank-pill {
+  background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(251,146,60,0.04)) !important;
+  border: 1px solid rgba(249,115,22,0.25) !important;
+  box-shadow: 0 4px 14px rgba(249,115,22,0.1) !important;
+}
+
+/* ── 10. EMPTY STATES ── */
+.stats-empty, .empty-state, .no-data, .empty-msg {
+  text-align: center;
+  padding: 40px !important;
+  color: var(--text-muted) !important;
+  font-size: 0.9rem !important;
+}
+
+/* ── 11. SECTION TITLES ── */
+.chart-title, .section-title, .card-title, .panel-title,
+.list-title, .block-title {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin-bottom: 18px !important;
+}
+
+/* ── 12. GRID LAYOUTS ── */
+.overview-grid, .stats-grid, .cards-grid, .items-grid,
+.ach-grid, .shop-grid, .lb-grid, .vocab-grid, .fc-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: 14px !important;
+  margin-bottom: 28px !important;
+}
+
+/* ── 13. TWO-COLUMN LAYOUT ── */
+@media (min-width: 768px) {
+  .two-col, .dual-col, .split-col {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+/* ── 14. MOBILE ── */
+@media (max-width: 640px) {
+  .stats-wrap, .streak-wrap, .ach-wrap, .shop-wrap, .lb-wrap,
+  .profile-wrap, .settings-wrap, .ai-wrap, .vocab-wrap, .fc-wrap,
+  .study-wrap, .folder-wrap, .results-wrap, .upload-wrap, .quiz-wrap {
+    padding: 20px 16px !important;
+  }
+  .overview-grid, .stats-grid, .cards-grid, .items-grid,
+  .ach-grid, .shop-grid, .lb-grid, .vocab-grid, .fc-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .two-col, .dual-col, .split-col {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── 15. ANIMATED GRADIENT BORDER on hover ── */
+@keyframes cardBorderRotate {
+  0% { --cb-angle: 0deg; }
+  50% { --cb-angle: 180deg; }
+  100% { --cb-angle: 360deg; }
+}
+@property --cb-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.ov-card::after, .ach-card::after, .shop-item::after,
+.goal-card::after, .calendar-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1.2px;
+  background: conic-gradient(
+    from var(--cb-angle, 0deg),
+    transparent,
+    rgba(124,58,237,0.4),
+    rgba(59,130,246,0.5),
+    rgba(236,72,153,0.4),
+    transparent
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+.ov-card:hover::after, .ach-card:hover::after, .shop-item:hover::after,
+.goal-card:hover::after, .calendar-card:hover::after {
+  opacity: 1;
+  animation: cardBorderRotate 3.6s linear infinite;
+}
+
+/* ── 16. FADE-IN ANIMATION ── */
+@keyframes premiumFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stats-wrap > *, .streak-wrap > *, .ach-wrap > *, .shop-wrap > *,
+.lb-wrap > *, .profile-wrap > *, .settings-wrap > *, .ai-wrap > *,
+.vocab-wrap > *, .fc-wrap > *, .study-wrap > *, .folder-wrap > *,
+.results-wrap > *, .upload-wrap > *, .quiz-wrap > * {
+  animation: premiumFadeIn 0.6s cubic-bezier(.2,.8,.2,1) both;
+}
+.stats-wrap > *:nth-child(1), .streak-wrap > *:nth-child(1),
+.ach-wrap > *:nth-child(1), .shop-wrap > *:nth-child(1),
+.lb-wrap > *:nth-child(1), .profile-wrap > *:nth-child(1),
+.settings-wrap > *:nth-child(1), .ai-wrap > *:nth-child(1),
+.vocab-wrap > *:nth-child(1), .fc-wrap > *:nth-child(1),
+.study-wrap > *:nth-child(1), .folder-wrap > *:nth-child(1),
+.results-wrap > *:nth-child(1), .upload-wrap > *:nth-child(1),
+.quiz-wrap > *:nth-child(1) { animation-delay: 0s; }
+
+.stats-wrap > *:nth-child(2), .streak-wrap > *:nth-child(2),
+.ach-wrap > *:nth-child(2), .shop-wrap > *:nth-child(2),
+.lb-wrap > *:nth-child(2), .profile-wrap > *:nth-child(2),
+.settings-wrap > *:nth-child(2), .ai-wrap > *:nth-child(2),
+.vocab-wrap > *:nth-child(2), .fc-wrap > *:nth-child(2),
+.study-wrap > *:nth-child(2), .folder-wrap > *:nth-child(2),
+.results-wrap > *:nth-child(2), .upload-wrap > *:nth-child(2),
+.quiz-wrap > *:nth-child(2) { animation-delay: 0.1s; }
+
+.stats-wrap > *:nth-child(3), .streak-wrap > *:nth-child(3),
+.ach-wrap > *:nth-child(3), .shop-wrap > *:nth-child(3),
+.lb-wrap > *:nth-child(3), .profile-wrap > *:nth-child(3),
+.settings-wrap > *:nth-child(3), .ai-wrap > *:nth-child(3),
+.vocab-wrap > *:nth-child(3), .fc-wrap > *:nth-child(3),
+.study-wrap > *:nth-child(3), .folder-wrap > *:nth-child(3),
+.results-wrap > *:nth-child(3), .upload-wrap > *:nth-child(3),
+.quiz-wrap > *:nth-child(3) { animation-delay: 0.2s; }
+
+.stats-wrap > *:nth-child(4), .streak-wrap > *:nth-child(4),
+.ach-wrap > *:nth-child(4), .shop-wrap > *:nth-child(4),
+.lb-wrap > *:nth-child(4), .profile-wrap > *:nth-child(4),
+.settings-wrap > *:nth-child(4), .ai-wrap > *:nth-child(4),
+.vocab-wrap > *:nth-child(4), .fc-wrap > *:nth-child(4),
+.study-wrap > *:nth-child(4), .folder-wrap > *:nth-child(4),
+.results-wrap > *:nth-child(4), .upload-wrap > *:nth-child(4),
+.quiz-wrap > *:nth-child(4) { animation-delay: 0.3s; }
+
+.stats-wrap > *:nth-child(5), .streak-wrap > *:nth-child(5),
+.ach-wrap > *:nth-child(5), .shop-wrap > *:nth-child(5),
+.lb-wrap > *:nth-child(5), .profile-wrap > *:nth-child(5),
+.settings-wrap > *:nth-child(5), .ai-wrap > *:nth-child(5),
+.vocab-wrap > *:nth-child(5), .fc-wrap > *:nth-child(5),
+.study-wrap > *:nth-child(5), .folder-wrap > *:nth-child(5),
+.results-wrap > *:nth-child(5), .upload-wrap > *:nth-child(5),
+.quiz-wrap > *:nth-child(5) { animation-delay: 0.4s; }
+
+.stats-wrap > *:nth-child(n+6), .streak-wrap > *:nth-child(n+6),
+.ach-wrap > *:nth-child(n+6), .shop-wrap > *:nth-child(n+6),
+.lb-wrap > *:nth-child(n+6), .profile-wrap > *:nth-child(n+6),
+.settings-wrap > *:nth-child(n+6), .ai-wrap > *:nth-child(n+6),
+.vocab-wrap > *:nth-child(n+6), .fc-wrap > *:nth-child(n+6),
+.study-wrap > *:nth-child(n+6), .folder-wrap > *:nth-child(n+6),
+.results-wrap > *:nth-child(n+6), .upload-wrap > *:nth-child(n+6),
+.quiz-wrap > *:nth-child(n+6) { animation-delay: 0.5s; }

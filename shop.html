@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8"/>
@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -520,7 +521,7 @@ function renderAICard() {
         ${icon('alert-triangle',{size:16,color:'var(--danger)'})} Marta tugadi
       </div>
       <button class="btn-buy-premium" onclick="openAIBuyModal()">
-        <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px">${icon('coins',{size:14,color:'#34d399'})}</span>100 — Yana sotib olish
+        <span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px">${icon('coins',{size:14,color:'#34d399'})}</span>100 � Yana sotib olish
       </button>`;
   } else {
     actionHtml = `
@@ -537,7 +538,7 @@ function renderAICard() {
     <div class="ai-premium-card">
       <div class="ai-premium-icon">${icon('bot',{size:48,color:'var(--purple-light)'})}</div>
       <div class="ai-premium-info">
-        <div class="ai-premium-badge">${icon('flame',{size:12,color:'#fbbf24'})} Premium xizmat — Yangi!</div>
+        <div class="ai-premium-badge">${icon('flame',{size:12,color:'#fbbf24'})} Premium xizmat � Yangi!</div>
         <div class="ai-premium-title">AI Word Generator</div>
         <div class="ai-premium-desc">
           Istalgan mavzuda ingliz lugat so'zlarini AI yordamida avtomatik yarating.
@@ -585,7 +586,7 @@ function renderItems(items) {
 
     let actionBtn = '';
     if (equipped) {
-      actionBtn = `<div class="btn-equipped">✓ Taqilgan</div>`;
+      actionBtn = `<div class="btn-equipped">? Taqilgan</div>`;
     } else if (owned) {
       actionBtn = `<button class="btn-equip" onclick="equipItem('${item.id}','${item.category}')">Taqish</button>`;
     } else {
@@ -626,7 +627,7 @@ window.buyAIGenerator = async () => {
     await addDoc(collection(db,'users',currentUser.uid,'purchases'), {
       itemId: AI_GEN_ITEM_ID,
       itemName: 'AI Word Generator (20 marta)',
-      itemEmoji: '🤖',
+      itemEmoji: '??',
       price: AI_GEN_PRICE,
       purchasedAt: serverTimestamp()
     });
@@ -635,7 +636,7 @@ window.buyAIGenerator = async () => {
     ownedItems.add(AI_GEN_ITEM_ID);
     document.getElementById('nav-coins').textContent = userCoins;
     document.getElementById('balance-coins').textContent = userCoins;
-    toast('AI Generator sotib olindi! 🤖🎉');
+    toast('AI Generator sotib olindi! ????');
     closeAIBuyModal();
     renderAICard();
     await loadHistory();
@@ -684,7 +685,7 @@ window.confirmBuy = async () => {
     await addDoc(collection(db,'users',currentUser.uid,'purchases'), {
       itemId: pendingItem.id,
       itemName: pendingItem.name,
-      itemEmoji: pendingItem.emoji || '🎁',
+      itemEmoji: pendingItem.emoji || '??',
       price: pendingItem.price,
       purchasedAt: serverTimestamp()
     });
@@ -694,8 +695,8 @@ window.confirmBuy = async () => {
     document.getElementById('nav-coins').textContent = userCoins;
     document.getElementById('balance-coins').textContent = userCoins;
 
-    toast(`${pendingItem.name} sotib olindi! 🎉`);
-    // 🎉 Har bir harid uchun confetti
+    toast(`${pendingItem.name} sotib olindi! ??`);
+    // ?? Har bir harid uchun confetti
     if (window.AzConfetti) {
       setTimeout(() => {
         if ((pendingItem.price || 0) >= 100) window.AzConfetti.preset('success');

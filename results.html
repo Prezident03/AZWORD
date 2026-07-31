@@ -1,13 +1,14 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AzWord â€” Natija</title>
+  <title>AzWord — Natija</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -217,7 +218,7 @@
     </div>
 
     <div id="mistakes-section" style="display:none" class="mistakes-section">
-      <div class="section-label" id="mistakes-label" style="color:var(--danger)"><span id="mistakes-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Xato qilingan so'zlar â€” to'g'ri javoblar</div>
+      <div class="section-label" id="mistakes-label" style="color:var(--danger)"><span id="mistakes-label-icon" style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:6px"></span>Xato qilingan so'zlar — to'g'ri javoblar</div>
       <div id="mistakes-list"></div>
     </div>
 
@@ -302,7 +303,7 @@
     document.getElementById('mistakes-label-icon').innerHTML = icon('x-circle', {size:16,color:'var(--danger)'});
     document.getElementById('all-label-icon').innerHTML = icon('clipboard-list', {size:16,color:'var(--purple-light)'});
     document.getElementById('all-label').innerHTML = icon('clipboard-list', {size:16,color:'var(--purple-light)'}) + ' Barcha so\'zlar natijalari';
-    document.getElementById('mistakes-label').innerHTML = icon('x-circle', {size:16,color:'var(--danger)'}) + ' Xato qilingan so\'zlar â€” to\'g\'ri javoblar';
+    document.getElementById('mistakes-label').innerHTML = icon('x-circle', {size:16,color:'var(--danger)'}) + ' Xato qilingan so\'zlar — to\'g\'ri javoblar';
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -334,7 +335,7 @@
     setTimeout(() => playSound('victory'), 500);
     setTimeout(() => playSound('victory'), 500);
 
-    // ðŸŽ‰ #11 Confetti Burst â€” natijaga qarab
+    // ?? #11 Confetti Burst — natijaga qarab
     if (window.AzConfetti) {
       const pctInit = perfectWords / totalWords;
       setTimeout(() => {
@@ -532,7 +533,7 @@
               <div class="correct-answer-label">${icon('pen-line',{size:14,color:'var(--success)'})} To'g'ri javob</div>
               <div class="correct-answer-row">
                 <span class="correct-en">${word.en}</span>
-                <span class="correct-arrow">â†’</span>
+                <span class="correct-arrow">></span>
                 <span class="correct-uz">${word.uz}</span>
               </div>
               ${word.example ? `<div class="correct-example">"${word.example}"</div>` : ''}

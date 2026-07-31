@@ -1,13 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AzWord — Bo'lim</title>
+  <title>AzWord � Bo'lim</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -455,7 +456,7 @@
       const data = snap.data();
       document.getElementById('folder-emoji').innerHTML = fromEmoji(data.emoji || 'folder', {size:40,color:'var(--purple-light)'});
       document.getElementById('folder-name').textContent = data.name;
-      document.title = `AzWord — ${data.name}`;
+      document.title = `AzWord � ${data.name}`;
     }
 
     async function loadWords() {
@@ -599,7 +600,7 @@
 
       btn.disabled = false;
       closeAddModal();
-      showToast("So'z qo'shildi! ✅");
+      showToast("So'z qo'shildi! ?");
       await loadWords();
 
       if (!aiGeneratedExample && en.length >= 2 && uz.length >= 1) {

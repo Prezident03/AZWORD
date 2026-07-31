@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8"/>
@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -323,7 +324,7 @@ async function checkAndUnlockAchievements() {
   if (starReward) document.getElementById('nav-stars').textContent = (userStats.stars||0) + starReward;
   if (coinReward) document.getElementById('nav-coins').textContent = (userStats.coins||0) + coinReward;
 
-  // 🎉 Yutuqlar ochilganda confetti
+  // ?? Yutuqlar ochilganda confetti
   if (window.AzConfetti) {
     setTimeout(() => {
       if (newlyUnlocked.length >= 3) window.AzConfetti.preset('victory');
@@ -332,7 +333,7 @@ async function checkAndUnlockAchievements() {
     }, 320);
   }
 
-  toast(`🎉 ${newlyUnlocked.length} ta yangi mukofot ochildi!`);
+  toast(`?? ${newlyUnlocked.length} ta yangi mukofot ochildi!`);
   renderGrid('all');
 }
 
@@ -384,7 +385,7 @@ function renderGrid(tab) {
     const card = document.createElement('div');
     card.className = 'ach-card ' + (unlocked ? 'unlocked' : 'locked');
     card.innerHTML = `
-      ${unlocked ? '<span class="ach-unlocked-badge">✓ Olindi</span>' : ''}
+      ${unlocked ? '<span class="ach-unlocked-badge">? Olindi</span>' : ''}
       <div class="ach-icon-wrap" style="display:flex;align-items:center;justify-content:center">${fromEmoji(ach.emoji || 'medal', { size: 40, color: 'var(--purple-light)' })}</div>
       <div class="ach-info">
         <div class="ach-name">${ach.name}</div>

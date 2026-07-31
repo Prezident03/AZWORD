@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8"/>
@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -351,7 +352,7 @@ onAuthStateChanged(auth, async user => {
       document.getElementById('streak-number').textContent = streak;
       document.getElementById('stat-longest').textContent = longest;
 
-      // 🎉 Streak milestone uchun confetti
+      // ?? Streak milestone uchun confetti
       if (window.AzConfetti && (streak >= 7 || longest >= 30)) {
         setTimeout(() => {
           if (streak >= 30) window.AzConfetti.preset('victory');

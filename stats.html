@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8"/>
@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -165,6 +166,82 @@
       .ov-num { font-size: 1.4rem; }
       .chart-wrap { height: 180px; }
     }
+    /* ═══════ PREMIUM UPGRADE ═══════ */
+    .stats-wrap { max-width: 960px; margin: 0 auto; padding: 40px 28px; position: relative; z-index: 2; }
+    .stats-header h1 {
+      font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, #fff, #a78bfa 60%, #ec4899);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      letter-spacing: -0.02em;
+    }
+    .back-btn {
+      padding: 8px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: rgba(26,22,37,0.5); backdrop-filter: blur(8px); transition: all 0.25s;
+    }
+    .back-btn:hover { border-color: var(--purple-main); background: var(--purple-glow); color: var(--purple-light); transform: translateX(-3px); }
+    .stats-overview {
+      background: linear-gradient(135deg, rgba(38,32,60,0.8), rgba(22,19,36,0.85));
+      backdrop-filter: blur(20px); border: 1px solid rgba(167,139,250,0.18);
+      border-radius: 22px; box-shadow: 0 0 60px rgba(124,58,237,0.15), 0 20px 50px rgba(0,0,0,0.4);
+      position: relative; overflow: hidden;
+    }
+    .stats-overview::before {
+      content: ''; position: absolute; top: -50%; right: -20%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(124,58,237,0.12), transparent 60%);
+      filter: blur(20px); pointer-events: none;
+    }
+    .ov-card {
+      background: linear-gradient(145deg, rgba(38,32,56,0.75), rgba(26,22,37,0.6));
+      backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 18px; padding: 20px; text-align: center;
+      transition: all 0.35s cubic-bezier(.2,.8,.2,1); position: relative; overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .ov-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      border-color: rgba(167,139,250,0.3);
+      box-shadow: 0 0 50px rgba(124,58,237,0.2), 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .ov-icon {
+      width: 48px; height: 48px; margin: 0 auto 10px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(236,72,153,0.1));
+      border: 1px solid rgba(124,58,237,0.2);
+    }
+    .ov-num {
+      font-size: 1.8rem;
+      background: linear-gradient(135deg, #fff, #a78bfa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .chart-card {
+      background: linear-gradient(145deg, rgba(38,32,56,0.7), rgba(26,22,37,0.6));
+      backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      transition: all 0.35s cubic-bezier(.2,.8,.2,1); position: relative; overflow: hidden;
+    }
+    .chart-card:hover {
+      border-color: rgba(167,139,250,0.22);
+      box-shadow: 0 0 40px rgba(124,58,237,0.12), 0 16px 40px rgba(0,0,0,0.35);
+    }
+    .hw-item, .fs-item {
+      background: linear-gradient(90deg, rgba(26,22,37,0.6), rgba(20,18,35,0.4));
+      border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; transition: all 0.25s;
+    }
+    .hw-item:hover, .fs-item:hover {
+      border-color: rgba(124,58,237,0.2);
+      background: linear-gradient(90deg, rgba(30,26,43,0.7), rgba(22,19,36,0.5));
+      transform: translateX(3px);
+    }
+    .stats-xp-fill {
+      background: linear-gradient(90deg, #7c3aed, #a78bfa, #ec4899) !important;
+      background-size: 200% 100% !important; animation: xpGlide 3s ease-in-out infinite;
+    }
+    @keyframes xpGlide { 0%,100% { background-position: 0% 0; } 50% { background-position: 100% 0; } }
+    .stats-streak-pill {
+      background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(251,146,60,0.04));
+      border: 1px solid rgba(249,115,22,0.25); box-shadow: 0 4px 14px rgba(249,115,22,0.1);
+    }
   </style>
 </head>
 <body>
@@ -209,7 +286,7 @@
       <div class="stats-xp-bar"><div class="stats-xp-fill" id="stats-xp-fill"></div></div>
     </div>
     <div class="stats-streak-pill">
-      🔥 <span id="stats-hero-streak">0</span> <span class="streak-lbl">kunlik streak</span>
+      ?? <span id="stats-hero-streak">0</span> <span class="streak-lbl">kunlik streak</span>
     </div>
   </div>
 
@@ -322,7 +399,7 @@ onAuthStateChanged(auth, async user => {
         document.getElementById('nav-avatar').textContent = (user.displayName||user.email||'A').charAt(0).toUpperCase();
       }
 
-      // Daraja / XP / Streak — dashboard bilan bir xil formula (500 XP = 1 daraja)
+      // Daraja / XP / Streak � dashboard bilan bir xil formula (500 XP = 1 daraja)
       const stars = d.stars || 0;
       const levelNum = Math.floor(stars / 500) + 1;
       const xpInLevel = stars % 500;
@@ -362,13 +439,13 @@ onAuthStateChanged(auth, async user => {
 
       renderAccuracyChart(logs.slice(0,14).reverse());
     } else {
-      document.getElementById('ov-accuracy').textContent = '—';
-      document.getElementById('ov-words').textContent = '—';
+      document.getElementById('ov-accuracy').textContent = '�';
+      document.getElementById('ov-words').textContent = '�';
       renderAccuracyChart([]);
     }
   } catch(e) {
     console.error('studyLog xato:', e);
-    document.getElementById('ov-accuracy').textContent = '—';
+    document.getElementById('ov-accuracy').textContent = '�';
   }
 
   try {
@@ -383,7 +460,7 @@ onAuthStateChanged(auth, async user => {
       totalUserWords += d.data().wordCount || 0;
     });
 
-    if (!document.getElementById('ov-words').textContent || document.getElementById('ov-words').textContent === '—') {
+    if (!document.getElementById('ov-words').textContent || document.getElementById('ov-words').textContent === '�') {
       document.getElementById('ov-words').textContent = totalUserWords;
     }
 
@@ -461,7 +538,7 @@ async function loadHardWords(uid) {
   const top = hardWords.slice(0,7);
 
   if (!top.length) {
-    list.innerHTML = '<div class="stats-empty">Hali xato so\'zlar yo\'q — ajoyib!</div>';
+    list.innerHTML = '<div class="stats-empty">Hali xato so\'zlar yo\'q � ajoyib!</div>';
     return;
   }
 
@@ -503,7 +580,7 @@ function renderFolderStats(folders) {
         <div class="fs-name">${f.name}</div>
         <div class="fs-meta">${wc} ta soz</div>
       </div>
-      <div class="fs-acc ${accClass}">${score !== null && score !== undefined ? score+'%' : '—'}</div>
+      <div class="fs-acc ${accClass}">${score !== null && score !== undefined ? score+'%' : '�'}</div>
     `;
     list.appendChild(div);
   });

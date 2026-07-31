@@ -4711,6 +4711,45 @@ html.az-no-cursor-glow #az-follow-light {
 }
 .sb-aicc-cta svg { flex-shrink: 0; }
 
-/* 7) Eski nav-label & admin-label — o'chirilganiga ishonch hosil qilish */
-.nav-label { display: none !important; }
+/* Nav labels — premium sidebar uchun ko'rinadi */
+.nav-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 14px 12px 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(139,127,184,0.15), transparent);
+}
 #admin-nav-label { display: none !important; }
+
+/* ═══════════════════ PREMIUM SIDEBAR — SHARED (sidebar.js) ═══════════════════ */
+body.has-premium-sidebar { margin-left: 240px; }
+
+.sb-mobile-toggle { display: none; }
+
+@media (max-width: 768px) {
+  body.has-premium-sidebar { margin-left: 0; }
+  .sb-mobile-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    position: absolute;
+    top: 12px; left: 12px;
+    z-index: 201;
+  }
+}

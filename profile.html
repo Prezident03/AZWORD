@@ -1,13 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AzWord — Profil</title>
+  <title>AzWord � Profil</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -371,7 +372,7 @@
         </div>
         <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" />
         <h2 id="profile-name">Yuklanmoqda...</h2>
-        <div class="email" id="profile-email">—</div>
+        <div class="email" id="profile-email">�</div>
       </div>
 
       <div class="profile-stats">
@@ -525,7 +526,7 @@
         document.getElementById('profile-name').textContent = newName;
         document.getElementById('nav-username').textContent = newName;
         document.getElementById('avatar-letter').textContent = newName.charAt(0).toUpperCase();
-        showToast('Ism saqlandi! ✅');
+        showToast('Ism saqlandi! ?');
       } catch(e) {
         showToast('Xato yuz berdi', true);
       }
@@ -538,7 +539,7 @@
       try {
         await sendPasswordResetEmail(auth, currentUser.email);
         document.getElementById('reset-success').classList.add('show');
-        showToast('Emailga yuborildi! 📧');
+        showToast('Emailga yuborildi! ??');
       } catch(e) {
         showToast('Xato yuz berdi', true);
       }
@@ -575,7 +576,7 @@
 
             avatarCircle.innerHTML = `<img src="${base64}" alt="avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
             avatarCircle.style.opacity = '1';
-            showToast('Rasm saqlandi! ✅');
+            showToast('Rasm saqlandi! ?');
           } catch(err) {
             avatarCircle.style.opacity = '1';
             showToast('Xato: ' + err.message, true);
@@ -616,7 +617,7 @@
 
       if (enabled && Notification.permission === 'granted') {
         statusBox.className = 'notif-status on';
-        statusBox.textContent = `Eslatma yoqilgan — har kuni soat ${savedTime} da`;
+        statusBox.textContent = `Eslatma yoqilgan � har kuni soat ${savedTime} da`;
         toggle.checked = true;
         timeRow.style.display = 'flex';
       } else {
@@ -637,7 +638,7 @@
         if (permission === 'granted') {
           localStorage.setItem('notif-enabled', 'true');
           statusBox.className = 'notif-status on';
-          statusBox.textContent = `Eslatma yoqilgan — har kuni soat ${savedTime} da`;
+          statusBox.textContent = `Eslatma yoqilgan � har kuni soat ${savedTime} da`;
           timeRow.style.display = 'flex';
           showToast(`Eslatma yoqildi!`);
         } else {
@@ -659,8 +660,8 @@
     window.saveNotifTime = time => {
       localStorage.setItem('notif-time', time);
       const statusBox = document.getElementById('notif-status-box');
-      statusBox.textContent = `Eslatma yoqilgan — har kuni soat ${time} da`;
-      showToast(`Vaqt saqlandi: ${time} ✅`);
+      statusBox.textContent = `Eslatma yoqilgan � har kuni soat ${time} da`;
+      showToast(`Vaqt saqlandi: ${time} ?`);
     };
 
     setTimeout(initNotifUI, 500);

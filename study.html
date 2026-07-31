@@ -1,13 +1,14 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AzWord — Mashq</title>
+  <title>AzWord � Mashq</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -410,7 +411,7 @@
   <nav class="navbar">
     <a class="nav-logo" href="dashboard.html"><img src="logo.png" alt="AzWord"></a>
     <div class="nav-user">
-      <button class="btn-sm" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+      <button class="btn-sm" onclick="window.location.href='dashboard.html'">< Dashboard</button>
     </div>
   </nav>
 
@@ -433,7 +434,7 @@
 
     <div class="study-nav">
       <button class="btn-skip" id="skip-btn" onclick="skipWord()">O'tkazib yuborish</button>
-      <button class="btn-next" id="next-btn" onclick="nextAction()">Davom etish →</button>
+      <button class="btn-next" id="next-btn" onclick="nextAction()">Davom etish ></button>
     </div>
   </div>
 
@@ -521,7 +522,7 @@
       const card = document.getElementById('study-card');
       card.classList.remove('card-animate'); void card.offsetWidth; card.classList.add('card-animate');
       const nextBtn = document.getElementById('next-btn');
-      nextBtn.textContent = 'Davom etish →';
+      nextBtn.textContent = 'Davom etish >';
       nextBtn.disabled = false;
       nextBtn.onclick = () => nextAction();
 
@@ -552,7 +553,7 @@
           </div>
         ` : ''}
       `;
-      document.getElementById('next-btn').textContent = "Tushundim →";
+      document.getElementById('next-btn').textContent = "Tushundim >";
 
       setTimeout(() => speakWord(word.en), 600);
     }
@@ -676,7 +677,7 @@
         <div class="pieces-area" id="pieces-area">
           ${pieces.map((p, i) => `<button class="piece-btn" id="piece-${i}" onclick="addPiece(${i}, '${p}', '${en}')">${p}</button>`).join('')}
         </div>
-        <button class="undo-btn" id="undo-btn" onclick="undoPiece()" style="display:none">↩ Orqaga</button>
+        <button class="undo-btn" id="undo-btn" onclick="undoPiece()" style="display:none">? Orqaga</button>
       `;
       document.getElementById('next-btn').disabled = true;
     }
@@ -957,7 +958,7 @@
       updateProgress();
       const card = document.getElementById('study-card');
       const nextBtn = document.getElementById('next-btn');
-      nextBtn.textContent = 'Davom etish →';
+      nextBtn.textContent = 'Davom etish >';
       nextBtn.disabled = false;
       nextBtn.onclick = () => nextAction();
 
