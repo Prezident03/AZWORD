@@ -3554,14 +3554,14 @@ html.az-no-cursor-glow #az-follow-light {
   position: relative;
   z-index: 1;
   margin-top: 14px;
-  padding: 18px 18px 16px;
-  border-radius: var(--radius-2xl, 28px);
+  padding: 14px 16px 13px;
+  border-radius: var(--radius-2xl, 26px);
   background:
     radial-gradient(ellipse at 30% -30%, rgba(251,191,36,0.18), transparent 55%),
     radial-gradient(ellipse at 110% 40%, rgba(124,58,237,0.18), transparent 55%),
     linear-gradient(160deg, rgba(10, 8, 20, 0.35), rgba(10, 8, 20, 0.72));
-  border: 1px solid rgba(251,191,36,0.18);
-  box-shadow: 0 18px 46px rgba(0,0,0,0.45);
+  border: 1px solid rgba(251,191,36,0.16);
+  box-shadow: 0 12px 34px rgba(0,0,0,0.4);
   overflow: hidden;
   cursor: pointer;
   transition: all var(--dur-fast, 180ms) var(--ease-standard);
@@ -3575,8 +3575,8 @@ html.az-no-cursor-glow #az-follow-light {
 }
 .az-level-wide:hover {
   transform: translateY(-2px);
-  border-color: rgba(251,191,36,0.28);
-  box-shadow: 0 24px 58px rgba(0,0,0,0.5), 0 0 60px rgba(251,191,36,0.06);
+  border-color: rgba(251,191,36,0.24);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.46), 0 0 48px rgba(251,191,36,0.05);
 }
 .az-level-wide-top {
   position: relative;
@@ -3586,22 +3586,22 @@ html.az-no-cursor-glow #az-follow-light {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 .az-level-wide-label {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.28em;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   color: rgba(251,191,36,0.92);
 }
 .az-level-wide-num {
   font-family: var(--font-display);
-  font-weight: 900;
-  font-size: 2.4rem;
+  font-weight: 850;
+  font-size: 2.05rem;
   line-height: 1;
   color: #fbbf24;
-  text-shadow: 0 18px 42px rgba(251,191,36,0.18);
+  text-shadow: 0 12px 28px rgba(251,191,36,0.14);
 }
 .az-level-wide-row {
   position: relative;
@@ -3612,17 +3612,17 @@ html.az-no-cursor-glow #az-follow-light {
   gap: 12px;
   margin-bottom: 8px;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
 }
 .az-level-wide-pct {
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   color: rgba(251,191,36,0.95);
 }
 .az-level-wide-bar {
   position: relative;
   z-index: 1;
-  height: 8px;
+  height: 6px;
   border-radius: 99px;
   overflow: hidden;
   background: rgba(255,255,255,0.04);
@@ -3699,12 +3699,12 @@ html.az-no-cursor-glow #az-follow-light {
   .az-hero-minimal-row { grid-template-columns: 1fr; }
   .az-hm-continue { max-width: 100%; }
   .az-quick-row { grid-template-columns: repeat(2, 1fr); }
-  .az-level-wide { padding: 16px 16px 14px; }
+  .az-level-wide { padding: 13px 14px 12px; }
 }
 @media (max-width: 540px) {
   .az-quick-row { grid-template-columns: 1fr 1fr; }
   .az-hm-kpi { flex: 1 1 46%; }
-  .az-level-wide-num { font-size: 2.05rem; }
+  .az-level-wide-num { font-size: 1.9rem; }
 }
 
 /* ═══════════════════════════════════════════════════════════════
