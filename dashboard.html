@@ -2068,10 +2068,42 @@ async function loadUserStats(uid) {
   try {
     const ud = await getDoc(doc(db, 'users', uid));
     if (ud.exists()) {
-      const d = ud.data();
+      let d = ud.data();
       const streak = d.streakDays || 0;
       const stars = d.stars || 0;
       const coins = d.coins || 0;
+
+      // ──────────────── BIR MARTALIK AVTOMATIK RESET (eski/test statistikani tozalash) ────────────────
+      if (d.statsResetV1 !== true) {
+        try {
+          await updateDoc(doc(db, 'users', uid), {
+            totalWordsLearned: 0,
+            studyTimeMinutes: 0,
+            totalPerfectWords: 0,
+            statsResetV1: true
+          });
+          d = { ...d, totalWordsLearned: 0, studyTimeMinutes: 0, totalPerfectWords: 0, statsResetV1: true };
+        } catch (err) { console.error('stats auto-reset failed', err); }
+      }
+
+      try {
+        const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 0;
+        const studyMinutes = d.studyTimeMinutes != null ? d.studyTimeMinutes : 0;
+        const studyHours = Math.round((studyMinutes / 60) * 10) / 10;
+        const totalPerfect = d.totalPerfectWords != null ? d.totalPerfectWords : 0;
+        const accuracy = totalWords > 0 ? Math.round((totalPerfect / totalWords) * 100) : 0;
+        if (window.AzDash && window.AzDash.updateHeroKpis) {
+          window.AzDash.updateHeroKpis({ words: totalWords, hours: studyHours, accuracy: accuracy });
+        } else {
+          const elW = document.getElementById('kpi-words-total');
+          const elT = document.getElementById('kpi-time-total');
+          const elA = document.getElementById('kpi-acc-total');
+          if (elW) elW.textContent = totalWords;
+          if (elT) elT.textContent = studyHours;
+          if (elA) elA.textContent = accuracy;
+        }
+        window.__azStatsKpi = { totalWords, studyHours, accuracy };
+      } catch (err) { console.error('KPI update failed', err); }
 
       document.getElementById('nav-streak').textContent = streak;
       document.getElementById('nav-stars').textContent = stars;
@@ -2129,17 +2161,9 @@ async function loadUserStats(uid) {
         window.AzDash.updateSidebarLevel({ stars: stars, streakDays: streak });
       }
 
-      // ──────────────── STATS: HERO KPI PILLS + STATISTIKA MODAL uchun saqlash ────────────────
-      const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 0;
-      const studyMinutes = d.studyTimeMinutes != null ? d.studyTimeMinutes : 0;
-      const studyHours = Math.round((studyMinutes / 60) * 10) / 10;
-      const totalPerfect = d.totalPerfectWords != null ? d.totalPerfectWords : 0;
-      const accuracy = totalWords > 0 ? Math.round((totalPerfect / totalWords) * 100) : 0;
-
-      // → NEW HERO MINIMAL KPI PILLS (3)
-      if (window.AzDash && window.AzDash.updateHeroKpis) {
-        window.AzDash.updateHeroKpis({ words: totalWords, hours: studyHours, accuracy: accuracy });
-      }
+      // ──────────────── STATS: STATISTIKA MODAL uchun saqlash (KPI pills yuqorida allaqachon yangilandi) ────────────────
+      const kpiVals = window.__azStatsKpi || { totalWords: 0, studyHours: 0, accuracy: 0 };
+      const totalWords = kpiVals.totalWords, studyHours = kpiVals.studyHours, accuracy = kpiVals.accuracy;
 
       // → Sidebar "Statistics" bosilganda ochiladigan modal shu ma'lumotlardan foydalanadi
       window.__azStats = {
