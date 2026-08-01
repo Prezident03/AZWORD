@@ -245,7 +245,10 @@
       <div class="sec">
         <div class="sec-head">
           <h3><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Barcha foydalanuvchilar</h3>
-          <input type="text" id="user-search" placeholder="Qidirish..." oninput="filterUsers()" style="background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;width:200px"/>
+          <div style="display:flex;gap:10px;align-items:center">
+            <button class="btn-sm" onclick="resetAllUserStats()" style="color:var(--danger)" title="Barcha foydalanuvchilarning So'zlar/Vaqt/Aniqlik ko'rsatkichini 0'ga tushiradi">Statistikani reset qilish</button>
+            <input type="text" id="user-search" placeholder="Qidirish..." oninput="filterUsers()" style="background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.85rem;outline:none;width:200px"/>
+          </div>
         </div>
         <div class="tbl-head"><span>Foydalanuvchi</span><span>Email</span><span>Stars</span><span>Coins</span><span>Status</span><span>Amal</span></div>
         <div id="all-users-list"></div>
@@ -858,6 +861,23 @@ window.deleteBook = async function(bookId) {
     toast("Kitob o'chirildi");
     if (selBookId === bookId) closeBookTopics();
     loadBooks();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+};
+
+window.resetAllUserStats = async function() {
+  if (!confirm("DIQQAT: barcha foydalanuvchilarning 'So'zlar', 'O'qish vaqti' va 'Aniqlik' ko'rsatkichlari 0'ga tushiriladi (eski/test ma'lumotlar tozalanadi). Bu amalni orqaga qaytarib bo'lmaydi. Davom etasizmi?")) return;
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    let count = 0;
+    for (const u of snap.docs) {
+      await updateDoc(doc(db, 'users', u.id), {
+        totalWordsLearned: 0,
+        studyTimeMinutes: 0,
+        totalPerfectWords: 0
+      });
+      count++;
+    }
+    toast(count + " ta foydalanuvchi statistikasi reset qilindi");
   } catch(e) { toast('Xato: ' + e.message, true); }
 };
 
