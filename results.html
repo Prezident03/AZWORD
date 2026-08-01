@@ -387,7 +387,8 @@
           await updateDoc(userRef, {
             streakDays: currentStreak,
             lastStudyDate: todayKey,
-            longestStreak: Math.max(currentStreak, udata.longestStreak || 0)
+            longestStreak: Math.max(currentStreak, udata.longestStreak || 0),
+            todayWordsLearned: totalWords
           });
 
           if (currentStreak > 1) {
@@ -402,6 +403,11 @@
             `;
             document.querySelector('.results-hero').appendChild(streakBanner);
           }
+        } else {
+          // Bugun avval ham mashq qilingan — bugungi so'zlar sonini ustiga qo'shamiz
+          await updateDoc(userRef, {
+            todayWordsLearned: increment(totalWords)
+          });
         }
       } catch(e) {
         console.error('Streak xato:', e);

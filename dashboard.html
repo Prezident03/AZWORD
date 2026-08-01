@@ -2080,9 +2080,10 @@ async function loadUserStats(uid) {
             totalWordsLearned: 0,
             studyTimeMinutes: 0,
             totalPerfectWords: 0,
+            todayWordsLearned: 0,
             statsResetV1: true
           });
-          d = { ...d, totalWordsLearned: 0, studyTimeMinutes: 0, totalPerfectWords: 0, statsResetV1: true };
+          d = { ...d, totalWordsLearned: 0, studyTimeMinutes: 0, totalPerfectWords: 0, todayWordsLearned: 0, statsResetV1: true };
         } catch (err) { console.error('stats auto-reset failed', err); }
       }
 
@@ -2121,7 +2122,9 @@ async function loadUserStats(uid) {
       });
 
       // ──────────────── HERO GOAL TODAY (old ring + new thin bar) ────────────────
-      const todayDone = d.todayWordsLearned || 0;
+      const nowD = new Date();
+      const todayKeyD = nowD.getFullYear() + '-' + String(nowD.getMonth() + 1).padStart(2, '0') + '-' + String(nowD.getDate()).padStart(2, '0');
+      const todayDone = (d.lastStudyDate === todayKeyD) ? (d.todayWordsLearned || 0) : 0;
       const goalTotal = d.dailyGoal || 30;
       const goalPct = Math.min(Math.round((todayDone / goalTotal) * 100), 100);
       const goalDoneEl = document.getElementById('goal-done');
