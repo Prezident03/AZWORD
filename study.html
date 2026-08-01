@@ -1103,7 +1103,7 @@
 
     function showToast(msg, isError = false) {
       const t = document.getElementById('toast');
-      t.textContent = msg;
+      t.innerHTML = msg;
       t.className = 'toast' + (isError ? ' error' : '');
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 3000);
