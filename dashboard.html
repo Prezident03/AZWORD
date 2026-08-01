@@ -2131,8 +2131,10 @@ async function loadUserStats(uid) {
 
       // ──────────────── STATS: HERO KPI PILLS + STATISTIKA MODAL uchun saqlash ────────────────
       const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 0;
-      const studyHours = d.studyTimeHours != null ? d.studyTimeHours : 0;
-      const accuracy = d.accuracyPercent != null ? d.accuracyPercent : 0;
+      const studyMinutes = d.studyTimeMinutes != null ? d.studyTimeMinutes : 0;
+      const studyHours = Math.round((studyMinutes / 60) * 10) / 10;
+      const totalPerfect = d.totalPerfectWords != null ? d.totalPerfectWords : 0;
+      const accuracy = totalWords > 0 ? Math.round((totalPerfect / totalWords) * 100) : 0;
 
       // → NEW HERO MINIMAL KPI PILLS (3)
       if (window.AzDash && window.AzDash.updateHeroKpis) {

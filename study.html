@@ -468,6 +468,7 @@
     let currentWordIndex = 0;
     let results = {};
     let currentUser = null;
+    let sessionStartTime = null;
 
     let matchSelected = null;
     let matchedPairs = 0;
@@ -497,6 +498,7 @@
       }
 
       words.forEach(w => { results[w.id] = { en: w.en, uz: w.uz, mistakes: [] }; });
+      sessionStartTime = Date.now();
       renderStage();
     }
 
@@ -1046,10 +1048,14 @@
       } catch(e) { console.log('studyResults:', e); }
 
       try {
+        const sessionMinutes = sessionStartTime ? Math.max(1, Math.round((Date.now() - sessionStartTime) / 60000)) : 1;
         await updateDoc(doc(db, 'users', currentUser.uid), {
           stars: increment(earnedStars),
           coins: increment(earnedCoins),
           weeklyStars: increment(earnedStars),
+          totalWordsLearned: increment(allWords.length),
+          totalPerfectWords: increment(perfectWords),
+          studyTimeMinutes: increment(sessionMinutes),
           lastSeen: serverTimestamp()
         });
       } catch(e) { console.log('stars/coins:', e); }
