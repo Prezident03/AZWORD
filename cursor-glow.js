@@ -14,7 +14,10 @@
   var hasFinePointer = (typeof window !== 'undefined' && window.matchMedia &&
     window.matchMedia('(pointer: fine)').matches);
 
-  var canRun = !isTouchDevice && hasFinePointer && (typeof document !== 'undefined');
+  var reduceMotion = (typeof window !== 'undefined' && window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  var canRun = !isTouchDevice && hasFinePointer && !reduceMotion && (typeof document !== 'undefined');
   if (!canRun) {
     document.documentElement.classList.add('az-no-cursor-glow');
     return;

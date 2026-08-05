@@ -2132,7 +2132,7 @@ html {
     rgba(255, 255, 255, 0.25) 30%,
     transparent 70%);
   transform: scale(0);
-  animation: btnRipplePop 620ms cubic-bezier(.2,.8,.2,1) forwards;
+  animation: btnRipplePop var(--dur-emphasis, 650ms) var(--ease-standard, cubic-bezier(.2,.8,.2,1)) forwards;
   mix-blend-mode: screen;
 }
 @keyframes btnRipplePop {
@@ -4751,5 +4751,67 @@ body.has-premium-sidebar { margin-left: 240px; }
     position: absolute;
     top: 12px; left: 12px;
     z-index: 201;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   ACCESSIBILITY · GLOBAL MOTION & FOCUS
+   Barcha sahifalarga bir vaqtda ta'sir qiladi (style.css umumiy fayl)
+   ══════════════════════════════════════════════════════════ */
+
+/* 1) Harakatni kamaytirish afzalligini bildirgan foydalanuvchilar uchun:
+      barcha animatsiya/transition/parallax deyarli o'chiriladi. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Parallax orb'lar, kursor izi va ripple effektlari ham yashiriladi
+     (parallax.js va cursor-glow.js JS darajasida ham o'zini o'chiradi;
+     bu qoida ularni CSS darajasida qo'shimcha kafolatlaydi) */
+  #az-parallax-orbs,
+  #az-cursor-trail,
+  #az-follow-light,
+  .btn-ripple {
+    display: none !important;
+  }
+}
+
+/* 2) Klaviatura orqali fokus - barcha interaktiv elementlarga bir xil uslub.
+      Sichqoncha bilan bosganda (:focus) emas, faqat Tab bilan (:focus-visible) chiqadi. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible,
+.btn-primary:focus-visible,
+.btn-google:focus-visible,
+.auth-tab:focus-visible,
+.sidebar-link:focus-visible,
+.folder-card:focus-visible {
+  outline: 2.5px solid var(--primary-light, #a78bfa);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Sichqoncha bilan bosilganda standart brauzer outline chiqmasin */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* 3) Yuqori kontrast rejimini afzal ko'rgan foydalanuvchilar uchun */
+@media (prefers-contrast: high) {
+  :root {
+    --border: rgba(255,255,255,0.35);
+    --border-light: rgba(255,255,255,0.45);
+    --text-muted: #e4e4e7;
+  }
+  button, .btn-primary, .btn-google, input, select, textarea {
+    border-width: 2px !important;
   }
 }

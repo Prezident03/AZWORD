@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AzWord â€” Mashq</title>
+  <title>AzWord — Mashq</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1028,18 +1028,6 @@
       const perfectWords = Object.values(results).filter(r => r.mistakes.length === 0).length;
       const earnedStars = perfectWords;
       const earnedCoins = allWords.length;
-
-      // ============================================================
-      // YANGI QO'SHIMCHA: Statistikani saqlashdan oldin, yakuniy
-      // raqamlarni sessionStorage ga yozamiz.
-      // Bu ma'lumotlar dashboard sahifasiga ochilganda o'qiladi.
-      // ============================================================
-      const finalStats = {
-        todayWords: allWords.length, // Bugun o'rganilgan so'zlar soni
-        earnedStars: earnedStars,
-        earnedCoins: earnedCoins
-      };
-      sessionStorage.setItem('az:lastStudyStats', JSON.stringify(finalStats));
 
       const resultDocId = isBookMode
         ? `${currentUser.uid}_${bookId}_${topicId}_${Date.now()}`

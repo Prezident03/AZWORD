@@ -409,7 +409,7 @@
     import {
       collection, addDoc, getDocs, serverTimestamp, updateDoc, doc, increment, query, where
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { icon, starIcon, fromEmoji, PATHS } from './icons.js';
+    import { icon, starIcon, fromEmoji, PATHS, escapeHtml } from './icons.js';
 
     const params = new URLSearchParams(window.location.search);
     const folderId = params.get('id');
@@ -595,9 +595,9 @@
         div.className = 'preview-item';
         div.innerHTML = `
           <div class="preview-num">${i + 1}</div>
-          <div class="preview-en">${w.en}</div>
-          <div class="preview-uz">${w.uz}</div>
-          <div class="preview-example">${w.example || ''}</div>
+          <div class="preview-en">${escapeHtml(w.en)}</div>
+          <div class="preview-uz">${escapeHtml(w.uz)}</div>
+          <div class="preview-example">${escapeHtml(w.example || '')}</div>
         `;
         list.appendChild(div);
       });

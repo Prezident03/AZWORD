@@ -35,13 +35,13 @@ function buildSidebarHTML(currentPage) {
     <img src="logo.png" alt="AzWord" style="height:28px;width:auto;display:block">
   </a>
 
-  <div class="sidebar-user" onclick="window.location.href='profile.html'">
+  <a class="sidebar-user" href="profile.html" aria-label="Profilga o'tish">
     <div class="sb-avatar" id="sb-avatar">A</div>
     <div class="sb-user-info">
       <div class="sb-user-name" id="sb-user-name">Yuklanmoqda...</div>
       <div class="sb-user-sub" id="sb-user-email"></div>
     </div>
-  </div>
+  </a>
 
   <nav class="sidebar-nav">
     <div class="nav-label">Asosiy</div>
@@ -94,7 +94,7 @@ function buildSidebarHTML(currentPage) {
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
       Settings
     </a>
-    <button class="nav-item nav-item-logout" id="sb-logout-btn">
+    <button class="nav-item nav-item-logout" id="sb-logout-btn" aria-label="Tizimdan chiqish">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Log out
     </button>
@@ -125,7 +125,7 @@ function buildSidebarHTML(currentPage) {
   </div>
 
   <!-- AI Coach Card -->
-  <div class="sb-ai-coach-card" onclick="window.location.href='ai.html'">
+  <a class="sb-ai-coach-card" href="ai.html" aria-label="AI Coach - shaxsiy o'quv rejasi va tavsiyalar">
     <div class="sb-aicc-stars" aria-hidden="true">✦ ✧ ✦</div>
     <div class="sb-aicc-badge-row">
       <div class="sb-aicc-robot" aria-hidden="true">
@@ -152,14 +152,14 @@ function buildSidebarHTML(currentPage) {
     </div>
     <div class="sb-aicc-title">AI Coach</div>
     <p class="sb-aicc-text">Get personalized study plan & smart recommendations.</p>
-    <button class="sb-aicc-cta" type="button">
+    <span class="sb-aicc-cta" aria-hidden="true">
       <span>Try AI Coach</span>
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-  </div>
+    </span>
+  </a>
 
   <!-- Mobile menu button (hidden on desktop) -->
-  <button class="mobile-menu-btn" id="sb-mobile-btn" style="display:none">
+  <button class="mobile-menu-btn" id="sb-mobile-btn" style="display:none" aria-label="Menyuni ochish">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
   </button>
 </aside>
@@ -203,14 +203,25 @@ function injectSidebar() {
     // Create mobile menu button and prepend to body
     const mobileMenuBtn = document.createElement('button');
     mobileMenuBtn.className = 'sb-mobile-toggle';
+    mobileMenuBtn.setAttribute('aria-label', 'Menyuni ochish');
+    mobileMenuBtn.setAttribute('aria-expanded', 'false');
     mobileMenuBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>';
     mobileMenuBtn.addEventListener('click', () => {
       sidebar.classList.add('open');
       overlay.classList.add('open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'true');
     });
     overlay.addEventListener('click', () => {
       sidebar.classList.remove('open');
       overlay.classList.remove('open');
+      mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      }
     });
     // Insert mobile toggle at the top of main content
     const mainContent = document.querySelector('main') || document.querySelector('.simple-wrap') || document.querySelector('.folder-page') || document.querySelector('.results-wrap');

@@ -675,7 +675,7 @@
       color: var(--text-main);
     }
 
-    /* ── Statistika detail modal (sidebardagi Daraja/Haftalik/Bu hafta) ── */
+    /* ── Statistika detail modal (sidebar Daraja/Haftalik/Bu hafta) ── */
     .stat-modal { max-width: 400px; }
     .stat-modal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
     .stat-modal-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); flex-shrink: 0; }
@@ -2023,6 +2023,12 @@ onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
   currentUser = user;
 
+  // "N" klaviatura shortcut boshqa sahifadan yangi bo'lim ochish uchun shu yerga yo'naltiradi
+  if (new URLSearchParams(location.search).get('new') === '1' && typeof window.openModal === 'function') {
+    setTimeout(() => window.openModal(), 300);
+    history.replaceState(null, '', 'dashboard.html');
+  }
+
   localStorage.setItem('last-study-date', new Date().toISOString().slice(0, 10));
 
   const name = user.displayName || user.email.split('@')[0];
@@ -2134,23 +2140,7 @@ async function loadUserStats(uid) {
       // ──────────────── HERO GOAL TODAY (old ring + new thin bar) ────────────────
       const nowD = new Date();
       const todayKeyD = nowD.getFullYear() + '-' + String(nowD.getMonth() + 1).padStart(2, '0') + '-' + String(nowD.getDate()).padStart(2, '0');
-      let todayDone = (d.lastStudyDate === todayKeyD) ? (d.todayWordsLearned || 0) : 0;
-
-      // ============================================================
-      // YANGI QO'SHIMCHA: sessionStorage dan mashqdan keyingi statistikani o'qish
-      // ============================================================
-      let sessionTodayWords = 0;
-      try {
-        const rawStats = sessionStorage.getItem('az:lastStudyStats');
-        if (rawStats) {
-          const parsedStats = JSON.parse(rawStats);
-          sessionTodayWords = parsedStats.todayWords || 0;
-          // Iste'mol qilingandan keyin o'chirib tashlaymiz
-          sessionStorage.removeItem('az:lastStudyStats');
-        }
-      } catch (e) { /* ignore */ }
-      todayDone += sessionTodayWords;
-
+      const todayDone = (d.lastStudyDate === todayKeyD) ? (d.todayWordsLearned || 0) : 0;
       const goalTotal = d.dailyGoal || 30;
       const goalPct = Math.min(Math.round((todayDone / goalTotal) * 100), 100);
       const goalDoneEl = document.getElementById('goal-done');

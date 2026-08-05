@@ -1870,7 +1870,7 @@ async function loadFolderWords(fid) {
     const w=d.data();
     const row=document.createElement('div');
     row.className='word-row';
-    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${w.en}</span><span class="wr-uz">${w.uz}</span><span class="wr-ex">${w.example?'"'+w.example+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
+    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${escapeHtml(w.en)}</span><span class="wr-uz">${escapeHtml(w.uz)}</span><span class="wr-ex">${w.example?'"'+escapeHtml(w.example)+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
     body.appendChild(row);
   });
 }
@@ -1918,7 +1918,7 @@ window.handleFile = async input => {
     }
     if (!words.length) { prev.innerHTML='<div style="padding:10px;color:var(--danger)">Soz topilmadi</div>'; btn.style.display='none'; return; }
     parsedWords=words;
-    prev.innerHTML=words.slice(0,20).map((w,i)=>`<div class="up-row"><span style="color:var(--text-dim);min-width:20px">${i+1}</span><span style="font-weight:600;min-width:80px">${w.en}</span><span style="color:var(--text-muted)">${w.uz}</span></div>`).join('')
+    prev.innerHTML=words.slice(0,20).map((w,i)=>`<div class="up-row"><span style="color:var(--text-dim);min-width:20px">${i+1}</span><span style="font-weight:600;min-width:80px">${escapeHtml(w.en)}</span><span style="color:var(--text-muted)">${escapeHtml(w.uz)}</span></div>`).join('')
       +(words.length>20?`<div style="padding:6px 8px;color:var(--text-dim)">... va yana ${words.length-20} ta</div>`:'');
     btn.style.display='flex'; btn.textContent='Saqlash ('+words.length+' ta)';
   } catch(e) { prev.innerHTML='<div style="padding:10px;color:var(--danger)">Xato: '+e.message+'</div>'; }

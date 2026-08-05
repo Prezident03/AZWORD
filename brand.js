@@ -8,6 +8,48 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ──────────────────────────────────────────────────────
+     0. PWA SETUP — manifest + service worker
+     brand.js har bir sahifada <head> ichida yuklanadi, shuning
+     uchun shu yerga qo'shish 20 ta HTML faylni qo'lda o'zgartirishning
+     o'rnini bosadi.
+     ────────────────────────────────────────────────────── */
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const manifestLink = document.createElement('link');
+    manifestLink.rel = 'manifest';
+    manifestLink.href = 'manifest.json';
+    document.head.appendChild(manifestLink);
+  }
+  if (!document.querySelector('meta[name="theme-color"]')) {
+    const themeMeta = document.createElement('meta');
+    themeMeta.name = 'theme-color';
+    themeMeta.content = '#7c3aed';
+    document.head.appendChild(themeMeta);
+  }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {
+        /* Service worker yo'q bo'lsa ham sayt oddiy ishlashda davom etadi */
+      });
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────
+     0b. SHARED MOTION TOKENS — style.css dizayn tokenlari
+     (--dur-fast, --dur-normal, --ease-standard va h.k.) bilan bir xil qiymatlar. ripple/confetti/transition/parallax/
+     cursor-glow shu obyektdan foydalanadi, shunda barchasi bir xil
+     vaqt oralig'i va easing bilan ishlaydi.
+     ────────────────────────────────────────────────────── */
+  window.AzMotion = {
+    fast: 180,
+    normal: 280,
+    slow: 450,
+    emphasis: 650,
+    ease: 'cubic-bezier(.2,.8,.2,1)',         // --ease-standard
+    easeEmphasis: 'cubic-bezier(.16,1,.3,1)', // --ease-emphasis
+    easeBounce: 'cubic-bezier(.34,1.56,.64,1)' // --ease-bounce
+  };
+
+  /* ──────────────────────────────────────────────────────
      1. LOGO SVG MAKER — Monogram "Az" + Wordmark "AzWord"
      Colors: purple → rose → blue gradient (brand palette)
      ────────────────────────────────────────────────────── */

@@ -597,6 +597,10 @@ kbd.az-k {
           <div class="az-footer-group">
             <span>Masalan: <strong style="color:var(--primary-light)">ai:</strong> translate hello</span>
           </div>
+          <div class="az-footer-group">
+            <span class="az-footer-k"><kbd class="az-k">N</kbd> yangi bo'lim</span>
+            <span class="az-footer-k"><kbd class="az-k">S</kbd> study</span>
+          </div>
         </div>
       </div>`;
     document.body.appendChild(overlay);
@@ -702,6 +706,26 @@ kbd.az-k {
       if (e.target && e.target.isContentEditable) return;
       e.preventDefault();
       open();
+    } else if (!mod && !e.altKey && !state.open) {
+      // Harf-shortcutlar: faqat inputga yozilmayotganda va palette yopiq bo'lganda
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.target && e.target.isContentEditable) return;
+
+      const key = e.key.toLowerCase();
+      if (key === 'n') {
+        // N -> Yangi bo'lim/papka
+        e.preventDefault();
+        if (typeof window.openModal === 'function' && /dashboard\.html$/.test(location.pathname)) {
+          window.openModal();
+        } else {
+          window.location.href = 'dashboard.html?new=1';
+        }
+      } else if (key === 's') {
+        // S -> Study (so'z o'rganishni boshlash)
+        e.preventDefault();
+        window.location.href = 'vocabulary.html';
+      }
     }
   }, true);
 

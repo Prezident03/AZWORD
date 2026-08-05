@@ -40,9 +40,10 @@
     span.style.top    = py + 'px';
 
     btn.appendChild(span);
+    var azMotion = window.AzMotion || { emphasis: 650 };
     setTimeout(function () {
       if (span.parentNode) span.parentNode.removeChild(span);
-    }, 720);
+    }, azMotion.emphasis + 70); // CSS animatsiya (--dur-emphasis) tugagach ozgina zaxira bilan tozalaydi
   }
 
   document.addEventListener('pointerdown', function (e) {

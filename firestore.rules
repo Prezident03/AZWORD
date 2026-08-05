@@ -16,13 +16,27 @@ service cloud.firestore {
       }
     }
 
-    // Folders - hammaga read, login qilgan har kim write
+    // Folders - faqat ega yoki admin write qila oladi
     match /folders/{folderId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null;
+
+      // Yangi papka: faqat o'z uid'i bilan yoki admin (isAdmin papka) yarata oladi
+      allow create: if request.auth != null &&
+        (request.resource.data.uid == request.auth.uid ||
+         request.auth.token.email == "abdurasul1406z@gmail.com");
+
+      // O'zgartirish/o'chirish: faqat papka egasi yoki admin
+      allow update, delete: if request.auth != null &&
+        (resource.data.uid == request.auth.uid ||
+         request.auth.token.email == "abdurasul1406z@gmail.com");
 
       match /words/{wordId} {
-        allow read, write: if request.auth != null;
+        allow read: if request.auth != null;
+
+        // So'z yozish: faqat shu papkaning egasi yoki admin
+        allow write: if request.auth != null &&
+          (get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
+           request.auth.token.email == "abdurasul1406z@gmail.com");
       }
     }
 
