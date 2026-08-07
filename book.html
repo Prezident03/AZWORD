@@ -272,6 +272,43 @@
     .topic-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,58,237,0.45); filter: brightness(1.08); }
     .topic-btn:active { transform: translateY(0); }
 
+    /* ── PREMIUM FLIP PREVIEW ── */
+    .topic-flip { perspective: 1400px; }
+    .topic-flip-inner {
+      position: relative; transition: transform 0.6s cubic-bezier(.22,1,.36,1);
+      transform-style: preserve-3d;
+    }
+    .topic-flip.open .topic-flip-inner { transform: rotateY(180deg); }
+    .topic-flip.open .topic-card { cursor: default; }
+    .topic-face-front, .topic-face-back { backface-visibility: hidden; }
+    .topic-face-back {
+      position: absolute; inset: 0; transform: rotateY(180deg);
+      background: linear-gradient(145deg, rgba(38,32,56,0.92), rgba(26,22,37,0.92));
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(167,139,250,0.25);
+      border-radius: 18px; padding: 16px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 0 50px rgba(124,58,237,0.2), 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .peek-btn {
+      position: absolute; top: 14px; right: 14px; z-index: 3;
+      width: 30px; height: 30px; border-radius: 9px;
+      background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25);
+      color: var(--primary-light); display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .peek-btn:hover { background: rgba(124,58,237,0.25); transform: scale(1.08); }
+    .peek-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .peek-head span { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--primary-light); }
+    .peek-close { background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    .peek-close:hover { background: rgba(255,255,255,0.06); color: var(--text-main); }
+    .peek-list { flex: 1; overflow-y: auto; }
+    .peek-row { display: flex; justify-content: space-between; align-items: baseline; padding: 7px 2px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.82rem; }
+    .peek-row:last-child { border-bottom: none; }
+    .peek-en { font-weight: 600; color: var(--text-main); }
+    .peek-uz { color: var(--text-muted); font-size: 0.76rem; }
+    .peek-empty { text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 20px 0; }
+
     .book-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
     .book-empty svg { margin-bottom: 16px; opacity: 0.3; }
     .book-loading { text-align: center; padding: 60px 20px; color: var(--text-muted); }
@@ -464,11 +501,47 @@ import { auth, db } from './firebase.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   collection, getDocs, doc, getDoc,
-  query, orderBy
+  query, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get('id');
+
+// ── Premium flip preview: so'zlarni on-demand yuklash ──
+window.peekTopic = async function(topicId, btn) {
+  const flip = btn.closest('.topic-flip');
+  flip.classList.add('open');
+  const list = flip.querySelector('.peek-list');
+  if (list.dataset.loaded === '1') return;
+
+  try {
+    const wSnap = await getDocs(query(
+      collection(db, 'books', bookId, 'topics', topicId, 'words'),
+      orderBy('createdAt', 'asc'),
+      limit(6)
+    ));
+    if (wSnap.empty) {
+      list.innerHTML = '<div class="peek-empty">Hozircha so\'zlar yo\'q</div>';
+    } else {
+      list.innerHTML = '';
+      wSnap.forEach(d => {
+        const w = d.data();
+        const row = document.createElement('div');
+        row.className = 'peek-row';
+        row.innerHTML = `<span class="peek-en">${w.en || ''}</span><span class="peek-uz">${w.uz || ''}</span>`;
+        list.appendChild(row);
+      });
+    }
+    list.dataset.loaded = '1';
+  } catch (e) {
+    console.error('peekTopic:', e);
+    list.innerHTML = '<div class="peek-empty">Yuklab bo\'lmadi</div>';
+  }
+};
+
+window.closePeek = function(btn) {
+  btn.closest('.topic-flip').classList.remove('open');
+};
 
 onAuthStateChanged(auth, async user => {
   if (!user) return location.href = 'index.html';
@@ -547,24 +620,40 @@ onAuthStateChanged(auth, async user => {
 
     grid.innerHTML = '';
     topics.forEach((topic, i) => {
-      const card = document.createElement('div');
-      card.className = 'topic-card';
+      const flip = document.createElement('div');
+      flip.className = 'topic-flip';
       let pct = 0;
       if (topic.lastScore) {
         const [done, total] = String(topic.lastScore).split('/').map(Number);
         if (total > 0) pct = Math.round((done / total) * 100);
       }
-      card.innerHTML = `
-        <div class="topic-num">${i + 1}</div>
-        <div class="topic-name">${topic.title || 'Mavzu ' + (i+1)}</div>
-        <div class="topic-meta">${topic.wordCount || 0} ta so'z${topic.lastScore ? ' &middot; ' + topic.lastScore : ''}</div>
-        <div class="topic-progress"><div class="topic-progress-fill" style="width:${pct}%"></div></div>
-        <button class="topic-btn" onclick="window.location.href='study.html?book=${bookId}&topic=${topic.id}'">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-          Practice
-        </button>
+      flip.innerHTML = `
+        <div class="topic-flip-inner">
+          <div class="topic-face-front topic-card">
+            <button class="peek-btn" title="So'zlarni ko'rish" onclick="event.stopPropagation(); peekTopic('${topic.id}', this)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+            <div class="topic-num">${i + 1}</div>
+            <div class="topic-name">${topic.title || 'Mavzu ' + (i+1)}</div>
+            <div class="topic-meta">${topic.wordCount || 0} ta so'z${topic.lastScore ? ' &middot; ' + topic.lastScore : ''}</div>
+            <div class="topic-progress"><div class="topic-progress-fill" style="width:${pct}%"></div></div>
+            <button class="topic-btn" onclick="window.location.href='study.html?book=${bookId}&topic=${topic.id}'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              Practice
+            </button>
+          </div>
+          <div class="topic-face-back">
+            <div class="peek-head">
+              <span>${topic.title || 'Mavzu'} &middot; So'zlar</span>
+              <button class="peek-close" onclick="event.stopPropagation(); closePeek(this)">✕</button>
+            </div>
+            <div class="peek-list" data-loaded="0">
+              <div class="peek-empty">Yuklanmoqda...</div>
+            </div>
+          </div>
+        </div>
       `;
-      grid.appendChild(card);
+      grid.appendChild(flip);
     });
   } catch(e) {
     console.error('Book load error:', e);
