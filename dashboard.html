@@ -1491,7 +1491,7 @@
       content: '';
       position: absolute;
       left: 50%; top: 50%;
-      width: 100%; height: 80%;
+      width: 100%; height: 90%;
       transform: translate(-50%, -50%);
       background: radial-gradient(circle, rgba(124,58,237,0.35), rgba(124,58,237,0.08) 55%, transparent 75%);
       filter: blur(20px);
@@ -1502,36 +1502,54 @@
     }
     .book-card:hover::before { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
 
-    /* glass frame surrounding the cover */
+    /* ── LIQUID GLASS FRAME ── */
     .book-glass-frame {
       position: relative; z-index: 1;
       padding: 10px;
-      border-radius: 20px;
-      background: linear-gradient(160deg, rgba(124,58,237,0.14), rgba(255,255,255,0.02) 40%, rgba(124,58,237,0.08));
-      border: 1px solid rgba(167,139,250,0.28);
-      backdrop-filter: blur(6px);
+      border-radius: 24px;
+      background: linear-gradient(160deg, rgba(124,58,237,0.16), rgba(255,255,255,0.03) 40%, rgba(124,58,237,0.10));
+      border: 1px solid rgba(167,139,250,0.25);
+      backdrop-filter: blur(10px) saturate(160%);
+      -webkit-backdrop-filter: blur(10px) saturate(160%);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.14),
         inset 0 -1px 0 rgba(0,0,0,0.3),
         0 10px 26px rgba(0,0,0,0.45);
       transition: transform 0.45s cubic-bezier(.2,.8,.2,1), box-shadow 0.45s cubic-bezier(.2,.8,.2,1), border-color 0.4s;
       transform-style: preserve-3d;
+      overflow: hidden;
     }
+    /* animated rim-light ring — the "liquid" edge highlight */
+    .book-glass-frame::after {
+      content: ''; position: absolute; inset: -1px; z-index: 5;
+      border-radius: inherit; padding: 1.4px;
+      background: conic-gradient(from var(--lg-angle, 0deg),
+        transparent 0%, rgba(255,255,255,0.65) 8%, transparent 18%,
+        transparent 45%, rgba(167,139,250,0.7) 53%, transparent 63%,
+        transparent 100%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0.75; pointer-events: none;
+      animation: liquidRim 5s linear infinite;
+    }
+    @keyframes liquidRim { 0% { --lg-angle: 0deg; } 100% { --lg-angle: 360deg; } }
+    @property --lg-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
     .book-card:hover .book-glass-frame {
       transform: translateY(-8px) rotateY(-6deg) rotateX(2deg) scale(1.03);
       border-color: rgba(196,181,253,0.55);
       box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.2),
         inset 0 -1px 0 rgba(0,0,0,0.3),
         0 0 55px rgba(124,58,237,0.5),
         0 20px 45px rgba(0,0,0,0.5);
     }
     /* top glass reflection streak */
-    .book-glass-frame::before {
+    .book-glass-frame > .book-glass-sheen {
       content: '';
-      position: absolute; top: 0; left: 12%; right: 12%; height: 45%;
-      background: linear-gradient(180deg, rgba(255,255,255,0.14), transparent);
-      border-radius: 20px 20px 60% 60% / 20px 20px 30% 30%;
+      position: absolute; top: 0; left: 12%; right: 12%; height: 40%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), transparent);
+      border-radius: 24px 24px 60% 60% / 24px 24px 30% 30%;
       pointer-events: none; z-index: 3;
     }
 
@@ -1541,9 +1559,9 @@
       background: radial-gradient(circle, #fff, rgba(196,181,253,0.6) 45%, transparent 75%);
       opacity: 0; animation: sparkTwinkle 3.2s ease-in-out infinite;
     }
-    .book-spark:nth-child(1) { width: 5px; height: 5px; top: 14%; left: 10%; animation-delay: 0s; }
-    .book-spark:nth-child(2) { width: 3px; height: 3px; top: 65%; right: 10%; animation-delay: 0.9s; }
-    .book-spark:nth-child(3) { width: 4px; height: 4px; bottom: 12%; left: 22%; animation-delay: 1.8s; }
+    .book-spark:nth-child(1) { width: 5px; height: 5px; top: 12%; left: 10%; animation-delay: 0s; }
+    .book-spark:nth-child(2) { width: 3px; height: 3px; top: 55%; right: 8%; animation-delay: 0.9s; }
+    .book-spark:nth-child(3) { width: 4px; height: 4px; top: 62%; left: 20%; animation-delay: 1.8s; }
     @keyframes sparkTwinkle {
       0%, 100% { opacity: 0; transform: scale(0.6) translateY(0); }
       50% { opacity: 0.9; transform: scale(1.15) translateY(-4px); }
@@ -1554,7 +1572,7 @@
       z-index: 2;
       width: 100%;
       aspect-ratio: 2 / 3;
-      border-radius: 6px 12px 12px 6px;
+      border-radius: 6px 12px 4px 4px;
       overflow: hidden;
       background: linear-gradient(145deg, rgba(38,32,56,0.9), rgba(26,22,37,0.8));
       box-shadow:
@@ -1602,22 +1620,31 @@
       font-size: 0.65rem; font-weight: 700; color: #fbbf24;
       box-shadow: 0 0 12px rgba(245,158,11,0.2);
     }
-    .book-card-info { padding: 12px 4px 0; position: relative; z-index: 1; text-align: center; }
+
+    /* ── INFO PANEL — inside the glass, visually distinct from the cover ── */
+    .book-info-panel {
+      position: relative; z-index: 2;
+      margin-top: 8px; padding: 9px 8px 8px;
+      border-radius: 12px;
+      background: linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+      border-top: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+    }
     .book-card-title {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       line-height: 1.25;
-      color: var(--text-main);
       margin-bottom: 3px;
       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
       overflow: hidden;
-      transition: color 0.3s;
+      background: linear-gradient(90deg, #fbbf24, #f0abfc 55%, #a78bfa);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      filter: drop-shadow(0 0 6px rgba(251,191,36,0.15));
     }
-    .book-card:hover .book-card-title { color: var(--primary-light); text-shadow: 0 0 16px rgba(167,139,250,0.5); }
-    .book-card-meta { font-size: 0.72rem; color: var(--text-muted); }
+    .book-card-meta { font-size: 0.7rem; color: var(--text-muted); }
     .book-progress-track {
-      height: 4px; border-radius: 99px; background: rgba(255,255,255,0.06);
+      height: 4px; border-radius: 99px; background: rgba(255,255,255,0.08);
       overflow: hidden; margin: 5px 0;
     }
     .book-progress-fill {
@@ -2345,6 +2372,7 @@ async function loadBooks() {
       card.onclick = function() { window.location.href = 'book.html?id=' + id; };
       card.innerHTML = '<div class="book-glass-frame">' +
           '<span class="book-spark"></span><span class="book-spark"></span><span class="book-spark"></span>' +
+          '<div class="book-glass-sheen"></div>' +
           '<div class="book-cover-wrap">' +
             '<img class="book-cover-img" src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=\'logo.png\'"/>' +
             '<div class="book-shine"></div>' +
@@ -2352,12 +2380,12 @@ async function loadBooks() {
           '<div class="book-card-badge">' +
             '<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>' +
             (b.wordCount || totalWords || 0) + ' so\'z</div>' +
-        '</div>' +
-        '<div class="book-card-info">' +
-        '<div class="book-card-title">' + (b.title || 'Kitob') + '</div>' +
-        '<div class="book-card-meta">Mavzu ' + completedTopics + '/' + totalTopics + ' &middot; ' + pct + '%</div>' +
-        '<div class="book-progress-track"><div class="book-progress-fill" style="width:' + pct + '%"></div></div>' +
-        '<div class="book-card-meta">' + doneWords + ' / ' + (b.wordCount || totalWords || 0) + ' so\'z</div>' +
+          '<div class="book-info-panel">' +
+            '<div class="book-card-title">' + (b.title || 'Kitob') + '</div>' +
+            '<div class="book-card-meta">Mavzu ' + completedTopics + '/' + totalTopics + ' &middot; ' + pct + '%</div>' +
+            '<div class="book-progress-track"><div class="book-progress-fill" style="width:' + pct + '%"></div></div>' +
+            '<div class="book-card-meta">' + doneWords + ' / ' + (b.wordCount || totalWords || 0) + ' so\'z</div>' +
+          '</div>' +
         '</div>';
       grid.appendChild(card);
     });
