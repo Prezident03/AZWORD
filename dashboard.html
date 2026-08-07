@@ -1477,7 +1477,7 @@
       .books-grid { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 16px 12px; }
     }
 
-    /* BOOK CARD — looks like an actual book standing on a shelf */
+    /* BOOK CARD — glass-panel premium look */
     .book-card {
       background: none;
       border: none;
@@ -1486,45 +1486,80 @@
       position: relative;
       perspective: 800px;
     }
-    /* ambient glow halo behind the book — subtle at rest, blooms on hover */
+    /* ambient glow halo behind the book — always visible, blooms on hover */
     .book-card::before {
       content: '';
       position: absolute;
-      left: 50%; top: 55%;
-      width: 85%; height: 60%;
+      left: 50%; top: 50%;
+      width: 100%; height: 80%;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(124,58,237,0.28), transparent 70%);
-      filter: blur(18px);
-      opacity: 0.35;
+      background: radial-gradient(circle, rgba(124,58,237,0.35), rgba(124,58,237,0.08) 55%, transparent 75%);
+      filter: blur(20px);
+      opacity: 0.55;
       transition: opacity 0.4s ease, transform 0.4s ease;
       pointer-events: none;
       z-index: 0;
     }
-    .book-card:hover::before { opacity: 0.85; transform: translate(-50%, -50%) scale(1.15); }
+    .book-card:hover::before { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+
+    /* glass frame surrounding the cover */
+    .book-glass-frame {
+      position: relative; z-index: 1;
+      padding: 10px;
+      border-radius: 20px;
+      background: linear-gradient(160deg, rgba(124,58,237,0.14), rgba(255,255,255,0.02) 40%, rgba(124,58,237,0.08));
+      border: 1px solid rgba(167,139,250,0.28);
+      backdrop-filter: blur(6px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.12),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 10px 26px rgba(0,0,0,0.45);
+      transition: transform 0.45s cubic-bezier(.2,.8,.2,1), box-shadow 0.45s cubic-bezier(.2,.8,.2,1), border-color 0.4s;
+      transform-style: preserve-3d;
+    }
+    .book-card:hover .book-glass-frame {
+      transform: translateY(-8px) rotateY(-6deg) rotateX(2deg) scale(1.03);
+      border-color: rgba(196,181,253,0.55);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 0 55px rgba(124,58,237,0.5),
+        0 20px 45px rgba(0,0,0,0.5);
+    }
+    /* top glass reflection streak */
+    .book-glass-frame::before {
+      content: '';
+      position: absolute; top: 0; left: 12%; right: 12%; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.14), transparent);
+      border-radius: 20px 20px 60% 60% / 20px 20px 30% 30%;
+      pointer-events: none; z-index: 3;
+    }
+
+    /* floating sparkle particles */
+    .book-spark {
+      position: absolute; border-radius: 50%; pointer-events: none; z-index: 4;
+      background: radial-gradient(circle, #fff, rgba(196,181,253,0.6) 45%, transparent 75%);
+      opacity: 0; animation: sparkTwinkle 3.2s ease-in-out infinite;
+    }
+    .book-spark:nth-child(1) { width: 5px; height: 5px; top: 14%; left: 10%; animation-delay: 0s; }
+    .book-spark:nth-child(2) { width: 3px; height: 3px; top: 65%; right: 10%; animation-delay: 0.9s; }
+    .book-spark:nth-child(3) { width: 4px; height: 4px; bottom: 12%; left: 22%; animation-delay: 1.8s; }
+    @keyframes sparkTwinkle {
+      0%, 100% { opacity: 0; transform: scale(0.6) translateY(0); }
+      50% { opacity: 0.9; transform: scale(1.15) translateY(-4px); }
+    }
+
     .book-cover-wrap {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       width: 100%;
       aspect-ratio: 2 / 3;
-      border-radius: 4px 10px 10px 4px;
+      border-radius: 6px 12px 12px 6px;
       overflow: hidden;
       background: linear-gradient(145deg, rgba(38,32,56,0.9), rgba(26,22,37,0.8));
       box-shadow:
         inset 3px 0 0 rgba(0,0,0,0.35),
-        inset 4px 0 6px rgba(0,0,0,0.25),
-        0 10px 24px rgba(0,0,0,0.45);
-      transition: transform 0.4s cubic-bezier(.2,.8,.2,1), box-shadow 0.4s cubic-bezier(.2,.8,.2,1);
-      transform-style: preserve-3d;
-      border: 1px solid rgba(167,139,250,0.12);
-    }
-    .book-card:hover .book-cover-wrap {
-      transform: translateY(-8px) rotateY(-8deg) rotateX(2deg) scale(1.04);
-      box-shadow:
-        inset 3px 0 0 rgba(0,0,0,0.35),
-        inset 4px 0 6px rgba(0,0,0,0.25),
-        -10px 20px 40px rgba(0,0,0,0.5),
-        0 0 50px rgba(124,58,237,0.45);
-      border-color: rgba(167,139,250,0.4);
+        inset 4px 0 6px rgba(0,0,0,0.25);
     }
     .book-cover-img {
       width: 100%;
@@ -1557,7 +1592,7 @@
     .book-card:hover .book-shine { transform: translateX(120%); }
 
     .book-card-badge {
-      position: absolute; top: 8px; right: 12px; z-index: 3;
+      position: absolute; top: 6px; right: 6px; z-index: 5;
       display: flex; align-items: center; gap: 4px;
       padding: 3px 10px; border-radius: 99px;
       background: rgba(15,13,26,0.75);
@@ -1567,7 +1602,7 @@
       font-size: 0.65rem; font-weight: 700; color: #fbbf24;
       box-shadow: 0 0 12px rgba(245,158,11,0.2);
     }
-    .book-card-info { padding: 10px 2px 0; position: relative; z-index: 1; }
+    .book-card-info { padding: 12px 4px 0; position: relative; z-index: 1; text-align: center; }
     .book-card-title {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700;
@@ -1579,7 +1614,7 @@
       overflow: hidden;
       transition: color 0.3s;
     }
-    .book-card:hover .book-card-title { color: var(--primary-light); }
+    .book-card:hover .book-card-title { color: var(--primary-light); text-shadow: 0 0 16px rgba(167,139,250,0.5); }
     .book-card-meta { font-size: 0.72rem; color: var(--text-muted); }
   </style>
 </head>
@@ -2274,9 +2309,12 @@ async function loadBooks() {
       const card = document.createElement('div');
       card.className = 'book-card';
       card.onclick = function() { window.location.href = 'book.html?id=' + d.id; };
-      card.innerHTML = '<div class="book-cover-wrap">' +
-          '<img class="book-cover-img" src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=\'logo.png\'"/>' +
-          '<div class="book-shine"></div>' +
+      card.innerHTML = '<div class="book-glass-frame">' +
+          '<span class="book-spark"></span><span class="book-spark"></span><span class="book-spark"></span>' +
+          '<div class="book-cover-wrap">' +
+            '<img class="book-cover-img" src="' + (b.imageUrl || 'logo.png') + '" alt="' + (b.title || '') + '" onerror="this.src=\'logo.png\'"/>' +
+            '<div class="book-shine"></div>' +
+          '</div>' +
           '<div class="book-card-badge">' +
             '<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>' +
             (b.wordCount || 0) + ' so\'z</div>' +
