@@ -1616,6 +1616,15 @@
     }
     .book-card:hover .book-card-title { color: var(--primary-light); text-shadow: 0 0 16px rgba(167,139,250,0.5); }
     .book-card-meta { font-size: 0.72rem; color: var(--text-muted); }
+    .book-progress-track {
+      height: 4px; border-radius: 99px; background: rgba(255,255,255,0.06);
+      overflow: hidden; margin: 5px 0;
+    }
+    .book-progress-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transition: width 0.8s cubic-bezier(.2,.8,.2,1);
+    }
   </style>
 </head>
 <body>
@@ -2303,12 +2312,37 @@ async function loadBooks() {
       grid.innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Hozircha kitoblar yo\'q</p></div>';
       return;
     }
-    grid.innerHTML = '';
-    snap.forEach(d => {
+
+    const bookDocs = snap.docs;
+
+    // Har bir kitob uchun mavzularni yig'ib, haqiqiy progressni hisoblaymiz
+    const withProgress = await Promise.all(bookDocs.map(async d => {
       const b = d.data();
+      let completedTopics = 0, totalTopics = 0, doneWords = 0, totalWords = 0;
+      try {
+        const topicsSnap = await getDocs(collection(db, 'books', d.id, 'topics'));
+        totalTopics = topicsSnap.size;
+        topicsSnap.forEach(t => {
+          const td = t.data();
+          totalWords += td.wordCount || 0;
+          if (td.lastScore) {
+            const parts = String(td.lastScore).split('/').map(Number);
+            const done = parts[0] || 0, total = parts[1] || 0;
+            doneWords += done;
+            if (total > 0 && done >= total) completedTopics++;
+          }
+        });
+      } catch (err) { console.warn('book progress load failed for', d.id, err); }
+      if (!totalWords) totalWords = b.wordCount || 0;
+      const pct = totalWords > 0 ? Math.min(100, Math.round((doneWords / totalWords) * 100)) : 0;
+      return { id: d.id, b, totalTopics, completedTopics, doneWords, totalWords, pct };
+    }));
+
+    grid.innerHTML = '';
+    withProgress.forEach(({ id, b, totalTopics, completedTopics, doneWords, totalWords, pct }) => {
       const card = document.createElement('div');
       card.className = 'book-card';
-      card.onclick = function() { window.location.href = 'book.html?id=' + d.id; };
+      card.onclick = function() { window.location.href = 'book.html?id=' + id; };
       card.innerHTML = '<div class="book-glass-frame">' +
           '<span class="book-spark"></span><span class="book-spark"></span><span class="book-spark"></span>' +
           '<div class="book-cover-wrap">' +
@@ -2317,11 +2351,13 @@ async function loadBooks() {
           '</div>' +
           '<div class="book-card-badge">' +
             '<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>' +
-            (b.wordCount || 0) + ' so\'z</div>' +
+            (b.wordCount || totalWords || 0) + ' so\'z</div>' +
         '</div>' +
         '<div class="book-card-info">' +
         '<div class="book-card-title">' + (b.title || 'Kitob') + '</div>' +
-        '<div class="book-card-meta">' + (b.topicCount || 0) + ' ta mavzu</div>' +
+        '<div class="book-card-meta">Mavzu ' + completedTopics + '/' + totalTopics + ' &middot; ' + pct + '%</div>' +
+        '<div class="book-progress-track"><div class="book-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '<div class="book-card-meta">' + doneWords + ' / ' + (b.wordCount || totalWords || 0) + ' so\'z</div>' +
         '</div>';
       grid.appendChild(card);
     });
