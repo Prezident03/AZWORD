@@ -573,6 +573,42 @@
       margin-bottom: 32px;
     }
 
+    /* Umumiy bo'limlar — gorizontal scroll, shisha kartochkalar (faqat rasm + nom) */
+    .sections-scroll-row {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      overflow-y: visible;
+      padding: 6px 4px 20px;
+      margin-bottom: 12px;
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+    }
+    .sections-scroll-row::-webkit-scrollbar { height: 6px; }
+    .sections-scroll-row::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.35); border-radius: 99px; }
+    .section-card {
+      flex: 0 0 140px;
+      scroll-snap-align: start;
+      cursor: pointer;
+    }
+    .section-cover-wrap {
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      border-radius: 6px 12px 4px 4px;
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(38,32,56,0.9), rgba(26,22,37,0.8));
+      display: flex; align-items: center; justify-content: center;
+    }
+    .section-cover-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .section-cover-fallback { font-size: 2.4rem; opacity: 0.85; }
+    .section-card .book-card-title {
+      margin-top: 8px; text-align: center; font-size: 0.8rem;
+      -webkit-line-clamp: 2;
+    }
+    @media (max-width: 640px) {
+      .section-card { flex-basis: 118px; }
+    }
+
     .folder-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
@@ -1997,7 +2033,7 @@
         Umumiy bo'limlar
       </div>
     </div>
-    <div class="folders-grid" id="admin-folders">
+    <div class="sections-scroll-row" id="admin-folders">
       <div class="folders-empty" style="min-height:140px">
         <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.75;margin-bottom:10px">
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
@@ -2426,6 +2462,29 @@ function renderFolders(snap, containerId, isAdmin) {
   }
 
   container.innerHTML = '';
+
+  if (isAdmin) {
+    // Umumiy bo'limlar — glass kartochka, faqat rasm + nom (kitoblar uslubida)
+    snap.forEach(d => {
+      const f = d.data();
+      const id = d.id;
+      const card = document.createElement('div');
+      card.className = 'section-card book-card';
+      card.onclick = () => location.href = `folder.html?id=${id}`;
+      const coverInner = f.imageUrl
+        ? '<img src="' + f.imageUrl + '" alt="' + (f.name || '') + '" onerror="this.parentElement.innerHTML=\'<div class=&quot;section-cover-fallback&quot;>' + (f.emoji ? '' : '📁') + '</div>\'"/>'
+        : '<div class="section-cover-fallback">📁</div>';
+      card.innerHTML = '<div class="book-glass-frame" style="padding:8px">' +
+          '<span class="book-spark"></span><span class="book-spark"></span><span class="book-spark"></span>' +
+          '<div class="book-glass-sheen"></div>' +
+          '<div class="section-cover-wrap">' + coverInner + '</div>' +
+        '</div>' +
+        '<div class="book-card-title">' + (f.name || 'Bolim') + '</div>';
+      container.appendChild(card);
+    });
+    return;
+  }
+
   snap.forEach(d => {
     const f = d.data();
     const id = d.id;

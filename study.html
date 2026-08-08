@@ -461,6 +461,7 @@
     const bookId = params.get('book');
     const topicId = params.get('topic');
     const isBookMode = !!(bookId && topicId);
+    const isFolderTopicMode = !!(folderId && topicId && !bookId);
     if (!folderId && !isBookMode) window.location.href = 'dashboard.html';
 
     let words = [];
@@ -486,7 +487,9 @@
     async function loadWords() {
       const wordsRef = isBookMode
         ? collection(db, 'books', bookId, 'topics', topicId, 'words')
-        : collection(db, 'folders', folderId, 'words');
+        : isFolderTopicMode
+          ? collection(db, 'folders', folderId, 'topics', topicId, 'words')
+          : collection(db, 'folders', folderId, 'words');
       const q = query(wordsRef, orderBy('createdAt', 'asc'));
       const snap = await getDocs(q);
       words = [];
@@ -1031,14 +1034,16 @@
 
       const resultDocId = isBookMode
         ? `${currentUser.uid}_${bookId}_${topicId}_${Date.now()}`
-        : `${currentUser.uid}_${folderId}_${Date.now()}`;
+        : isFolderTopicMode
+          ? `${currentUser.uid}_${folderId}_${topicId}_${Date.now()}`
+          : `${currentUser.uid}_${folderId}_${Date.now()}`;
 
       try {
         await setDoc(
           doc(db, 'studyResults', resultDocId),
           {
             uid: currentUser.uid,
-            ...(isBookMode ? { bookId, topicId } : { folderId }),
+            ...(isBookMode ? { bookId, topicId } : isFolderTopicMode ? { folderId, topicId } : { folderId }),
             completedAt: serverTimestamp(),
             totalWords: allWords.length,
             perfectWords,
@@ -1066,6 +1071,11 @@
             lastScore: `${perfectWords}/${allWords.length}`,
             lastStudied: serverTimestamp()
           });
+        } else if (isFolderTopicMode) {
+          await updateDoc(doc(db, 'folders', folderId, 'topics', topicId), {
+            lastScore: `${perfectWords}/${allWords.length}`,
+            lastStudied: serverTimestamp()
+          });
         } else {
           await updateDoc(doc(db, 'folders', folderId), {
             lastScore: `${perfectWords}/${allWords.length}`,
@@ -1079,7 +1089,9 @@
 
       window.location.href = isBookMode
         ? `results.html?book=${bookId}&topic=${topicId}`
-        : `results.html?id=${folderId}`;
+        : isFolderTopicMode
+          ? `results.html?id=${folderId}&topic=${topicId}`
+          : `results.html?id=${folderId}`;
     }
 
     function showRoundBanner(count) {
