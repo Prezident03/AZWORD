@@ -1376,13 +1376,13 @@ body {
     opacity var(--pt-duration-in) var(--pt-ease),
     transform var(--pt-duration-in) var(--pt-ease),
     filter var(--pt-duration-in) var(--pt-ease);
-  will-change: opacity, transform, filter;
 }
 
 body.pt-leaving, html.pt-leaving body {
   opacity: 0 !important;
   transform: scale(0.985) translateY(12px);
   filter: blur(6px);
+  will-change: opacity, transform, filter;
   transition:
     opacity var(--pt-duration-out) var(--pt-ease),
     transform var(--pt-duration-out) var(--pt-ease),
@@ -1393,12 +1393,14 @@ body.pt-entering, html.pt-entering body {
   opacity: 0;
   transform: translateY(18px) scale(0.992);
   filter: blur(8px);
+  will-change: opacity, transform, filter;
 }
 
 body.pt-entered, html.pt-entered body {
   opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
+  transform: none;
+  filter: none;
+  will-change: auto;
 }
 
 /* Gradient sweep overlay — Stripe/Raycast style */
