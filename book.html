@@ -507,6 +507,18 @@ import {
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get('id');
 
+// ── "Davom ettirish" (Continue) tugmasi uchun — oxirgi o'qilgan mavzuni saqlab qo'yamiz ──
+window.goStudyTopic = function(kind, containerId, containerName, topicId, topicName) {
+  try {
+    const entry = { kind, id: containerId, name: containerName, topic: topicId, topicName: topicName };
+    localStorage.setItem('az:lastFolder', JSON.stringify(entry));
+  } catch (e) {}
+  const url = kind === 'book'
+    ? `study.html?book=${containerId}&topic=${topicId}`
+    : `study.html?id=${containerId}&topic=${topicId}`;
+  window.location.href = url;
+};
+
 // ── Premium flip preview: so'zlarni on-demand yuklash ──
 window.peekTopic = async function(topicId, btn) {
   const flip = btn.closest('.topic-flip');
@@ -637,7 +649,7 @@ onAuthStateChanged(auth, async user => {
             <div class="topic-name">${topic.title || 'Mavzu ' + (i+1)}</div>
             <div class="topic-meta">${topic.wordCount || 0} ta so'z${topic.lastScore ? ' &middot; ' + topic.lastScore : ''}</div>
             <div class="topic-progress"><div class="topic-progress-fill" style="width:${pct}%"></div></div>
-            <button class="topic-btn" onclick="window.location.href='study.html?book=${bookId}&topic=${topic.id}'">
+            <button class="topic-btn" data-topic-btn="${topic.id}">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
               Practice
             </button>
@@ -654,6 +666,11 @@ onAuthStateChanged(auth, async user => {
         </div>
       `;
       grid.appendChild(flip);
+      const practiceBtn = flip.querySelector('[data-topic-btn]');
+      if (practiceBtn) {
+        const topicId = topic.id, topicTitle = topic.title || ('Mavzu ' + (i + 1));
+        practiceBtn.addEventListener('click', () => goStudyTopic('book', bookId, book.title || 'Kitob', topicId, topicTitle));
+      }
     });
   } catch(e) {
     console.error('Book load error:', e);

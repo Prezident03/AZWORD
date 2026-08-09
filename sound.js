@@ -8,14 +8,19 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   let ctx = null;
+  let unlocked = false;
 
   function getCtx() {
     if (!ctx && AudioCtx) ctx = new AudioCtx();
     return ctx;
   }
 
-  // Resume on first user gesture (browser autoplay policy)
+  // Resume on first user gesture (browser autoplay policy).
+  // Real gestures only (click/tap/keydown) — NOT hover/pointerover, which browsers
+  // don't count as a gesture and which would otherwise create a suspended
+  // AudioContext (and log the "not allowed to start" warning) before any real interaction.
   function unlock() {
+    unlocked = true;
     const c = getCtx();
     if (c && c.state === 'suspended') { c.resume(); }
     document.removeEventListener('pointerdown', unlock);
@@ -118,6 +123,9 @@
   /* ─── Public API ─── */
   window.AzSound = {
     play(name) {
+      // Real user gesture bo'lmaguncha (hover autoplay policy tomonidan hisoblanmaydi)
+      // AudioContext yaratmaymiz — aks holda brauzer konsolida ogohlantirish chiqadi.
+      if (!unlocked) return;
       if (reduceMotion || name === 'hover' && window._azHoverThrottle && Date.now() - window._azHoverThrottle < 35) return;
       if (name === 'hover') window._azHoverThrottle = Date.now();
 

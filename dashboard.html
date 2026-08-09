@@ -2054,7 +2054,7 @@
           </div>
         </div>
 
-        <button class="az-hm-continue" onclick="window.AzDash.continueLastFolder()">
+        <button class="az-hm-continue" onclick="handleContinueClick()">
           <div class="az-hm-continue-play">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
           </div>
@@ -2419,6 +2419,41 @@ async function loadFolders() {
   renderFolders(mySnap, 'my-folders', false);
   renderFolders(adminSnap, 'admin-folders', true);
 }
+
+// "Davom ettirish" tugmasi: oxirgi o'qilgan mavzuga qaytaradi;
+// birinchi marta bosilsa (saqlangan ma'lumot yo'q bo'lsa) — umumiy bo'limlardagi birinchi bo'limga kiritadi.
+window.handleContinueClick = async () => {
+  let lastFolder = null;
+  try { lastFolder = JSON.parse(localStorage.getItem('az:lastFolder') || 'null'); } catch (e) {}
+
+  if (lastFolder && lastFolder.id) {
+    if (lastFolder.kind === 'book') {
+      window.location.href = lastFolder.topic
+        ? `study.html?book=${lastFolder.id}&topic=${lastFolder.topic}`
+        : `book.html?id=${lastFolder.id}`;
+    } else {
+      window.location.href = lastFolder.topic
+        ? `study.html?id=${lastFolder.id}&topic=${lastFolder.topic}`
+        : `study.html?id=${lastFolder.id}`;
+    }
+    return;
+  }
+
+  // Birinchi marta — umumiy bo'limlardagi birinchi bo'limga kiramiz
+  try {
+    const adminQ = query(collection(db,'folders'), where('isAdmin','==',true));
+    const adminSnap = await getDocs(adminQ);
+    if (!adminSnap.empty) {
+      const first = adminSnap.docs[0];
+      window.location.href = `folder.html?id=${first.id}`;
+      return;
+    }
+  } catch (err) { console.error('handleContinueClick: admin folder fetch failed', err); }
+
+  // Umumiy bo'lim topilmasa — dashboard'da qoldiramiz
+  showToast("Hozircha boshlash uchun bo'lim topilmadi", true);
+};
+
 
 async function loadBooks() {
   try {

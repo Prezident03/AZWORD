@@ -469,6 +469,8 @@
     let currentUser = null;
     let words = [];
     let folderTopicMode = false;
+    let folderName = '';
+    let folderIsAdmin = false;
 
     if (!folderId) window.location.href = 'dashboard.html';
 
@@ -492,6 +494,8 @@
       document.getElementById('folder-emoji').innerHTML = fromEmoji(data.emoji || 'folder', {size:40,color:'var(--purple-light)'});
       document.getElementById('folder-name').textContent = data.name;
       document.title = 'AzWord - ' + data.name;
+      folderName = data.name || 'Bo\'lim';
+      folderIsAdmin = !!data.isAdmin;
 
       folderTopicMode = !!(data.isAdmin && (data.topicCount || 0) > 0);
       if (folderTopicMode) {
@@ -529,8 +533,11 @@
           '<div class="topic-name">' + (t.title || 'Mavzu') + '</div>' +
           '<div class="topic-meta">' + (t.wordCount || 0) + ' ta so\'z' + (t.lastScore ? ' &middot; ' + t.lastScore : '') + '</div>' +
           '<div class="topic-progress"><div class="topic-progress-fill" style="width:' + pct + '%"></div></div>' +
-          '<button class="topic-btn" onclick="window.location.href=\'study.html?id=' + folderId + '&topic=' + d.id + '\'">' +
+          '<button class="topic-btn" type="button">' +
           '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg> Boshlash</button>';
+        const topicBtn = card.querySelector('.topic-btn');
+        const topicId = d.id, topicTitle = t.title || 'Mavzu';
+        topicBtn.addEventListener('click', () => goStudyTopic(folderId, folderName, topicId, topicTitle));
         container.appendChild(card);
       });
     }
@@ -701,8 +708,18 @@
       await loadWords();
     };
 
+    window.goStudyTopic = (id, name, topicId, topicName) => {
+      try {
+        localStorage.setItem('az:lastFolder', JSON.stringify({ kind: 'folder', id, name, topic: topicId, topicName }));
+      } catch (e) {}
+      window.location.href = `study.html?id=${id}&topic=${topicId}`;
+    };
+
     window.startStudy = () => {
       if (words.length === 0) return;
+      try {
+        localStorage.setItem('az:lastFolder', JSON.stringify({ kind: 'folder', id: folderId, name: folderName }));
+      } catch (e) {}
       window.location.href = `study.html?id=${folderId}`;
     };
 
