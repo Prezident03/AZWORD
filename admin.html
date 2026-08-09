@@ -287,10 +287,12 @@
           <h3 id="folder-topic-words-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Sozlar</h3>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="btn-sm" onclick="closeTopicWords()" style="color:var(--text-muted)">Orqaga</button>
+            <button class="btn-sm" onclick="openAiWordGen()" style="display:flex;align-items:center;gap:5px;color:var(--purple-light);border-color:rgba(124,58,237,0.4)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> AI orqali yaratish</button>
             <button class="btn-sm" onclick="openBulkWordModal()" style="display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Fayldan yuklash</button>
             <button class="btn-add" onclick="openWordModal()" style="padding:8px 16px;font-size:0.85rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Soz qoshish</button>
           </div>
         </div>
+
         <div class="tbl-head" style="grid-template-columns:40px 1fr 1fr 1fr 60px"><span>#</span><span>English</span><span>Uzbek</span><span>Example</span><span>Amal</span></div>
         <div id="admin-folder-words-list"></div>
       </div>
@@ -354,6 +356,7 @@
           <h3 id="topic-words-title"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Sozlar</h3>
           <div style="display:flex;gap:8px;align-items:center">
             <button class="btn-sm" onclick="closeTopicWords()" style="color:var(--text-muted)">Orqaga</button>
+            <button class="btn-sm" onclick="openAiWordGen()" style="display:flex;align-items:center;gap:5px;color:var(--purple-light);border-color:rgba(124,58,237,0.4)"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> AI orqali yaratish</button>
             <button class="btn-sm" onclick="openBulkWordModal()" style="display:flex;align-items:center;gap:5px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Fayldan yuklash</button>
             <button class="btn-add" onclick="openWordModal()" style="padding:8px 16px;font-size:0.85rem"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:4px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Soz qoshish</button>
           </div>
@@ -648,6 +651,39 @@
 </div>
 
 <!-- Topic Modal -->
+<div class="modal-overlay" id="ai-word-gen-modal">
+  <div class="modal" style="max-width:640px">
+    <h3>AI orqali soz yaratish</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label style="display:block;font-size:0.76rem;color:var(--text-muted);margin-bottom:5px;font-weight:600">Mavzu</label>
+        <input type="text" id="ai-tw-topic" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-main);font-size:0.85rem;outline:none"/>
+      </div>
+      <div>
+        <label style="display:block;font-size:0.76rem;color:var(--text-muted);margin-bottom:5px;font-weight:600">Daraja</label>
+        <select id="ai-tw-level" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-main);font-size:0.85rem;outline:none">
+          <option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option><option value="B2" selected>B2</option><option value="C1">C1</option><option value="C2">C2</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:0.76rem;color:var(--text-muted);margin-bottom:5px;font-weight:600">Son</label>
+        <select id="ai-tw-count" style="width:100%;background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-main);font-size:0.85rem;outline:none">
+          <option value="10" selected>10 ta</option><option value="20">20 ta</option><option value="50">50 ta</option>
+        </select>
+      </div>
+    </div>
+    <div id="ai-tw-status" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:10px"></div>
+    <div id="ai-tw-preview" style="display:none;margin-bottom:14px">
+      <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:8px" id="ai-tw-list"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeAiWordGen()">Bekor</button>
+      <button class="btn-confirm" id="ai-tw-gen-btn" onclick="generateAiTopicWords()">Generate</button>
+      <button class="btn-confirm" id="ai-tw-publish-btn" style="display:none" onclick="publishAiTopicWords()">Barchasini qoshish</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="topic-modal">
   <div class="modal">
     <h3 id="topic-modal-title">Yangi mavzu</h3>
@@ -825,6 +861,8 @@ import { icon, fromEmoji, starIcon, coinIcon, flameIcon, folderIcon, iconPickerH
 const ADMIN = "abdurasul1406z@gmail.com";
 // BOOKS
 let selBookId = null, selTopicId = null;
+let curTopicTitle = '';
+let aiTopicWords = [];
 // selCollection: 'books' yoki 'folders' — mavzu/soz funksiyalari qaysi kolleksiya bilan ishlayotganini bildiradi
 let selCollection = 'books';
 // UI element id'lari kolleksiya turiga qarab almashadi
@@ -1040,6 +1078,7 @@ window.deleteTopic = async function(topicId) {
 // WORDS
 window.openTopicTopics = async function(topicId, title) {
   selTopicId = topicId;
+  curTopicTitle = title || '';
   const wordsTitleId = topicsUI[selCollection].wordsTitleId;
   const wordsSectionId = selCollection === 'folders' ? 'folder-topic-words-section' : 'topic-words-section';
   document.getElementById(wordsTitleId).innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:6px"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> ' + (title || '') + ' - Sozlar';
@@ -1301,6 +1340,103 @@ async function loadFoldersForAI() {
     sel.appendChild(opt);
   });
 }
+
+window.openAiWordGen = function() {
+  document.getElementById('ai-tw-topic').value = curTopicTitle || '';
+  document.getElementById('ai-tw-status').textContent = '';
+  document.getElementById('ai-tw-preview').style.display = 'none';
+  document.getElementById('ai-tw-publish-btn').style.display = 'none';
+  aiTopicWords = [];
+  document.getElementById('ai-word-gen-modal').classList.add('open');
+};
+
+window.closeAiWordGen = function() {
+  document.getElementById('ai-word-gen-modal').classList.remove('open');
+};
+
+window.generateAiTopicWords = async function() {
+  const topic = document.getElementById('ai-tw-topic').value.trim();
+  const level = document.getElementById('ai-tw-level').value;
+  const count = document.getElementById('ai-tw-count').value;
+  const statusEl = document.getElementById('ai-tw-status');
+  const btn = document.getElementById('ai-tw-gen-btn');
+  if (!topic) { statusEl.textContent = 'Mavzu nomini kiriting'; statusEl.style.color = '#f87171'; return; }
+
+  btn.disabled = true; btn.textContent = 'Generatsiya...';
+  statusEl.style.color = 'var(--text-muted)';
+  statusEl.textContent = 'AI sozlarni yaratmoqda... (10-20 soniya)';
+  document.getElementById('ai-tw-preview').style.display = 'none';
+  document.getElementById('ai-tw-publish-btn').style.display = 'none';
+
+  try {
+    const response = await fetch("/api/generate-words", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ topic, level, count })
+    });
+    if (!response.ok) { const err = await response.json(); throw new Error(err.error?.message || 'API xato'); }
+    const data = await response.json();
+    const text = data.choices[0].message.content.trim();
+    let parsed;
+    try { parsed = JSON.parse(text); } catch(e) {
+      const match = text.match(/\[[\s\S]*\]/);
+      if (match) { parsed = JSON.parse(match[0]); } else { throw new Error('JSON parse xato'); }
+    }
+    if (!Array.isArray(parsed) || !parsed.length) throw new Error('Natija yoq');
+    aiTopicWords = parsed;
+    statusEl.textContent = parsed.length + ' ta soz tayyor. Korib chiqing va "Barchasini qoshish"ni bosing.';
+    statusEl.style.color = '#4ade80';
+    generateAiTopicWordsRerender();
+    document.getElementById('ai-tw-preview').style.display = 'block';
+    document.getElementById('ai-tw-publish-btn').style.display = 'inline-flex';
+  } catch(e) {
+    statusEl.textContent = 'Xato: ' + e.message;
+    statusEl.style.color = '#f87171';
+  }
+  btn.disabled = false; btn.textContent = 'Generate';
+};
+
+window.generateAiTopicWordsRerender = function() {
+  document.getElementById('ai-tw-list').innerHTML = '';
+  const evt = { target: null };
+  const list = document.getElementById('ai-tw-list');
+  aiTopicWords.forEach((w, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:14px;padding:9px 14px;border-bottom:1px solid var(--border);font-size:0.85rem;align-items:center';
+    row.innerHTML = '<span style="color:var(--text-dim);width:20px">' + (i+1) + '</span>' +
+      '<span style="font-weight:600;flex:1">' + w.en + '</span>' +
+      '<span style="color:var(--text-muted);flex:1">' + w.uz + '</span>' +
+      '<button class="abtn red" onclick="aiTopicWords.splice(' + i + ',1); generateAiTopicWordsRerender();"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
+    list.appendChild(row);
+  });
+  document.getElementById('ai-tw-status').textContent = aiTopicWords.length + " ta soz qoldi.";
+};
+
+window.publishAiTopicWords = async function() {
+  if (!aiTopicWords.length || !selBookId || !selTopicId) return;
+  const btn = document.getElementById('ai-tw-publish-btn');
+  btn.disabled = true; btn.textContent = 'Saqlanmoqda...';
+  try {
+    const existingSnap = await getDocs(collection(db, selCollection, selBookId, 'topics', selTopicId, 'words'));
+    const existing = new Set();
+    existingSnap.forEach(d => existing.add((d.data().en || '').toLowerCase()));
+    const newWords = aiTopicWords.filter(w => !existing.has((w.en || '').toLowerCase()));
+    const skipped = aiTopicWords.length - newWords.length;
+    for (const w of newWords) {
+      await addDoc(collection(db, selCollection, selBookId, 'topics', selTopicId, 'words'), {
+        en: (w.en || '').toLowerCase(), uz: w.uz || '', example: w.example || '', createdAt: serverTimestamp()
+      });
+    }
+    if (newWords.length) {
+      await updateDoc(doc(db, selCollection, selBookId, 'topics', selTopicId), { wordCount: increment(newWords.length) });
+      await updateDoc(doc(db, selCollection, selBookId), { wordCount: increment(newWords.length) });
+    }
+    toast(newWords.length + ' ta soz qoshildi' + (skipped ? ' (' + skipped + ' takror otkazib yuborildi)' : ''));
+    closeAiWordGen();
+    loadWords();
+  } catch(e) { toast('Xato: ' + e.message, true); }
+  btn.disabled = false; btn.textContent = 'Barchasini qoshish';
+};
 
 window.generateWords = async () => {
   const topic = document.getElementById('ai-topic').value.trim();
