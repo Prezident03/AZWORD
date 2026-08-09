@@ -36,7 +36,13 @@
       z-index: 200;
       transition: transform 0.35s var(--ease-emphasis, cubic-bezier(0.22,1,0.36,1));
       box-shadow: 4px 0 30px rgba(0,0,0,0.3);
+      overflow-y: auto;
+      overflow-x: hidden;
     }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.2); border-radius: 99px; }
+    .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.4); }
     .sidebar::before {
       content: '';
       position: absolute;
@@ -113,7 +119,7 @@
     @keyframes sb-online { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
 
     /* ── NAVIGATION ── */
-    .sidebar-nav { flex: 1; padding: 8px 10px; overflow-y: auto; overflow-x: hidden; }
+    .sidebar-nav { padding: 8px 10px; }
     .nav-label {
       font-size: 0.6rem;
       font-weight: 700;
