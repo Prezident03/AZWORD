@@ -529,7 +529,21 @@
     </div>
     <div class="form-group">
       <label>Muqova rasmi (URL) — ixtiyoriy, kitoblardagi kabi glass kartochkada ko'rinadi</label>
-      <input type="text" id="nf-image" placeholder="https://..."/>
+      <div style="display:flex; gap:8px">
+        <input type="text" id="nf-image" placeholder="https://..." style="flex:1"/>
+        <button type="button" class="btn-sm" onclick="toggleAiImageGen('nf')" style="white-space:nowrap;display:flex;align-items:center;gap:5px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          AI generator
+        </button>
+      </div>
+      <div id="nf-ai-panel" style="display:none;margin-top:10px;padding:12px;border-radius:10px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25)">
+        <input type="text" id="nf-ai-prompt" placeholder="Masalan: travel suitcase globe passport 3d icon purple" style="width:100%;margin-bottom:8px"/>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="button" class="btn-confirm" style="padding:8px 14px;font-size:0.82rem" onclick="generateAiCover('nf')">Yaratish</button>
+          <span id="nf-ai-status" style="font-size:0.78rem;color:var(--text-muted)"></span>
+        </div>
+        <img id="nf-ai-preview" style="display:none;margin-top:10px;width:120px;border-radius:8px;border:1px solid rgba(255,255,255,0.1)"/>
+      </div>
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeNewFolder()">Bekor</button>
@@ -1863,7 +1877,47 @@ window.closeNewFolder = () => {
   document.getElementById('nf-modal').classList.remove('open');
   document.getElementById('nf-name').value='';
   document.getElementById('nf-image').value='';
+  document.getElementById('nf-ai-panel').style.display='none';
+  document.getElementById('nf-ai-prompt').value='';
+  document.getElementById('nf-ai-preview').style.display='none';
+  document.getElementById('nf-ai-status').textContent='';
 };
+window.toggleAiImageGen = function(prefix) {
+  const panel = document.getElementById(prefix + '-ai-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+};
+
+window.generateAiCover = async function(prefix) {
+  const promptEl = document.getElementById(prefix + '-ai-prompt');
+  const statusEl = document.getElementById(prefix + '-ai-status');
+  const previewEl = document.getElementById(prefix + '-ai-preview');
+  const imageInput = document.getElementById(prefix + '-image');
+  const prompt = promptEl.value.trim();
+  if (!prompt) { statusEl.textContent = 'Tavsif yozing (masalan: "travel suitcase 3d icon")'; statusEl.style.color = '#f87171'; return; }
+
+  statusEl.textContent = 'Yaratilmoqda... (10-20 soniya)';
+  statusEl.style.color = 'var(--text-muted)';
+  previewEl.style.display = 'none';
+
+  const styledPrompt = prompt + ', 3d icon, purple and violet tones, glossy render, dark background, premium app cover art';
+  const seed = Math.floor(Math.random() * 1000000);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=600&height=900&seed=${seed}&nologo=true`;
+
+  const img = new Image();
+  img.onload = () => {
+    previewEl.src = url;
+    previewEl.style.display = 'block';
+    imageInput.value = url;
+    statusEl.textContent = 'Tayyor! Rasm avtomatik tanlandi.';
+    statusEl.style.color = '#4ade80';
+  };
+  img.onerror = () => {
+    statusEl.textContent = 'Xato: rasm yaratilmadi, qayta urinib koring';
+    statusEl.style.color = '#f87171';
+  };
+  img.src = url;
+};
+
 window.createFolder = async () => {
   const name = document.getElementById('nf-name').value.trim();
   const emoji = document.getElementById('nf-emoji').value.trim() || 'book-open';
