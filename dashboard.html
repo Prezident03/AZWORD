@@ -609,6 +609,44 @@
       .section-card { flex-basis: 118px; }
     }
 
+    /* Mening bo'limlarim — rasmsiz, gradient-belgili shisha kartochka */
+    .myf-card { flex: 0 0 168px; scroll-snap-align: start; cursor: pointer; }
+    .myf-icon-wrap {
+      position: relative; z-index: 2;
+      width: 100%; aspect-ratio: 2 / 3;
+      border-radius: 6px 12px 4px 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.2rem;
+      overflow: hidden;
+    }
+    .myf-grad-0 { background: linear-gradient(150deg, #7c3aed, #4c1d95); }
+    .myf-grad-1 { background: linear-gradient(150deg, #d97706, #78350f); }
+    .myf-grad-2 { background: linear-gradient(150deg, #db2777, #831843); }
+    .myf-grad-3 { background: linear-gradient(150deg, #0891b2, #164e63); }
+    .myf-grad-4 { background: linear-gradient(150deg, #16a34a, #14532d); }
+    .myf-icon-wrap::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.22), transparent 60%);
+    }
+    .myf-delete {
+      position: absolute; top: 6px; right: 6px; z-index: 6;
+      width: 24px; height: 24px; border-radius: 8px; border: none;
+      background: rgba(15,13,26,0.55); color: #fca5a5;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; opacity: 0; transition: opacity 0.2s;
+    }
+    .myf-card:hover .myf-delete { opacity: 1; }
+    .myf-delete:hover { background: rgba(239,68,68,0.3); color: #fff; }
+    .myf-add {
+      flex: 0 0 168px; scroll-snap-align: start; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; aspect-ratio: 2/3; border-radius: 16px;
+      border: 1.5px dashed rgba(167,139,250,0.35);
+      color: var(--text-muted); font-size: 0.8rem; font-weight: 600;
+      transition: border-color 0.25s, color 0.25s, transform 0.25s;
+    }
+    .myf-add:hover { border-color: var(--primary); color: var(--primary-light); transform: translateY(-4px); }
+
     .folder-card {
       background: var(--bg-card);
       border: 1.5px solid var(--border);
@@ -2050,7 +2088,7 @@
         Mening bo'limlarim
       </div>
     </div>
-    <div class="folders-grid" id="my-folders">
+    <div class="sections-scroll-row" id="my-folders">
       <div class="folders-empty">
         <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.6">
           <rect x="20" y="30" width="80" height="60" rx="8" fill="#2e2845" stroke="#4a3f6b" stroke-width="2"/>
@@ -2110,13 +2148,10 @@
       <label>Bo'lim nomi</label>
       <input type="text" id="folder-name" placeholder="Masalan: IELTS Vocabulary" onkeydown="if(event.key==='Enter') createFolder()"/>
     </div>
-    <div class="form-group">
-      <label>Emoji</label>
-      <input type="text" id="folder-emoji" placeholder="📚" maxlength="2"/>
-    </div>
+    <input type="hidden" id="folder-emoji" value=""/>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">Bekor</button>
-      <button class="btn-confirm" onclick="createFolder()">Yaratish</button>
+      <button class="btn-confirm" id="folder-create-btn" onclick="createFolder()">Yaratish</button>
     </div>
   </div>
 </div>
@@ -2485,40 +2520,42 @@ function renderFolders(snap, containerId, isAdmin) {
     return;
   }
 
-  snap.forEach(d => {
+  const gradIcons = ['','','','',''];
+  snap.forEach((d, i) => {
     const f = d.data();
     const id = d.id;
     const wc = f.wordCount || 0;
     const score = f.lastScore;
     const pct = score !== null && score !== undefined ? score : 0;
+    const gradClass = 'myf-grad-' + (i % 5);
+    const iconInner = f.imageUrl
+      ? '<img src="' + f.imageUrl + '" alt="' + (f.name || '') + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'"/>'
+      : '';
 
     const card = document.createElement('div');
-    card.className = 'folder-card';
+    card.className = 'myf-card book-card';
     card.onclick = () => location.href = `folder.html?id=${id}`;
-    card.innerHTML = `
-      ${!isAdmin ? `<button class="folder-delete" onclick="deleteFolder(event,'${id}')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-      </button>` : ''}
-      <div class="folder-icon">${f.emoji || '📁'}</div>
-      <div class="folder-name">${f.name}</div>
-      <div class="folder-meta">${wc} ta soz</div>
-      <div class="folder-progress">
-        <div class="folder-progress-fill" style="width:${pct}%"></div>
-      </div>
-      ${score !== null && score !== undefined ? `<div class="folder-score">
-        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fbbf24" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        ${score}/${wc}
-      </div>` : ''}
-    `;
+    card.innerHTML = '<div class="book-glass-frame" style="padding:8px">' +
+        '<span class="book-spark"></span><span class="book-spark"></span><span class="book-spark"></span>' +
+        '<div class="book-glass-sheen"></div>' +
+        (!isAdmin ? '<button class="myf-delete" onclick="deleteFolder(event,\'' + id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>' : '') +
+        '<div class="myf-icon-wrap ' + (f.imageUrl ? '' : gradClass) + '">' + iconInner + '</div>' +
+        (score !== null && score !== undefined ? '<div class="book-card-badge"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>' + score + '/' + wc + '</div>' : '') +
+        '<div class="book-info-panel">' +
+          '<div class="book-card-title">' + (f.name || 'Bolim') + '</div>' +
+          '<div class="book-card-meta">' + wc + ' ta so\'z</div>' +
+          '<div class="book-progress-track"><div class="book-progress-fill" style="width:' + pct + '%"></div></div>' +
+        '</div>' +
+      '</div>';
     container.appendChild(card);
   });
 
   if (!isAdmin) {
     const addCard = document.createElement('div');
-    addCard.className = 'folder-card-add';
+    addCard.className = 'myf-add';
     addCard.onclick = openModal;
     addCard.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
       Yangi bolim
     `;
     container.appendChild(addCard);
@@ -2586,13 +2623,32 @@ document.getElementById('stat-detail-modal')?.addEventListener('click', e => { i
 
 window.createFolder = async () => {
   const name = document.getElementById('folder-name').value.trim();
-  const emoji = document.getElementById('folder-emoji').value.trim() || '📁';
   if (!name) return;
   const existing = await getDocs(query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false)));
   if ([...existing.docs].find(d => d.data().name.toLowerCase() === name.toLowerCase())) {
     return showToast(name + " nomli bolim allaqachon mavjud!", true);
   }
-  await addDoc(collection(db,'folders'), { name, emoji, uid:currentUser.uid, isAdmin:false, wordCount:0, progress:0, lastScore:null, createdAt:serverTimestamp() });
+
+  const btn = document.getElementById('folder-create-btn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Rasm yaratilmoqda...';
+
+  const imageUrl = await new Promise((resolve) => {
+    const styledPrompt = name + ', 3d icon, purple and violet tones, glossy render, dark background, premium app cover art';
+    const seed = Math.floor(Math.random() * 1000000);
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=600&height=900&seed=${seed}&nologo=true`;
+    const img = new Image();
+    const timer = setTimeout(() => resolve(''), 20000);
+    img.onload = () => { clearTimeout(timer); resolve(url); };
+    img.onerror = () => { clearTimeout(timer); resolve(''); };
+    img.src = url;
+  });
+
+  btn.textContent = originalLabel;
+  btn.disabled = false;
+
+  await addDoc(collection(db,'folders'), { name, imageUrl, uid:currentUser.uid, isAdmin:false, wordCount:0, progress:0, lastScore:null, createdAt:serverTimestamp() });
   closeModal();
   showToast("Bolim yaratildi!");
   await loadFolders();
