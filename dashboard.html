@@ -2261,157 +2261,149 @@ onAuthStateChanged(auth, async user => {
 });
 
 async function loadUserStats(uid) {
+  let d = null;
   try {
     const ud = await getDoc(doc(db, 'users', uid));
-    if (ud.exists()) {
-      let d = ud.data();
-      const streak = d.streakDays || 0;
-      const stars = d.stars || 0;
-      const coins = d.coins || 0;
+    if (ud.exists()) d = ud.data();
+  } catch (err) { console.error('loadUserStats: fetch failed', err); }
 
-      // ──────────────── BIR MARTALIK AVTOMATIK RESET (eski/test statistikani tozalash) ────────────────
-      if (d.statsResetV1 !== true) {
-        try {
-          await updateDoc(doc(db, 'users', uid), {
-            totalWordsLearned: 0,
-            studyTimeMinutes: 0,
-            totalPerfectWords: 0,
-            todayWordsLearned: 0,
-            statsResetV1: true
-          });
-          d = { ...d, totalWordsLearned: 0, studyTimeMinutes: 0, totalPerfectWords: 0, todayWordsLearned: 0, statsResetV1: true };
-        } catch (err) { console.error('stats auto-reset failed', err); }
-      }
-      // ──────────────── ALOHIDA BIR MARTALIK RESET: faqat "Bugungi maqsad" uchun (statsResetV1 avval ishlagan bo'lsa ham qayta ishlaydi) ────────────────
-      if (d.todayResetV1 !== true) {
-        try {
-          await updateDoc(doc(db, 'users', uid), {
-            todayWordsLearned: 0,
-            todayResetV1: true
-          });
-          d = { ...d, todayWordsLearned: 0, todayResetV1: true };
-        } catch (err) { console.error('today-goal auto-reset failed', err); }
-      }
-
-      try {
-        const totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 0;
-        const studyMinutes = d.studyTimeMinutes != null ? d.studyTimeMinutes : 0;
-        const studyHours = Math.round((studyMinutes / 60) * 10) / 10;
-        const totalPerfect = d.totalPerfectWords != null ? d.totalPerfectWords : 0;
-        const accuracy = totalWords > 0 ? Math.round((totalPerfect / totalWords) * 100) : 0;
-        if (window.AzDash && window.AzDash.updateHeroKpis) {
-          window.AzDash.updateHeroKpis({ words: totalWords, hours: studyHours, accuracy: accuracy });
-        } else {
-          const elW = document.getElementById('kpi-words-total');
-          const elT = document.getElementById('kpi-time-total');
-          const elA = document.getElementById('kpi-acc-total');
-          if (elW) elW.textContent = totalWords;
-          if (elT) elT.textContent = studyHours;
-          if (elA) elA.textContent = accuracy;
-        }
-        window.__azStatsKpi = { totalWords, studyHours, accuracy };
-      } catch (err) { console.error('KPI update failed', err); }
-
-      document.getElementById('nav-streak').textContent = streak;
-      document.getElementById('nav-stars').textContent = stars;
-      document.getElementById('nav-coins').textContent = coins;
-      document.getElementById('sb-streak').textContent = streak;
-
-      const avatarEls = ['sb-avatar', 'topbar-avatar'];
-      avatarEls.forEach(id => {
-        const el = document.getElementById(id);
-        if (d.photoBase64) {
-          el.innerHTML = `<img src="${d.photoBase64}" alt="avatar">`;
-        } else {
-          el.textContent = (d.displayName || currentUser.email || 'A').charAt(0).toUpperCase();
-        }
-      });
-
-      // ──────────────── HERO GOAL TODAY (old ring + new thin bar) ────────────────
-      const nowD = new Date();
-      const todayKeyD = nowD.getFullYear() + '-' + String(nowD.getMonth() + 1).padStart(2, '0') + '-' + String(nowD.getDate()).padStart(2, '0');
-      const todayDone = (d.lastStudyDate === todayKeyD) ? (d.todayWordsLearned || 0) : 0;
-      const goalTotal = d.dailyGoal || 30;
-      const goalPct = Math.min(Math.round((todayDone / goalTotal) * 100), 100);
-      const goalDoneEl = document.getElementById('goal-done');
-      const goalTotalEl = document.getElementById('goal-total');
-      const goalFillEl = document.getElementById('goal-fill');
-      if (goalDoneEl) goalDoneEl.textContent = todayDone;
-      if (goalTotalEl) goalTotalEl.textContent = goalTotal;
-      if (goalFillEl) {
-        setTimeout(() => { goalFillEl.style.width = goalPct + '%'; }, 350);
-      }
-      // → NEW HM minimal goal thin bar
-      const hmDone = document.getElementById('hm-goal-done');
-      const hmTot  = document.getElementById('hm-goal-total');
-      const hmPct  = document.getElementById('hm-goal-pct-val');
-      const hmFill = document.getElementById('hm-goal-fill');
-      if (hmDone && window.AzDash) window.AzDash.animateCount(hmDone, todayDone, { duration: 900 });
-      else if (hmDone) hmDone.textContent = todayDone;
-      if (hmTot)  hmTot.textContent = goalTotal;
-      if (hmPct && window.AzDash) window.AzDash.animateCount(hmPct, goalPct, { duration: 1000, suffix: '%' });
-      else if (hmPct) hmPct.textContent = goalPct + '%';
-      if (hmFill) setTimeout(() => { hmFill.style.width = goalPct + '%'; }, 200);
-
-      // ──────────────── HERO LEVEL BADGE ────────────────
-      const levelNum = Math.floor(stars / 500) + 1;
-      const xpInLevel = stars % 500;
-      const xpPct = Math.round((xpInLevel / 500) * 100);
-      const levelNumEl = document.getElementById('level-num');
-      const xpPctEl = document.getElementById('xp-pct');
-      const xpFillEl = document.getElementById('xp-fill');
-      if (levelNumEl) levelNumEl.textContent = levelNum;
-      if (xpPctEl) xpPctEl.textContent = xpPct + '%';
-      if (xpFillEl) {
-        setTimeout(() => { xpFillEl.style.width = xpPct + '%'; }, 420);
-      }
-      // → NEW Sidebar Level/XP widget + Quick streak card
-      if (window.AzDash && window.AzDash.updateSidebarLevel) {
-        window.AzDash.updateSidebarLevel({ stars: stars, streakDays: streak });
-      }
-
-      // ──────────────── STATS: STATISTIKA MODAL uchun saqlash (KPI pills yuqorida allaqachon yangilandi) ────────────────
-      const kpiVals = window.__azStatsKpi || { totalWords: 0, studyHours: 0, accuracy: 0 };
-      const totalWords = kpiVals.totalWords, studyHours = kpiVals.studyHours, accuracy = kpiVals.accuracy;
-
-      // → Sidebar "Statistics" bosilganda ochiladigan modal shu ma'lumotlardan foydalanadi
-      window.__azStats = {
-        levelNum, xpInLevel, xpPct, streak,
-        totalWords, studyHours, accuracy
-      };
-    } else {
-      // Yangi foydalanuvchi — default qiymatlarni o'rnatish, barlarni animatsiyalash
-      const goalFillEl = document.getElementById('goal-fill');
-      const xpFillEl = document.getElementById('xp-fill');
-      const hmFillEl = document.getElementById('hm-goal-fill');
-      const sbXpFill  = document.getElementById('sbw-xp-fill');
-      if (goalFillEl) setTimeout(()=>goalFillEl.style.width='0%', 350);
-      if (xpFillEl) setTimeout(()=>xpFillEl.style.width='0%', 420);
-      if (hmFillEl) setTimeout(()=>hmFillEl.style.width='0%', 380);
-      if (sbXpFill)  setTimeout(()=>sbXpFill.style.width='0%', 440);
-      document.querySelectorAll('.az-stat-bar-fill').forEach((bf, i) => {
-        const w = bf.getAttribute('data-width') || '0%';
-        setTimeout(()=>bf.style.width = w, 480 + i*60);
-      });
-    }
-  } catch(e) {
-    // Xato bo'lsa ham — default static barlarni ishga tushurish
-    try {
-      const goalFillEl = document.getElementById('goal-fill');
-      const xpFillEl = document.getElementById('xp-fill');
-      const hmFillEl = document.getElementById('hm-goal-fill');
-      const sbXpFill  = document.getElementById('sbw-xp-fill');
-      if (goalFillEl) setTimeout(()=>goalFillEl.style.width='0%', 350);
-      if (xpFillEl) setTimeout(()=>xpFillEl.style.width='65%', 420);
-      if (hmFillEl) setTimeout(()=>hmFillEl.style.width='40%', 380);
-      if (sbXpFill)  setTimeout(()=>sbXpFill.style.width='65%', 440);
-      document.querySelectorAll('.az-stat-bar-fill').forEach((bf, i) => {
-        const w = bf.getAttribute('data-width') || '0%';
-        setTimeout(()=>bf.style.width = w, 480 + i*60);
-      });
-    } catch(_) {}
+  if (!d) {
+    // Foydalanuvchi hujjati topilmadi — barlarni 0% holatda qoldiramiz (soxta qiymat ko'rsatilmaydi)
+    return;
   }
+
+  const streak = d.streakDays || 0;
+  const stars = d.stars || 0;
+  const coins = d.coins || 0;
+
+  // ──────────────── BIR MARTALIK AVTOMATIK RESET (eski/test statistikani tozalash) ────────────────
+  if (d.statsResetV1 !== true) {
+    try {
+      await updateDoc(doc(db, 'users', uid), {
+        totalWordsLearned: 0,
+        studyTimeMinutes: 0,
+        totalPerfectWords: 0,
+        todayWordsLearned: 0,
+        statsResetV1: true
+      });
+      d = { ...d, totalWordsLearned: 0, studyTimeMinutes: 0, totalPerfectWords: 0, todayWordsLearned: 0, statsResetV1: true };
+    } catch (err) { console.error('stats auto-reset failed', err); }
+  }
+  // ──────────────── ALOHIDA BIR MARTALIK RESET: faqat "Bugungi maqsad" uchun (statsResetV1 avval ishlagan bo'lsa ham qayta ishlaydi) ────────────────
+  if (d.todayResetV1 !== true) {
+    try {
+      await updateDoc(doc(db, 'users', uid), {
+        todayWordsLearned: 0,
+        todayResetV1: true
+      });
+      d = { ...d, todayWordsLearned: 0, todayResetV1: true };
+    } catch (err) { console.error('today-goal auto-reset failed', err); }
+  }
+
+  // ──────────────── KPI PILLS (jami so'z / vaqt / aniqlik) ────────────────
+  let totalWords = 0, studyHours = 0, accuracy = 0;
+  try {
+    totalWords = d.totalWordsLearned != null ? d.totalWordsLearned : 0;
+    const studyMinutes = d.studyTimeMinutes != null ? d.studyTimeMinutes : 0;
+    studyHours = Math.round((studyMinutes / 60) * 10) / 10;
+    const totalPerfect = d.totalPerfectWords != null ? d.totalPerfectWords : 0;
+    accuracy = totalWords > 0 ? Math.round((totalPerfect / totalWords) * 100) : 0;
+    if (window.AzDash && window.AzDash.updateHeroKpis) {
+      window.AzDash.updateHeroKpis({ words: totalWords, hours: studyHours, accuracy: accuracy });
+    } else {
+      const elW = document.getElementById('kpi-words-total');
+      const elT = document.getElementById('kpi-time-total');
+      const elA = document.getElementById('kpi-acc-total');
+      if (elW) elW.textContent = totalWords;
+      if (elT) elT.textContent = studyHours;
+      if (elA) elA.textContent = accuracy;
+    }
+    window.__azStatsKpi = { totalWords, studyHours, accuracy };
+  } catch (err) { console.error('KPI update failed', err); }
+
+  // ──────────────── TOP BAR / SIDEBAR: streak, stars, coins, avatar ────────────────
+  try {
+    const navStreakEl = document.getElementById('nav-streak');
+    const navStarsEl = document.getElementById('nav-stars');
+    const navCoinsEl = document.getElementById('nav-coins');
+    const sbStreakEl = document.getElementById('sb-streak');
+    if (navStreakEl) navStreakEl.textContent = streak;
+    if (navStarsEl) navStarsEl.textContent = stars;
+    if (navCoinsEl) navCoinsEl.textContent = coins;
+    if (sbStreakEl) sbStreakEl.textContent = streak;
+  } catch (err) { console.error('topbar stats update failed', err); }
+
+  try {
+    const avatarEls = ['sb-avatar', 'topbar-avatar'];
+    avatarEls.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (d.photoBase64) {
+        el.innerHTML = `<img src="${d.photoBase64}" alt="avatar">`;
+      } else {
+        el.textContent = (d.displayName || currentUser.email || 'A').charAt(0).toUpperCase();
+      }
+    });
+  } catch (err) { console.error('avatar update failed', err); }
+
+  // ──────────────── HERO GOAL TODAY (old ring + new thin bar) ────────────────
+  let todayDone = 0, goalTotal = 30, goalPct = 0;
+  try {
+    const nowD = new Date();
+    const todayKeyD = nowD.getFullYear() + '-' + String(nowD.getMonth() + 1).padStart(2, '0') + '-' + String(nowD.getDate()).padStart(2, '0');
+    todayDone = (d.lastStudyDate === todayKeyD) ? (d.todayWordsLearned || 0) : 0;
+    goalTotal = d.dailyGoal || 30;
+    goalPct = Math.min(Math.round((todayDone / goalTotal) * 100), 100);
+    const goalDoneEl = document.getElementById('goal-done');
+    const goalTotalEl = document.getElementById('goal-total');
+    const goalFillEl = document.getElementById('goal-fill');
+    if (goalDoneEl) goalDoneEl.textContent = todayDone;
+    if (goalTotalEl) goalTotalEl.textContent = goalTotal;
+    if (goalFillEl) {
+      setTimeout(() => { goalFillEl.style.width = goalPct + '%'; }, 350);
+    }
+    // → NEW HM minimal goal thin bar
+    const hmDone = document.getElementById('hm-goal-done');
+    const hmTot  = document.getElementById('hm-goal-total');
+    const hmPct  = document.getElementById('hm-goal-pct-val');
+    const hmFill = document.getElementById('hm-goal-fill');
+    if (hmDone && window.AzDash) window.AzDash.animateCount(hmDone, todayDone, { duration: 900 });
+    else if (hmDone) hmDone.textContent = todayDone;
+    if (hmTot)  hmTot.textContent = goalTotal;
+    if (hmPct && window.AzDash) window.AzDash.animateCount(hmPct, goalPct, { duration: 1000, suffix: '%' });
+    else if (hmPct) hmPct.textContent = goalPct + '%';
+    if (hmFill) setTimeout(() => { hmFill.style.width = goalPct + '%'; }, 200);
+  } catch (err) { console.error('daily goal update failed', err); }
+
+  // ──────────────── HERO LEVEL BADGE + SIDEBAR LEVEL/XP ────────────────
+  let levelNum = 1, xpInLevel = 0, xpPct = 0;
+  try {
+    levelNum = Math.floor(stars / 500) + 1;
+    xpInLevel = stars % 500;
+    xpPct = Math.round((xpInLevel / 500) * 100);
+    const levelNumEl = document.getElementById('level-num');
+    const xpPctEl = document.getElementById('xp-pct');
+    const xpFillEl = document.getElementById('xp-fill');
+    if (levelNumEl) levelNumEl.textContent = levelNum;
+    if (xpPctEl) xpPctEl.textContent = xpPct + '%';
+    if (xpFillEl) {
+      setTimeout(() => { xpFillEl.style.width = xpPct + '%'; }, 420);
+    }
+  } catch (err) { console.error('level/xp hero update failed', err); }
+
+  try {
+    if (window.AzDash && window.AzDash.updateSidebarLevel) {
+      window.AzDash.updateSidebarLevel({ stars: stars, streakDays: streak });
+    }
+  } catch (err) { console.error('sidebar level/xp update failed', err); }
+
+  // → Sidebar "Statistics" bosilganda ochiladigan modal shu ma'lumotlardan foydalanadi
+  window.__azStats = {
+    levelNum, xpInLevel, xpPct, streak,
+    totalWords, studyHours, accuracy
+  };
 }
+
 
 async function loadFolders() {
   let mySnap = { empty: true, forEach: () => {} };
