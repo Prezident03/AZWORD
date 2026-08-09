@@ -2035,7 +2035,7 @@ window.generateAiCover = async function(prefix) {
   statusEl.style.color = 'var(--text-muted)';
   previewEl.style.display = 'none';
 
-  const styledPrompt = prompt + ', 3d icon, purple and violet tones, glossy render, dark background, premium app cover art';
+  const styledPrompt = 'a cluster of ' + prompt + ' related objects and items arranged together, isometric 3d icon illustration, vibrant colorful, clean composition, soft purple gradient background, friendly mobile app icon style, no text, no single character portrait, not dark or gothic';
   const seed = Math.floor(Math.random() * 1000000);
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(styledPrompt)}?width=600&height=900&seed=${seed}&nologo=true`;
 
