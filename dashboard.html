@@ -2257,30 +2257,6 @@ async function loadUserStats(uid) {
   const stars = d.stars || 0;
   const coins = d.coins || 0;
 
-  // ──────────────── BIR MARTALIK AVTOMATIK RESET (eski/test statistikani tozalash) ────────────────
-  if (d.statsResetV1 !== true) {
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        totalWordsLearned: 0,
-        studyTimeMinutes: 0,
-        totalPerfectWords: 0,
-        todayWordsLearned: 0,
-        statsResetV1: true
-      });
-      d = { ...d, totalWordsLearned: 0, studyTimeMinutes: 0, totalPerfectWords: 0, todayWordsLearned: 0, statsResetV1: true };
-    } catch (err) { console.error('stats auto-reset failed', err); }
-  }
-  // ──────────────── ALOHIDA BIR MARTALIK RESET: faqat "Bugungi maqsad" uchun (statsResetV1 avval ishlagan bo'lsa ham qayta ishlaydi) ────────────────
-  if (d.todayResetV1 !== true) {
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        todayWordsLearned: 0,
-        todayResetV1: true
-      });
-      d = { ...d, todayWordsLearned: 0, todayResetV1: true };
-    } catch (err) { console.error('today-goal auto-reset failed', err); }
-  }
-
   // ──────────────── KPI PILLS (jami so'z / vaqt / aniqlik) ────────────────
   let totalWords = 0, studyHours = 0, accuracy = 0;
   try {
