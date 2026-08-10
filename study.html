@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="premium-pages.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
@@ -403,6 +404,79 @@
       .word-display { font-size: 1.8rem; }
       .options-grid { grid-template-columns: 1fr; }
       .match-area { grid-template-columns: 1fr; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MOBIL — "Word Study" immersiv dars ekrani (mockup: back + sarlavha
+       + hisoblagich yuqorida, harakatlar pastda doim ko'rinadi)
+       ═══════════════════════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      html, body { overflow-x: hidden; }
+
+      /* ── Yuqori panel: ixcham, orqaga tugmasi bilan ── */
+      .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
+        background: rgba(15,13,26,0.86);
+        backdrop-filter: blur(18px) saturate(160%);
+        -webkit-backdrop-filter: blur(18px) saturate(160%);
+        border-bottom: 1px solid var(--border-soft, rgba(46,40,69,0.6));
+      }
+      .navbar .nav-logo { display: none; }
+      .navbar .nav-user { flex: 1; display: flex; justify-content: flex-start; }
+      .navbar .nav-user .btn-sm {
+        width: 40px; height: 40px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0;
+        padding: 0;
+        position: relative;
+        background: var(--bg-card);
+      }
+      .navbar .nav-user .btn-sm::before {
+        content: '‹';
+        font-size: 26px;
+        line-height: 1;
+        color: var(--text-main);
+        font-family: Arial, sans-serif;
+      }
+
+      .study-wrap { padding: 14px 16px calc(96px + env(safe-area-inset-bottom, 0px)); }
+
+      .study-progress { margin-bottom: 16px; }
+      .progress-label { font-size: 0.76rem; }
+
+      .stage-badge { margin-bottom: 14px; }
+
+      /* ── O'qish kartasi: kattaroq, yumshoqroq, premium ko'rinish ── */
+      .study-card {
+        border-radius: 24px;
+        padding: 30px 22px;
+        min-height: 320px;
+        background: linear-gradient(165deg, var(--bg-card), var(--bg-deep));
+        box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+      }
+      .word-display { font-size: 2.1rem; }
+
+      /* ── Harakatlar: doim pastda, xavfsiz zonaga moslashgan ── */
+      .study-nav {
+        position: fixed;
+        left: 0; right: 0; bottom: 0;
+        z-index: 55;
+        margin: 0;
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+        background: rgba(15,13,26,0.9);
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        border-top: 1px solid var(--border-soft, rgba(46,40,69,0.6));
+      }
+      .btn-next, .btn-skip { min-height: 48px; }
+      .btn-next { border-radius: 14px; font-size: 0.98rem; }
+      .btn-skip { border-radius: 14px; }
     }
   </style>
 </head>
