@@ -3,88 +3,179 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AzWord — Quiz</title>
+  <title>AzWord â€” Mashq</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="premium-pages.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
   <script src="brand.js"></script>
-  <script src="confetti.js"></script>
   <script src="sound.js"></script>
-  <script src="search.js"></script>
   <script src="effects.js"></script>
   <script src="parallax.js"></script>
+  <script src="mobile-nav.js" defer></script>
   <style>
-    .simple-wrap { max-width: 920px; margin: 0 auto; padding: 36px 24px; }
-    .simple-head { display:flex; align-items:center; justify-content:space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--text-muted); font-size: 0.9rem; cursor: pointer;
-      border: none; background: none; padding: 0;
-      font-family: var(--font-body);
-      transition: color var(--dur-fast);
+    body { background: var(--bg-page); min-height: 100vh; }
+    .prc-wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 24px; }
+
+    .prc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .prc-title { font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--text-main); }
+    .prc-streak-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 99px;
+      background: rgba(251,146,60,0.1); border: 1.5px solid rgba(251,146,60,0.3);
+      color: #fb923c; font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
     }
-    .back-btn:hover { color: var(--text-main); }
-    .simple-card {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: var(--elev-card);
-      overflow: hidden;
-      position: relative;
+    .prc-sub { color: var(--text-muted); font-size: 0.9rem; margin: 6px 0 22px; }
+
+    .prc-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px; border-radius: 18px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      margin-bottom: 12px; cursor: pointer;
+      transition: transform var(--dur-fast), border-color var(--dur-fast);
     }
-    .simple-card::before {
-      content:'';
-      position:absolute;
-      inset:0;
-      background: radial-gradient(ellipse at 85% 10%, rgba(236,72,153,0.16), transparent 55%),
-                  radial-gradient(ellipse at 20% 90%, rgba(59,130,246,0.12), transparent 55%);
-      pointer-events:none;
+    .prc-row:active { transform: scale(0.98); }
+    .prc-row.disabled { opacity: 0.55; cursor: default; }
+    .prc-row.disabled:active { transform: none; }
+
+    .prc-icon {
+      width: 46px; height: 46px; border-radius: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
     }
-    .simple-card > * { position: relative; z-index: 1; }
-    .simple-title {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.35rem;
-      margin: 0 0 8px;
-      color: var(--text-main);
+    .prc-icon.grad-1 { background: linear-gradient(155deg, #7c3aed, #4c1d95); }
+    .prc-icon.grad-2 { background: linear-gradient(155deg, #f59e0b, #b45309); }
+    .prc-icon.grad-3 { background: linear-gradient(155deg, #10b981, #065f46); }
+    .prc-icon.grad-4 { background: linear-gradient(155deg, #3b82f6, #1e3a8a); }
+    .prc-icon.grad-5 { background: linear-gradient(155deg, #ec4899, #831843); }
+
+    .prc-info { flex: 1; min-width: 0; }
+    .prc-name { font-family: var(--font-display); font-weight: 700; font-size: 0.98rem; color: var(--text-main); margin-bottom: 3px; }
+    .prc-desc { font-size: 0.8rem; color: var(--text-muted); }
+    .prc-badge {
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.03em;
+      color: var(--text-dim); background: var(--bg-hover);
+      padding: 3px 8px; border-radius: 99px; flex-shrink: 0;
     }
-    .simple-sub { margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
-    .simple-actions { margin-top: 16px; display:flex; gap: 10px; flex-wrap: wrap; }
+    .prc-chevron { flex-shrink: 0; color: var(--text-dim); }
   </style>
 </head>
 <body>
-  <main class="simple-wrap">
-    <div class="simple-head">
-      <button class="back-btn" onclick="window.location.href='dashboard.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Dashboard
-      </button>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <a class="btn-add" href="vocabulary.html" style="text-decoration:none">Vocabulary</a>
-        <a class="btn-add" href="flashcards.html" style="text-decoration:none">Flashcards</a>
+  <main class="prc-wrap">
+    <div class="prc-top">
+      <div class="prc-title">Mashq</div>
+      <div class="prc-streak-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <span id="prc-streak">0</span>
       </div>
     </div>
+    <p class="prc-sub">Nimani mashq qilmoqchisiz?</p>
 
-    <section class="simple-card">
-      <h1 class="simple-title">Quiz</h1>
-      <p class="simple-sub">Bu sahifa hozircha tayyorlanmoqda. Tez orada test rejimi, time-limit, va natija tahlili qo‘shiladi.</p>
-      <div class="simple-actions">
-        <a class="btn-add" href="study.html" style="text-decoration:none">Study</a>
-        <a class="btn-add" href="stats.html" style="text-decoration:none">Statistics</a>
+    <div class="prc-row" id="prc-continue">
+      <div class="prc-icon grad-1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4.5A9.5 9.5 0 1 0 21 12"/><path d="M17 3v6h-6"/><path d="m21 12-4-4"/></svg>
       </div>
-    </section>
+      <div class="prc-info">
+        <div class="prc-name">Davom ettirish</div>
+        <div class="prc-desc" id="prc-continue-desc">Oxirgi mavzuni davom ettiring</div>
+      </div>
+      <svg class="prc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="prc-row" onclick="location.href='folders.html'">
+      <div class="prc-icon grad-2">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+      </div>
+      <div class="prc-info">
+        <div class="prc-name">Barcha kitob va bo'limlar</div>
+        <div class="prc-desc">Har qanday mavzudan mashq boshlang</div>
+      </div>
+      <svg class="prc-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+
+    <div class="prc-row disabled">
+      <div class="prc-icon grad-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="prc-info">
+        <div class="prc-name">Tezkor kviz</div>
+        <div class="prc-desc">Aralash savollar bilan o'zingizni sinang</div>
+      </div>
+      <span class="prc-badge">TEZ ORADA</span>
+    </div>
+
+    <div class="prc-row disabled">
+      <div class="prc-icon grad-4">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </div>
+      <div class="prc-info">
+        <div class="prc-name">Takrorlash (Spaced Repetition)</div>
+        <div class="prc-desc">Unutilayotgan so'zlarni aqlli takrorlash</div>
+      </div>
+      <span class="prc-badge">TEZ ORADA</span>
+    </div>
+
+    <div class="prc-row disabled">
+      <div class="prc-icon grad-5">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+      </div>
+      <div class="prc-info">
+        <div class="prc-name">Tinglab tushunish</div>
+        <div class="prc-desc">Talaffuzni tinglab so'zlarni toping</div>
+      </div>
+      <span class="prc-badge">TEZ ORADA</span>
+    </div>
   </main>
 
   <script type="module">
-    import { auth } from './firebase.js';
+    import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    onAuthStateChanged(auth, user => { if (!user) location.href = 'index.html'; });
+    import { doc, getDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    document.getElementById('prc-continue').addEventListener('click', async () => {
+      let lastFolder = null;
+      try { lastFolder = JSON.parse(localStorage.getItem('az:lastFolder') || 'null'); } catch (e) {}
+
+      if (lastFolder && lastFolder.id) {
+        if (lastFolder.kind === 'book') {
+          window.location.href = lastFolder.topic ? ('study.html?book=' + lastFolder.id + '&topic=' + lastFolder.topic) : ('book.html?id=' + lastFolder.id);
+        } else {
+          window.location.href = lastFolder.topic ? ('study.html?id=' + lastFolder.id + '&topic=' + lastFolder.topic) : ('study.html?id=' + lastFolder.id);
+        }
+        return;
+      }
+      try {
+        const adminQ = query(collection(db, 'folders'), where('isAdmin', '==', true));
+        const adminSnap = await getDocs(adminQ);
+        if (!adminSnap.empty) {
+          window.location.href = 'folder.html?id=' + adminSnap.docs[0].id;
+          return;
+        }
+      } catch (e) { console.error(e); }
+      window.location.href = 'folders.html';
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { location.href = 'index.html'; return; }
+      try {
+        const ud = await getDoc(doc(db, 'users', user.uid));
+        if (ud.exists()) {
+          const d = ud.data();
+          const streakEl = document.getElementById('prc-streak');
+          if (streakEl) streakEl.textContent = d.streakDays || 0;
+        }
+      } catch (e) { /* ignore */ }
+      try {
+        let lastFolder = JSON.parse(localStorage.getItem('az:lastFolder') || 'null');
+        if (lastFolder && lastFolder.name) {
+          document.getElementById('prc-continue-desc').textContent = lastFolder.name + " mavzusini davom ettiring";
+        }
+      } catch (e) { /* ignore */ }
+    });
   </script>
 </body>
 </html>

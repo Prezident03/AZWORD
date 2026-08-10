@@ -3,88 +3,450 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AzWord ó Folders</title>
+  <title>AzWord ‚Äî O'rganish</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="premium-pages.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
   <script src="cursor-glow.js"></script>
   <script src="brand.js"></script>
-  <script src="confetti.js"></script>
   <script src="sound.js"></script>
-  <script src="search.js"></script>
   <script src="effects.js"></script>
   <script src="parallax.js"></script>
+  <script src="mobile-nav.js" defer></script>
   <style>
-    .simple-wrap { max-width: 920px; margin: 0 auto; padding: 36px 24px; }
-    .simple-head { display:flex; align-items:center; justify-content:space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--text-muted); font-size: 0.9rem; cursor: pointer;
-      border: none; background: none; padding: 0;
-      font-family: var(--font-body);
-      transition: color var(--dur-fast);
+    body { background: var(--bg-page); min-height: 100vh; }
+    .lrn-wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 24px; }
+
+    .lrn-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
     }
-    .back-btn:hover { color: var(--text-main); }
-    .simple-card {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: var(--elev-card);
-      overflow: hidden;
-      position: relative;
-    }
-    .simple-card::before {
-      content:'';
-      position:absolute;
-      inset:0;
-      background: radial-gradient(ellipse at 85% 10%, rgba(124,58,237,0.18), transparent 55%),
-                  radial-gradient(ellipse at 20% 90%, rgba(34,211,238,0.12), transparent 55%);
-      pointer-events:none;
-    }
-    .simple-card > * { position: relative; z-index: 1; }
-    .simple-title {
+    .lrn-title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 1.35rem;
-      margin: 0 0 8px;
+      font-size: 1.5rem;
       color: var(--text-main);
     }
-    .simple-sub { margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
-    .simple-actions { margin-top: 16px; display:flex; gap: 10px; flex-wrap: wrap; }
+    .lrn-streak-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      border-radius: 99px;
+      background: rgba(251,146,60,0.1);
+      border: 1.5px solid rgba(251,146,60,0.3);
+      color: #fb923c;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .lrn-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .lrn-tab-btn {
+      flex: 1;
+      padding: 10px 6px;
+      text-align: center;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.84rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background var(--dur-fast), color var(--dur-fast);
+    }
+    .lrn-tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .lrn-panel { display: none; }
+    .lrn-panel.active { display: block; }
+
+    .lrn-book-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px;
+      border-radius: 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color var(--dur-fast), transform var(--dur-fast);
+    }
+    .lrn-book-row:active { transform: scale(0.98); }
+    .lrn-book-cover {
+      width: 58px; height: 78px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: linear-gradient(145deg, rgba(124,58,237,0.25), rgba(236,72,153,0.15));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+    }
+    .lrn-book-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lrn-book-info { flex: 1; min-width: 0; }
+    .lrn-book-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .lrn-book-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .lrn-book-track {
+      height: 6px; border-radius: 4px;
+      background: var(--bg-hover);
+      overflow: hidden;
+    }
+    .lrn-book-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--rose));
+    }
+    .lrn-book-chevron { flex-shrink: 0; color: var(--text-dim); }
+
+    .lrn-cat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .lrn-cat-tile {
+      border-radius: 18px;
+      overflow: hidden;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: transform var(--dur-fast), border-color var(--dur-fast);
+    }
+    .lrn-cat-tile:active { transform: scale(0.97); }
+    .lrn-cat-cover {
+      width: 100%; aspect-ratio: 4/3;
+      background: linear-gradient(145deg, rgba(124,58,237,0.25), rgba(236,72,153,0.12));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+    }
+    .lrn-cat-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lrn-cat-name {
+      padding: 10px 10px 12px;
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: var(--text-main);
+      text-align: center;
+    }
+
+    .lrn-myf-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(155deg, rgba(167,139,250,0.09), rgba(255,255,255,0.02) 55%);
+      border: 1px solid rgba(167,139,250,0.22);
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .lrn-myf-badge {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-weight: 700; color: #fff;
+      background: linear-gradient(155deg, #8b5cf6, #4c1d95);
+    }
+    .lrn-myf-info { flex: 1; min-width: 0; }
+    .lrn-myf-name { font-weight: 700; font-size: 0.9rem; color: var(--text-main); margin-bottom: 3px; }
+    .lrn-myf-meta { font-size: 0.76rem; color: var(--text-muted); }
+    .lrn-myf-del { color: var(--text-dim); background: none; border: none; padding: 6px; cursor: pointer; }
+
+    .lrn-add-btn {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1.5px dashed var(--border-light);
+      background: rgba(124,58,237,0.06);
+      color: var(--primary-light);
+      font-family: var(--font-body); font-weight: 700; font-size: 0.88rem;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .lrn-empty {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .lrn-skel {
+      height: 78px; border-radius: 18px;
+      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: lrnShimmer 1.4s ease-in-out infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes lrnShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
   </style>
 </head>
 <body>
-  <main class="simple-wrap">
-    <div class="simple-head">
-      <button class="back-btn" onclick="window.location.href='dashboard.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Dashboard
-      </button>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <a class="btn-add" href="study.html" style="text-decoration:none">Study</a>
-        <a class="btn-add" href="upload.html" style="text-decoration:none">Upload</a>
+  <main class="lrn-wrap">
+    <div class="lrn-top">
+      <div class="lrn-title">O'rganish</div>
+      <div class="lrn-streak-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <span id="lrn-streak">0</span>
       </div>
     </div>
 
-    <section class="simple-card">
-      <h1 class="simple-title">Folders</h1>
-      <p class="simple-sub">Hozircha boëlimlar roëyxati Dashboard ichida koërsatiladi. Keyingi updateída bu sahifaga toëliq folder manager chiqaramiz.</p>
-      <div class="simple-actions">
-        <a class="btn-add" href="dashboard.html#my-folders" style="text-decoration:none">My folders</a>
-        <a class="btn-add" href="dashboard.html#admin-folders" style="text-decoration:none">Public folders</a>
+    <div class="lrn-tabs">
+      <button class="lrn-tab-btn active" data-tab="books" onclick="switchLrnTab('books')">Kitoblar</button>
+      <button class="lrn-tab-btn" data-tab="cats" onclick="switchLrnTab('cats')">Kategoriyalar</button>
+      <button class="lrn-tab-btn" data-tab="myf" onclick="switchLrnTab('myf')">Mening bo'limlarim</button>
+    </div>
+
+    <section class="lrn-panel active" id="lrn-panel-books">
+      <div class="lrn-skel"></div>
+      <div class="lrn-skel"></div>
+      <div class="lrn-skel"></div>
+    </section>
+
+    <section class="lrn-panel" id="lrn-panel-cats">
+      <div class="lrn-cat-grid" id="lrn-cats-grid">
+        <div class="lrn-skel" style="height:130px"></div>
+        <div class="lrn-skel" style="height:130px"></div>
       </div>
+    </section>
+
+    <section class="lrn-panel" id="lrn-panel-myf">
+      <div id="lrn-myf-list"></div>
+      <button class="lrn-add-btn" onclick="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Yangi bo'lim
+      </button>
     </section>
   </main>
 
+  <div class="modal-overlay" id="folder-modal">
+    <div class="modal">
+      <h3>Yangi bo'lim yaratish</h3>
+      <div class="form-group">
+        <label>Bo'lim nomi</label>
+        <input type="text" id="folder-name" placeholder="Masalan: IELTS Vocabulary" onkeydown="if(event.key==='Enter') createFolder()"/>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Bekor</button>
+        <button class="btn-confirm" id="folder-create-btn" onclick="createFolder()">Yaratish</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
-    import { auth } from './firebase.js';
+    import { auth, db } from './firebase.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    onAuthStateChanged(auth, user => { if (!user) location.href = 'index.html'; });
+    import {
+      collection, getDocs, query, where, orderBy, doc, getDoc, addDoc, deleteDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    let currentUser = null;
+
+    window.switchLrnTab = (tab) => {
+      document.querySelectorAll('.lrn-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+      document.getElementById('lrn-panel-books').classList.toggle('active', tab === 'books');
+      document.getElementById('lrn-panel-cats').classList.toggle('active', tab === 'cats');
+      document.getElementById('lrn-panel-myf').classList.toggle('active', tab === 'myf');
+      if (window.AzSound && window.AzSound.play) window.AzSound.play('click');
+    };
+
+    window.openModal = () => {
+      document.getElementById('folder-modal').classList.add('open');
+      setTimeout(() => document.getElementById('folder-name').focus(), 100);
+    };
+    window.closeModal = () => {
+      document.getElementById('folder-modal').classList.remove('open');
+      document.getElementById('folder-name').value = '';
+    };
+    document.getElementById('folder-modal').addEventListener('click', e => {
+      if (e.target === document.getElementById('folder-modal')) closeModal();
+    });
+
+    function showToast(msg) {
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.style.cssText = 'position:fixed;left:50%;bottom:calc(var(--mnav-total-height,64px) + 20px);transform:translateX(-50%);background:var(--bg-elevated);color:var(--text-main);padding:10px 18px;border-radius:99px;font-size:0.85rem;font-weight:600;z-index:2000;box-shadow:var(--shadow-md);border:1px solid var(--border)';
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 2200);
+    }
+
+    async function loadBooksList() {
+      const panel = document.getElementById('lrn-panel-books');
+      try {
+        const snap = await getDocs(query(collection(db, 'books'), orderBy('order', 'asc')));
+        if (snap.empty) {
+          panel.innerHTML = '<div class="lrn-empty">Hozircha kitoblar yo\'q</div>';
+          return;
+        }
+        const withProgress = await Promise.all(snap.docs.map(async d => {
+          const b = d.data();
+          let doneWords = 0, totalWords = 0, totalTopics = 0, completedTopics = 0;
+          try {
+            const topicsSnap = await getDocs(collection(db, 'books', d.id, 'topics'));
+            totalTopics = topicsSnap.size;
+            topicsSnap.forEach(t => {
+              const td = t.data();
+              totalWords += td.wordCount || 0;
+              if (td.lastScore) {
+                const parts = String(td.lastScore).split('/').map(Number);
+                doneWords += parts[0] || 0;
+                if ((parts[1] || 0) > 0 && (parts[0] || 0) >= parts[1]) completedTopics++;
+              }
+            });
+          } catch (e) { /* ignore */ }
+          if (!totalWords) totalWords = b.wordCount || 0;
+          const pct = totalWords > 0 ? Math.min(100, Math.round((doneWords / totalWords) * 100)) : 0;
+          return { id: d.id, b, totalTopics, completedTopics, doneWords, totalWords, pct };
+        }));
+
+        panel.innerHTML = '';
+        withProgress.forEach(({ id, b, totalTopics, completedTopics, pct }) => {
+          const row = document.createElement('div');
+          row.className = 'lrn-book-row';
+          row.onclick = () => location.href = 'book.html?id=' + id;
+          row.innerHTML =
+            '<div class="lrn-book-cover"><img src="' + (b.imageUrl || 'logo.png') + '" alt="" onerror="this.src=\'logo.png\'"/></div>' +
+            '<div class="lrn-book-info">' +
+              '<div class="lrn-book-title">' + (b.title || 'Kitob') + '</div>' +
+              '<div class="lrn-book-meta">Mavzu ' + completedTopics + '/' + totalTopics + ' &middot; ' + pct + '%</div>' +
+              '<div class="lrn-book-track"><div class="lrn-book-fill" style="width:' + pct + '%"></div></div>' +
+            '</div>' +
+            '<svg class="lrn-book-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+          panel.appendChild(row);
+        });
+      } catch (e) {
+        console.error('loadBooksList', e);
+        panel.innerHTML = '<div class="lrn-empty">Kitoblar yuklanmadi</div>';
+      }
+    }
+
+    async function loadCategories() {
+      const grid = document.getElementById('lrn-cats-grid');
+      try {
+        const snap = await getDocs(query(collection(db, 'folders'), where('isAdmin', '==', true)));
+        if (snap.empty) {
+          grid.innerHTML = '<div class="lrn-empty" style="grid-column:1/-1">Tez kunda kategoriyalar qo\'shiladi</div>';
+          return;
+        }
+        grid.innerHTML = '';
+        snap.forEach(d => {
+          const f = d.data();
+          const tile = document.createElement('div');
+          tile.className = 'lrn-cat-tile';
+          tile.onclick = () => location.href = 'folder.html?id=' + d.id;
+          const cover = f.imageUrl
+            ? '<img src="' + f.imageUrl + '" alt="" onerror="this.parentElement.textContent=\'üìÅ\'"/>'
+            : (f.emoji || 'üìÅ');
+          tile.innerHTML = '<div class="lrn-cat-cover">' + cover + '</div><div class="lrn-cat-name">' + (f.name || "Bo'lim") + '</div>';
+          grid.appendChild(tile);
+        });
+      } catch (e) {
+        console.error('loadCategories', e);
+        grid.innerHTML = '<div class="lrn-empty" style="grid-column:1/-1">Yuklanmadi</div>';
+      }
+    }
+
+    window.deleteFolder = async (e, id) => {
+      e.stopPropagation();
+      if (!confirm("Bu bo'limni o'chirasizmi?")) return;
+      try {
+        const ws = await getDocs(collection(db, 'folders', id, 'words'));
+        for (const w of ws.docs) await deleteDoc(doc(db, 'folders', id, 'words', w.id));
+        await deleteDoc(doc(db, 'folders', id));
+        showToast("O'chirildi");
+        await loadMyFolders();
+      } catch (err) { console.error(err); showToast('Xatolik yuz berdi'); }
+    };
+
+    window.createFolder = async () => {
+      const name = document.getElementById('folder-name').value.trim();
+      if (!name || !currentUser) return;
+      const existing = await getDocs(query(collection(db, 'folders'), where('uid', '==', currentUser.uid), where('isAdmin', '==', false)));
+      if ([...existing.docs].find(d => (d.data().name || '').toLowerCase() === name.toLowerCase())) {
+        return showToast(name + " nomli bo'lim allaqachon mavjud!");
+      }
+      const btn = document.getElementById('folder-create-btn');
+      const original = btn.textContent;
+      btn.disabled = true; btn.textContent = 'Yaratilmoqda...';
+      try {
+        await addDoc(collection(db, 'folders'), { name, uid: currentUser.uid, isAdmin: false, wordCount: 0, progress: 0, lastScore: null, createdAt: serverTimestamp() });
+        closeModal();
+        showToast('Bo\'lim yaratildi!');
+        await loadMyFolders();
+      } catch (err) { console.error(err); showToast('Xatolik yuz berdi'); }
+      btn.disabled = false; btn.textContent = original;
+    };
+
+    async function loadMyFolders() {
+      const list = document.getElementById('lrn-myf-list');
+      if (!currentUser) return;
+      try {
+        const snap = await getDocs(query(collection(db, 'folders'), where('uid', '==', currentUser.uid), where('isAdmin', '==', false)));
+        if (snap.empty) {
+          list.innerHTML = '<div class="lrn-empty">Hali bo\'lim yo\'q ‚Äî pastdagi tugma orqali yarating</div>';
+          return;
+        }
+        const grads = ['#8b5cf6,#4c1d95', '#f59e0b,#78350f', '#ec4899,#831843', '#3b82f6,#1e3a8a', '#10b981,#065f46'];
+        list.innerHTML = '';
+        let i = 0;
+        snap.forEach(d => {
+          const f = d.data();
+          const score = f.lastScore;
+          const pct = (score !== null && score !== undefined) ? score : 0;
+          const grad = grads[i % grads.length]; i++;
+          const initial = (f.name || '?').trim().charAt(0).toUpperCase();
+          const row = document.createElement('div');
+          row.className = 'lrn-myf-row';
+          row.onclick = () => location.href = 'folder.html?id=' + d.id;
+          row.innerHTML =
+            '<div class="lrn-myf-badge" style="background:linear-gradient(155deg,' + grad + ')">' + initial + '</div>' +
+            '<div class="lrn-myf-info">' +
+              '<div class="lrn-myf-name">' + (f.name || "Bo'lim") + '</div>' +
+              '<div class="lrn-myf-meta">' + (f.wordCount || 0) + " ta so'z" + ((score !== null && score !== undefined) ? ' ¬∑ ' + score + '%' : '') + '</div>' +
+            '</div>' +
+            '<button class="lrn-myf-del" onclick="deleteFolder(event,\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>';
+          list.appendChild(row);
+        });
+      } catch (e) {
+        console.error('loadMyFolders', e);
+        list.innerHTML = '<div class="lrn-empty">Yuklanmadi</div>';
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { location.href = 'index.html'; return; }
+      currentUser = user;
+      try {
+        const ud = await getDoc(doc(db, 'users', user.uid));
+        if (ud.exists()) {
+          const streakEl = document.getElementById('lrn-streak');
+          if (streakEl) streakEl.textContent = ud.data().streakDays || 0;
+        }
+      } catch (e) { /* ignore */ }
+      loadBooksList();
+      loadCategories();
+      loadMyFolders();
+    });
   </script>
 </body>
 </html>
