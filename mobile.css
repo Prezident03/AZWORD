@@ -338,3 +338,79 @@
 
   .section-header { margin-top: 24px !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   6. PHASE 3 — STREAK CALENDAR (Home sahifasida, faqat mobilda)
+   ═══════════════════════════════════════════════════════════════════ */
+.az-streak-card { display: none; } /* desktopda yashirin */
+
+@media (max-width: 768px) {
+  .az-streak-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(165deg, rgba(249,115,22,0.14), rgba(124,58,237,0.08));
+    border: 1px solid rgba(249,115,22,0.28);
+    border-radius: 22px;
+    padding: 20px 18px 18px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .az-streak-flame {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(145deg, var(--streak, #f97316), var(--streak-dark, #ea580c));
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(249,115,22,0.4);
+    margin-bottom: 6px;
+  }
+  .az-streak-num {
+    font-family: var(--font-display, 'Space Grotesk', sans-serif);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: 0.02em;
+  }
+  .az-streak-caption {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .az-streak-week {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+  }
+  .az-streak-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 0;
+  }
+  .az-streak-day-lbl {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .az-streak-day.is-today .az-streak-day-lbl { color: var(--primary-light); }
+  .az-streak-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--border, #2e2845);
+    background: transparent;
+  }
+  .az-streak-dot.done {
+    background: linear-gradient(145deg, var(--streak, #f97316), #fbbf24);
+    border-color: transparent;
+    box-shadow: 0 3px 10px rgba(249,115,22,0.45);
+  }
+  .az-streak-day.is-today .az-streak-dot {
+    border-color: var(--primary-light, #a78bfa);
+    border-width: 2.5px;
+  }
+}
