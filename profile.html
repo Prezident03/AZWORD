@@ -358,6 +358,13 @@
       .back-btn { display: none; }
       .profile-page { margin-top: 20px; padding: 0 16px; }
 
+      /* Eski profile-header (avatar+ism+email) va profile-stats
+         (Bo'limlar/So'zlar/AzWord) mobilda yashiriladi — Profile Hub
+         (az-ph) yuqorida allaqachon shu ma'lumotlarni ko'rsatadi */
+      .profile-header,
+      .profile-stats { display: none; }
+      .az-ph-avatar { cursor: pointer; }
+
       .az-ph {
         display: flex;
         flex-direction: column;
@@ -490,7 +497,7 @@
 
     <!-- Profile Hub — faqat mobilda ko'rinadi (mobile.css bilan birga profile.html'ning o'z <style>'i) -->
     <section class="az-ph" id="az-ph">
-      <div class="az-ph-avatar" id="az-ph-avatar">
+      <div class="az-ph-avatar" id="az-ph-avatar" title="Rasm o'zgartirish" onclick="document.getElementById('photo-input').click()">
         <span id="az-ph-avatar-letter">A</span>
       </div>
       <h2 class="az-ph-name" id="az-ph-name">Yuklanmoqda...</h2>
