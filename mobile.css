@@ -414,3 +414,183 @@
     border-width: 2.5px;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   5. PERFORMANCE — og'ir backdrop-filter/blur effektlarini mobilda
+   kamaytirish. Eski/o'rta darajali Android GPU'larida backdrop-filter
+   blur radiusi katta bo'lsa scroll paytida FPS keskin tushib ketadi.
+   Bu yerda faqat BLUR RADIUSI kamaytiriladi (glass-effekt vizual
+   uslubi saqlanadi), shell/kartalar butunlay olib tashlanmaydi.
+   parallax.js va cursor-glow.js allaqachon o'zlari mobil/touch
+   qurilmalarda ishlamaydi (JS ichida tekshiriladi) — bu yerda faqat
+   CSS backdrop-filter qoladi. FAQAT mobilda, desktop teginilmaydi.
+   ───────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Doim ko'rinadigan top navbar/topbar — eng ko'p scroll bilan
+     birga qayta composite bo'ladigan joy, shuning uchun eng katta
+     tejov shu yerdan keladi */
+  .navbar,
+  .dash-topbar {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+
+  /* Dashboard hero va "bugungi maqsad" paneli */
+  .az-hero,
+  .az-hero-goal {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Kartalar oilasi (folder/achievement/shop/leaderboard/stat kartalari) */
+  .secondary-card,
+  .folder-card,
+  .ach-card,
+  .shop-item,
+  .lb-item,
+  .calendar-card,
+  .goal-card,
+  .chart-card,
+  .sec,
+  .streak-stat-card,
+  .afc,
+  .az-stat-card {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+
+  /* Modal/toast — qisqa muddat ko'rinadi, lekin ochilish animatsiyasi
+     paytida GPU'ga qiyin tegishi mumkin */
+  .modal-overlay,
+  .modal,
+  .toast {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Login/auth ekrani — birinchi ochilishda splash bilan bir vaqtda
+     render bo'lgani uchun yengillashtiriladi */
+  .auth-box {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   7. TOUCH UX — hover o'rniga tap/swipe/long-press
+   Mobil qurilmalarda ":hover" ishonchli ishlamaydi (ba'zi brauzerlarda
+   tap qilingandan keyin "yopishib qoladi", ba'zilarida umuman
+   ishlamaydi). Shu sabab bu bo'lim ikki narsa qiladi:
+     a) hover'ga bog'liq lift/shadow effektlarini touch'da neytrallaydi
+        va o'rniga darhol ko'rinadigan :active (bosish) holatini beradi,
+     b) kichik ikonka-tugmalarning bosish maydonini kattalashtiradi.
+   Swipe/long-press JS xatti-harakati touch-ux.js'da; bu yerda esa
+   ularning vizual asosi (.az-swipe-item, .az-lp-active va h.k.) bor.
+   FAQAT mobilda, desktop hech qachon teginilmaydi.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 7.1 Hover'ga bog'liq "yopishib qolish"ni oldini olish ──
+   Faqat HAQIQIY touch qurilmalarda (hover:none) ishlaydi — sichqonchali
+   768px'gacha kichraytirilgan desktop oynada hover xatti-harakati
+   o'zgarmaydi. */
+@media (max-width: 768px) and (hover: none) {
+  .hero-card:hover, .profile-card:hover, .stat-card:hover, .ach-overview:hover,
+  .secondary-card:hover, .folder-card:hover, .ach-card:hover, .shop-item:hover,
+  .sample-card:hover, .calendar-card:hover, .goal-card:hover, .chart-card:hover,
+  .streak-stat-card:hover, .afc:hover, .lb-item:hover, .result-item:hover,
+  .word-item:hover, .preview-item:hover, .history-item:hover,
+  .widget-card:hover, .notif-banner:hover, .announce-item-banner:hover,
+  .ach-progress:hover, .az-stat-card:hover, .myf-add:hover, .drop-zone:hover {
+    transform: none;
+    box-shadow: inherit;
+    border-color: inherit;
+    background: inherit;
+  }
+
+  /* O'rniga — bosilganda darhol seziladigan tap-feedback */
+  .hero-card:active, .profile-card:active, .stat-card:active, .ach-overview:active,
+  .secondary-card:active, .folder-card:active, .ach-card:active, .shop-item:active,
+  .sample-card:active, .calendar-card:active, .goal-card:active, .chart-card:active,
+  .streak-stat-card:active, .afc:active, .lb-item:active, .result-item:active,
+  .word-item:active, .preview-item:active, .history-item:active,
+  .widget-card:active, .myf-card:active, .lrn-myf-row:active, .sb-widget:active {
+    transform: scale(0.975);
+    transition: transform 90ms ease;
+    opacity: 0.92;
+  }
+
+  /* Tugmalar — ripple.js allaqachon "to'lqin" beradi, bu yerda
+     qo'shimcha bosilganda ozgina kichrayish (fizik tugma hissi) */
+  .btn-primary:active, .btn-add:active, .btn-study:active, .btn-confirm:active,
+  .btn-success:active, .btn-streak:active, .btn-ai:active, .btn-gold:active,
+  .btn-danger:active, .btn-sm:active, .btn-cancel:active, .az-bn-item:active {
+    transform: scale(0.96);
+    transition: transform 90ms ease;
+  }
+}
+
+/* ── 7.2 Kichik ikonka-tugmalarning bosish maydonini kattalashtirish ──
+   Vizual o'lcham saqlanadi, lekin haqiqiy tegiladigan maydon Apple/Google
+   tavsiyasiga (~40px+) yaqinlashtiriladi (padding orqali, layout
+   siljimasin deb position:relative + kengaytirilgan hit-area). */
+@media (max-width: 768px) {
+  .lrn-myf-del {
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-btn {
+    min-width: 38px;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+  }
+  .nav-item-dropbtn {
+    min-height: 40px;
+  }
+  .avatar-edit-btn {
+    min-width: 32px;
+    min-height: 32px;
+  }
+}
+
+/* ── 7.3 SWIPE-TO-DELETE — vizual asos (JS: touch-ux.js) ──
+   .az-swipe-item elementiga qo'shimcha class sifatida qo'shiladi;
+   o'zi allaqachon kartoteka/qator dizayniga ega bo'ladi, bu yerda
+   faqat swipe paytidagi transform/opacity animatsiyasi silliq bo'lishi
+   uchun asos beriladi (JS inline style bilan boshqaradi). */
+@media (max-width: 768px) {
+  .az-swipe-item {
+    will-change: transform;
+    touch-action: pan-y;
+  }
+}
+
+/* ── 7.4 LONG-PRESS — bosib turilganda va otilganda vizual javob ──
+   JS: touch-ux.js, class: .az-longpress (+ .az-lp-active bosilib
+   turilganda, .az-lp-fire otilgan zahoti qo'shiladi/olib tashlanadi). */
+@media (max-width: 768px) {
+  .az-longpress {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .az-lp-active {
+    transition: transform 520ms ease, box-shadow 520ms ease;
+    transform: scale(0.96);
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.35) inset;
+  }
+  .az-lp-fire {
+    animation: az-lp-pulse 260ms ease;
+  }
+}
+@keyframes az-lp-pulse {
+  0% { transform: scale(0.94); }
+  50% { transform: scale(1.03); box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.5) inset; }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .az-lp-fire { animation: none; }
+}

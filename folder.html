@@ -20,6 +20,7 @@
   <script src="effects.js"></script>
   <script src="parallax.js"></script>
   <script src="mobile-nav.js" defer></script>
+  <script src="touch-ux.js" defer></script>
   <style>
     .folder-page { max-width: 900px; margin: 0 auto; padding: 36px 24px; }
 
@@ -601,7 +602,10 @@
       container.innerHTML = '';
       words.forEach((w, i) => {
         const div = document.createElement('div');
-        div.className = 'word-item';
+        div.className = 'word-item az-swipe-item';
+        div.setAttribute('data-swipe-delete-fn', 'deleteWord');
+        div.setAttribute('data-swipe-delete-arg', w.id);
+        div.setAttribute('data-swipe-delete-arg-only', 'true');
         div.innerHTML = `
           <div class="word-num">${i + 1}</div>
           <div class="word-left">
@@ -615,6 +619,7 @@
         `;
         container.appendChild(div);
       });
+      if (window.AzTouchUX) window.AzTouchUX.init(container);
     }
 
     let aiGeneratedExample = '';

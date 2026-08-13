@@ -17,6 +17,7 @@
   <script src="effects.js"></script>
   <script src="parallax.js"></script>
   <script src="mobile-nav.js" defer></script>
+  <script src="touch-ux.js" defer></script>
   <style>
     body { background: var(--bg-page); min-height: 100vh; }
     .lrn-wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 24px; }
@@ -41,6 +42,50 @@
       font-family: var(--font-display);
       font-weight: 700;
       font-size: 0.9rem;
+    }
+
+    .lrn-continue {
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .lrn-continue {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        border-radius: 20px;
+        background: linear-gradient(155deg, rgba(124,58,237,0.16), rgba(236,72,153,0.08) 70%);
+        border: 1px solid rgba(167,139,250,0.28);
+        margin-bottom: 18px;
+        cursor: pointer;
+      }
+      .lrn-continue-cover {
+        width: 52px; height: 68px; border-radius: 10px; flex-shrink: 0;
+        overflow: hidden;
+        background: linear-gradient(145deg, rgba(124,58,237,0.3), rgba(236,72,153,0.18));
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+      }
+      .lrn-continue-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .lrn-continue-info { flex: 1; min-width: 0; }
+      .lrn-continue-eyebrow {
+        font-size: 0.7rem; font-weight: 800; letter-spacing: 0.04em;
+        text-transform: uppercase; color: var(--primary-light, #a78bfa);
+        margin-bottom: 4px;
+      }
+      .lrn-continue-title {
+        font-family: var(--font-display); font-weight: 700; font-size: 0.98rem;
+        color: var(--text-main);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        margin-bottom: 8px;
+      }
+      .lrn-continue-track { height: 6px; border-radius: 4px; background: rgba(255,255,255,0.08); overflow: hidden; }
+      .lrn-continue-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--primary), var(--rose)); }
+      .lrn-continue-arrow {
+        flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: rgba(255,255,255,0.08); color: var(--text-main);
+      }
     }
 
     .lrn-tabs {
@@ -208,6 +253,18 @@
       <div class="lrn-streak-pill">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
         <span id="lrn-streak">0</span>
+      </div>
+    </div>
+
+    <div class="lrn-continue" id="lrn-continue" onclick="location.href=window.__lrnContinueHref||'folders.html'">
+      <div class="lrn-continue-cover" id="lrn-continue-cover">📖</div>
+      <div class="lrn-continue-info">
+        <div class="lrn-continue-eyebrow">Davom eting</div>
+        <div class="lrn-continue-title" id="lrn-continue-title">Mavzu</div>
+        <div class="lrn-continue-track"><div class="lrn-continue-fill" id="lrn-continue-fill" style="width:0%"></div></div>
+      </div>
+      <div class="lrn-continue-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </div>
     </div>
 
@@ -416,7 +473,9 @@
           const grad = grads[i % grads.length]; i++;
           const initial = (f.name || '?').trim().charAt(0).toUpperCase();
           const row = document.createElement('div');
-          row.className = 'lrn-myf-row';
+          row.className = 'lrn-myf-row az-swipe-item';
+          row.setAttribute('data-swipe-delete-fn', 'deleteFolder');
+          row.setAttribute('data-swipe-delete-arg', d.id);
           row.onclick = () => location.href = 'folder.html?id=' + d.id;
           row.innerHTML =
             '<div class="lrn-myf-badge" style="background:linear-gradient(155deg,' + grad + ')">' + initial + '</div>' +
@@ -427,9 +486,30 @@
             '<button class="lrn-myf-del" onclick="deleteFolder(event,\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>';
           list.appendChild(row);
         });
+        if (window.AzTouchUX) window.AzTouchUX.init(list);
       } catch (e) {
         console.error('loadMyFolders', e);
         list.innerHTML = '<div class="lrn-empty">Yuklanmadi</div>';
+      }
+    }
+
+    function setupContinueCard() {
+      const card = document.getElementById('lrn-continue');
+      let lastFolder = null;
+      try { lastFolder = JSON.parse(localStorage.getItem('az:lastFolder') || 'null'); } catch (e) {}
+      if (!lastFolder || !lastFolder.id) { card.style.display = 'none'; return; }
+
+      const href = lastFolder.topic
+        ? ('study.html?' + (lastFolder.kind === 'book' ? 'book=' : 'id=') + lastFolder.id + '&topic=' + lastFolder.topic)
+        : (lastFolder.kind === 'book' ? ('book.html?id=' + lastFolder.id) : ('study.html?id=' + lastFolder.id));
+      window.__lrnContinueHref = href;
+
+      document.getElementById('lrn-continue-title').textContent = lastFolder.name || 'Mavzu';
+      const pct = Number(lastFolder.pct) || 0;
+      document.getElementById('lrn-continue-fill').style.width = Math.min(100, Math.max(0, pct)) + '%';
+      const coverEl = document.getElementById('lrn-continue-cover');
+      if (lastFolder.imageUrl) {
+        coverEl.innerHTML = '<img src="' + lastFolder.imageUrl + '" alt="" onerror="this.parentElement.textContent=\'📖\'"/>';
       }
     }
 
@@ -443,6 +523,7 @@
           if (streakEl) streakEl.textContent = ud.data().streakDays || 0;
         }
       } catch (e) { /* ignore */ }
+      setupContinueCard();
       loadBooksList();
       loadCategories();
       loadMyFolders();

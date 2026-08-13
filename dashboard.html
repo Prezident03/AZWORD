@@ -20,6 +20,7 @@
   <script src="parallax.js"></script>
   <script src="dash-enhance.js"></script>
   <script src="mobile-nav.js" defer data-splash="true"></script>
+  <script src="touch-ux.js" defer></script>
   <style>
     /* ── LAYOUT ── */
     body { display: flex; min-height: 100vh; background: var(--bg-deep); }
@@ -915,6 +916,22 @@
       .topbar-left p { display:none; }
       .az-hero-grid { grid-template-columns: 1fr !important; }
       .az-analytics-kpis { grid-template-columns: 1fr 1fr !important; }
+
+      /* Mobilda ":hover" ishonchli ishlamaydi — bu ikki tugma avval
+         faqat kartaga hover qilinganda opacity:1 bo'lardi, ya'ni
+         mobilda umuman ko'rinmas/bosilmas edi. Endi doim ko'rinadi
+         va bosish maydoni kattaroq (touch-ux.js'dagi long-press ham
+         shu kartaga qo'shimcha yo'l sifatida ishlaydi). */
+      .myf-delete {
+        opacity: 1 !important;
+        width: 30px;
+        height: 30px;
+      }
+      .folder-delete {
+        opacity: 1 !important;
+        width: 32px;
+        height: 32px;
+      }
     }
 
     /* ═══════════════════ PREMIUM HERO v2 STYLES ═══════════════════ */
@@ -2594,7 +2611,9 @@ function renderFolders(snap, containerId, isAdmin) {
     const initial = (f.name || '?').trim().charAt(0).toUpperCase();
 
     const card = document.createElement('div');
-    card.className = 'myf-card';
+    card.className = 'myf-card az-longpress';
+    card.setAttribute('data-longpress-fn', 'deleteFolder');
+    card.setAttribute('data-longpress-arg', id);
     card.onclick = () => location.href = `folder.html?id=${id}`;
     card.innerHTML =
         '<button class="myf-delete" onclick="deleteFolder(event,\'' + id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>' +
@@ -2617,6 +2636,8 @@ function renderFolders(snap, containerId, isAdmin) {
     `;
     container.appendChild(addCard);
   }
+
+  if (window.AzTouchUX) window.AzTouchUX.init(container);
 }
 
 window.openModal = () => { document.getElementById('folder-modal').classList.add('open'); setTimeout(()=>document.getElementById('folder-name').focus(),100); };
