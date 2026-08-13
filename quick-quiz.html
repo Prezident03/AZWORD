@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>AzWord — Tezkor kviz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="premium-pages.css"/>
+  <link rel="stylesheet" href="mobile.css"/>
+  <script src="transition.js"></script>
+  <script src="ripple.js"></script>
+  <script src="brand.js"></script>
+  <script src="confetti.js"></script>
+  <script src="sound.js"></script>
+  <script src="mobile-nav.js" defer></script>
+  <style>
+    html, body { overflow-x: hidden; }
+    body { background: var(--bg-page); min-height: 100vh; }
+
+    .qq-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 18px 18px 32px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .qq-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+    .qq-back {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      color: var(--text-main);
+      cursor: pointer;
+    }
+    .qq-progress-info { flex: 1; min-width: 0; }
+    .qq-progress-bar {
+      width: 100%; height: 7px;
+      background: var(--bg-hover, var(--bg-card));
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .qq-progress-fill {
+      height: 100%; width: 0%;
+      border-radius: 7px;
+      background: linear-gradient(90deg, var(--primary), var(--rose));
+      transition: width 400ms ease;
+    }
+    .qq-progress-text {
+      font-family: var(--font-display);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .qq-q-wrap { flex: 1; display: flex; flex-direction: column; }
+    .qq-q-label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+    .qq-word {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 2rem;
+      color: var(--text-main);
+      line-height: 1.2;
+      margin-bottom: 30px;
+      word-break: break-word;
+      animation: qqFadeIn 320ms ease;
+    }
+    @keyframes qqFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .qq-options { display: flex; flex-direction: column; gap: 12px; }
+    .qq-opt {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 16px 16px;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: transform 120ms ease, border-color 160ms ease, background 160ms ease;
+      animation: qqFadeIn 320ms ease backwards;
+    }
+    .qq-opt:nth-child(1) { animation-delay: 40ms; }
+    .qq-opt:nth-child(2) { animation-delay: 90ms; }
+    .qq-opt:nth-child(3) { animation-delay: 140ms; }
+    .qq-opt:nth-child(4) { animation-delay: 190ms; }
+    .qq-opt:active { transform: scale(0.98); }
+    .qq-opt-badge {
+      width: 30px; height: 30px; flex-shrink: 0;
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-hover, rgba(255,255,255,0.05));
+      color: var(--text-dim);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 0.82rem;
+    }
+    .qq-opt.correct {
+      border-color: var(--success);
+      background: var(--success-glow);
+    }
+    .qq-opt.correct .qq-opt-badge { background: var(--success); color: #fff; }
+    .qq-opt.wrong {
+      border-color: var(--danger);
+      background: var(--danger-glow);
+      animation: qqShake 380ms ease;
+    }
+    .qq-opt.wrong .qq-opt-badge { background: var(--danger); color: #fff; }
+    .qq-opt.dim { opacity: 0.45; }
+    @keyframes qqShake {
+      10%, 90% { transform: translateX(-2px); }
+      20%, 80% { transform: translateX(4px); }
+      30%, 50%, 70% { transform: translateX(-8px); }
+      40%, 60% { transform: translateX(8px); }
+    }
+
+    .qq-feedback {
+      text-align: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-top: 18px;
+      min-height: 22px;
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+    .qq-feedback.show { opacity: 1; }
+    .qq-feedback.ok { color: var(--success); }
+    .qq-feedback.bad { color: var(--danger); }
+
+    .qq-loading {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; padding: 80px 20px; color: var(--text-muted); font-size: 0.9rem;
+    }
+
+    /* ── Done screen ── */
+    .qq-done { max-width: 420px; margin: 50px auto; padding: 0 20px; text-align: center; }
+    .qq-done-score {
+      width: 140px; height: 140px; margin: 0 auto 20px;
+      border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: conic-gradient(var(--primary) calc(var(--pct,0) * 1%), var(--bg-hover, var(--bg-card)) 0);
+      position: relative;
+    }
+    .qq-done-score::before {
+      content: '';
+      position: absolute; inset: 8px;
+      border-radius: 50%;
+      background: var(--bg-page);
+    }
+    .qq-done-score-inner { position: relative; z-index: 1; }
+    .qq-done-score-num { font-family: var(--font-display); font-weight: 800; font-size: 1.8rem; color: var(--text-main); }
+    .qq-done-score-lbl { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
+    .qq-done h2 { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin: 0 0 6px; }
+    .qq-done p { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 26px; }
+    .qq-done-actions { display: flex; flex-direction: column; gap: 10px; }
+    .qq-done-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px; border-radius: 14px; font-weight: 700; font-size: 0.9rem;
+      cursor: pointer; border: none; font-family: var(--font-body); text-decoration: none;
+    }
+    .qq-done-btn.primary { background: linear-gradient(135deg, var(--primary), var(--rose)); color: #fff; }
+    .qq-done-btn.secondary { background: var(--bg-card); border: 1.5px solid var(--border); color: var(--text-main); }
+
+    @media (max-width: 380px) {
+      .qq-word { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="qq-wrap" id="qq-wrap">
+    <div class="qq-topbar">
+      <button class="qq-back" id="qq-back-btn" aria-label="Orqaga">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="qq-progress-info">
+        <div class="qq-progress-bar"><div class="qq-progress-fill" id="qq-progress-fill"></div></div>
+        <div class="qq-progress-text" id="qq-progress-text">— / —</div>
+      </div>
+    </div>
+
+    <div class="qq-q-wrap" id="qq-q-wrap">
+      <div class="qq-loading" id="qq-loading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Savollar tayyorlanmoqda...
+      </div>
+    </div>
+  </div>
+
+  <div class="qq-done" id="qq-done" style="display:none">
+    <div class="qq-done-score" id="qq-done-score" style="--pct:0">
+      <div class="qq-done-score-inner">
+        <div class="qq-done-score-num" id="qq-done-pct">0%</div>
+        <div class="qq-done-score-lbl">natija</div>
+      </div>
+    </div>
+    <h2 id="qq-done-title">Kviz tugadi!</h2>
+    <p id="qq-done-sub">— / — to'g'ri javob</p>
+    <div class="qq-done-actions">
+      <button class="qq-done-btn primary" id="qq-retry-btn">↻ Qayta urinish</button>
+      <a class="qq-done-btn secondary" id="qq-exit-btn" href="quiz.html">Mashqqa qaytish</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth, db } from './firebase.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const params = new URLSearchParams(window.location.search);
+    let folderId = params.get('id');
+    let bookId = params.get('book');
+    let topicId = params.get('topic');
+
+    if (!folderId && !bookId) {
+      try {
+        const last = JSON.parse(localStorage.getItem('az:lastFolder') || 'null');
+        if (last && last.id) {
+          if (last.kind === 'book') bookId = last.id; else folderId = last.id;
+          topicId = last.topic || null;
+        }
+      } catch (e) {}
+    }
+
+    const isBookMode = !!(bookId && topicId);
+    const isFolderTopicMode = !!(folderId && topicId && !bookId);
+    const backHref = isBookMode
+      ? `book.html?id=${bookId}`
+      : folderId
+        ? `folder.html?id=${folderId}`
+        : 'quiz.html';
+    document.getElementById('qq-back-btn').addEventListener('click', () => { window.location.href = backHref; });
+    document.getElementById('qq-exit-btn').href = backHref;
+
+    const QUESTION_COUNT = 10;
+    let pool = [];       // barcha so'zlar
+    let quiz = [];        // shu urinishdagi savollar to'plami
+    let qIndex = 0;
+    let correctCount = 0;
+    let currentUser = null;
+    let locked = false;
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = 'index.html'; return; }
+      currentUser = user;
+      if (!folderId && !bookId) { window.location.href = 'quiz.html'; return; }
+      await loadWords();
+    });
+
+    async function loadWords() {
+      const wordsRef = isBookMode
+        ? collection(db, 'books', bookId, 'topics', topicId, 'words')
+        : isFolderTopicMode
+          ? collection(db, 'folders', folderId, 'topics', topicId, 'words')
+          : collection(db, 'folders', folderId, 'words');
+      let snap;
+      try {
+        snap = await getDocs(query(wordsRef, orderBy('createdAt', 'asc')));
+      } catch (e) {
+        console.error('quick-quiz loadWords xato:', e);
+        document.getElementById('qq-loading').textContent = "Xato: so'zlarni yuklab bo'lmadi.";
+        return;
+      }
+      pool = [];
+      snap.forEach(d => pool.push({ id: d.id, ...d.data() }));
+
+      if (pool.length < 2) { window.location.href = backHref; return; }
+      buildQuiz();
+    }
+
+    function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+    function buildQuiz() {
+      const shuffledPool = shuffle(pool);
+      quiz = shuffledPool.slice(0, Math.min(QUESTION_COUNT, pool.length));
+      qIndex = 0;
+      correctCount = 0;
+      locked = false;
+      document.getElementById('qq-done').style.display = 'none';
+      document.getElementById('qq-wrap').style.display = 'flex';
+      renderQuestion();
+    }
+
+    function optionsFor(word) {
+      const maxOpts = Math.min(4, pool.length);
+      const others = pool.filter(w => w.id !== word.id).map(w => w.uz);
+      const distractors = shuffle(others).slice(0, maxOpts - 1);
+      return shuffle([word.uz, ...distractors]);
+    }
+
+    function updateProgress() {
+      const pct = quiz.length ? Math.round((qIndex / quiz.length) * 100) : 0;
+      document.getElementById('qq-progress-fill').style.width = pct + '%';
+      document.getElementById('qq-progress-text').textContent = `${Math.min(qIndex + 1, quiz.length)} / ${quiz.length}`;
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;').replaceAll("'", '&#039;');
+    }
+
+    const LETTERS = ['A', 'B', 'C', 'D'];
+
+    function renderQuestion() {
+      updateProgress();
+      if (qIndex >= quiz.length) { finishQuiz(); return; }
+      locked = false;
+      const word = quiz[qIndex];
+      const opts = optionsFor(word);
+
+      const wrap = document.getElementById('qq-q-wrap');
+      wrap.innerHTML = `
+        <div class="qq-q-label">"${escapeHtml(word.en)}" so'zi nima ma'noni bildiradi?</div>
+        <div class="qq-word">${escapeHtml(word.en)}</div>
+        <div class="qq-options" id="qq-options">
+          ${opts.map((o, i) => `<button class="qq-opt" data-answer="${escapeHtml(o)}"><span class="qq-opt-badge">${LETTERS[i] || (i+1)}</span><span>${escapeHtml(o)}</span></button>`).join('')}
+        </div>
+        <div class="qq-feedback" id="qq-feedback"></div>
+      `;
+
+      const correct = word.uz;
+      wrap.querySelectorAll('.qq-opt').forEach(btn => {
+        btn.addEventListener('click', () => handleAnswer(btn, correct));
+      });
+    }
+
+    function handleAnswer(btn, correct) {
+      if (locked) return;
+      locked = true;
+      const chosen = btn.getAttribute('data-answer');
+      const allOpts = document.querySelectorAll('.qq-opt');
+      const feedback = document.getElementById('qq-feedback');
+
+      allOpts.forEach(b => { b.disabled = true; if (b !== btn) b.classList.add('dim'); });
+
+      if (chosen === correct) {
+        btn.classList.remove('dim');
+        btn.classList.add('correct');
+        correctCount++;
+        feedback.textContent = "To'g'ri! \u2713";
+        feedback.className = 'qq-feedback show ok';
+        if (window.AzSound && window.AzSound.play) window.AzSound.play('correct');
+        if (window.AzConfetti && Math.random() < 0.4) window.AzConfetti.preset('study-correct');
+      } else {
+        btn.classList.remove('dim');
+        btn.classList.add('wrong');
+        allOpts.forEach(b => {
+          if (b.getAttribute('data-answer') === correct) { b.classList.remove('dim'); b.classList.add('correct'); }
+        });
+        feedback.textContent = `To'g'ri javob: ${correct}`;
+        feedback.className = 'qq-feedback show bad';
+        if (window.AzSound && window.AzSound.play) window.AzSound.play('wrong');
+      }
+
+      setTimeout(() => { qIndex++; renderQuestion(); }, 950);
+    }
+
+    function finishQuiz() {
+      document.getElementById('qq-wrap').style.display = 'none';
+      const done = document.getElementById('qq-done');
+      done.style.display = 'block';
+      const pct = quiz.length ? Math.round((correctCount / quiz.length) * 100) : 0;
+      document.getElementById('qq-done-score').style.setProperty('--pct', pct);
+      document.getElementById('qq-done-pct').textContent = pct + '%';
+      document.getElementById('qq-done-sub').textContent = `${correctCount} / ${quiz.length} to'g'ri javob`;
+
+      let title = "Ajoyib natija!";
+      if (pct < 40) title = "Mashq qiling, yaxshilanadi!";
+      else if (pct < 75) title = "Yaxshi urinish!";
+      document.getElementById('qq-done-title').textContent = title;
+
+      if (pct >= 80 && window.AzConfetti) window.AzConfetti.preset('study-correct');
+    }
+
+    document.getElementById('qq-retry-btn').addEventListener('click', buildQuiz);
+  </script>
+</body>
+</html>
