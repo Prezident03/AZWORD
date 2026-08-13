@@ -6,7 +6,7 @@
    alohida keshlanadi.
    ═══════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'azword-shell-v1';
+const CACHE_NAME = 'azword-shell-v2';
 
 const APP_SHELL = [
   'index.html',
@@ -15,6 +15,7 @@ const APP_SHELL = [
   'folder.html',
   'flashcards.html',
   'quiz.html',
+  'quick-quiz.html',
   'results.html',
   'vocabulary.html',
   'study.html',
@@ -30,7 +31,9 @@ const APP_SHELL = [
   'upload.html',
   'style.css',
   'premium-pages.css',
+  'mobile.css',
   'brand.js',
+  'mobile-nav.js',
   'confetti.js',
   'cursor-glow.js',
   'dash-enhance.js',

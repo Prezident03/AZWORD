@@ -34,6 +34,95 @@
   }
 
   /* ──────────────────────────────────────────────────────
+     0a. OFFLINE INDICATOR — internet uzilganda/tiklanganda
+     ekran tepasida slim banner ko'rsatadi. Firestore o'zi
+     persistentLocalCache orqali oxirgi ma'lumotlarni ko'rsatishda
+     davom etadi, bu banner shunchaki foydalanuvchiga holatni
+     bildiradi (sw.js sahifa qobig'ini keshlagani uchun offline'da
+     ham sahifa ochiladi).
+     ────────────────────────────────────────────────────── */
+  function injectOfflineCSS() {
+    if (document.getElementById('az-offline-css')) return;
+    const s = document.createElement('style');
+    s.id = 'az-offline-css';
+    s.textContent = `
+#az-offline-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px calc(9px + env(safe-area-inset-top, 0px));
+  padding-top: calc(9px + env(safe-area-inset-top, 0px));
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: var(--streak, #f97316);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  transform: translateY(-100%);
+  transition: transform 320ms cubic-bezier(.2,.8,.2,1);
+}
+#az-offline-bar.az-show { transform: translateY(0); }
+#az-offline-bar.az-online {
+  background: var(--success, #10b981);
+}
+#az-offline-bar svg { width: 15px; height: 15px; flex: none; }
+`;
+    document.head.appendChild(s);
+  }
+
+  function setupOfflineIndicator() {
+    injectOfflineCSS();
+    let bar = document.getElementById('az-offline-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'az-offline-bar';
+      bar.setAttribute('role', 'status');
+      bar.setAttribute('aria-live', 'polite');
+      document.body.appendChild(bar);
+    }
+
+    const DOT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>';
+    const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+
+    let backOnlineTimer = null;
+
+    function showOffline() {
+      clearTimeout(backOnlineTimer);
+      bar.classList.remove('az-online');
+      bar.innerHTML = DOT + '<span>Internet yo\u02bboq — oxirgi saqlangan ma\u02bblumotlar ko\u02bbrsatilmoqda</span>';
+      bar.classList.add('az-show');
+    }
+
+    function showBackOnline() {
+      bar.classList.add('az-online');
+      bar.innerHTML = CHECK + '<span>Internet tiklandi</span>';
+      bar.classList.add('az-show');
+      backOnlineTimer = setTimeout(() => bar.classList.remove('az-show'), 2200);
+    }
+
+    function hideBar() {
+      bar.classList.remove('az-show');
+    }
+
+    window.addEventListener('offline', showOffline);
+    window.addEventListener('online', () => {
+      // Faqat avval offline banner ko'ringan bo'lsa "tiklandi" xabarini chiqar
+      if (bar.classList.contains('az-show') && !bar.classList.contains('az-online')) {
+        showBackOnline();
+      } else {
+        hideBar();
+      }
+    });
+
+    // Sahifa ochilganda darhol holatni tekshirish
+    if (!navigator.onLine) showOffline();
+  }
+
+  /* ──────────────────────────────────────────────────────
      0b. SHARED MOTION TOKENS — style.css dizayn tokenlari
      (--dur-fast, --dur-normal, --ease-standard va h.k.) bilan bir xil qiymatlar. ripple/confetti/transition/parallax/
      cursor-glow shu obyektdan foydalanadi, shunda barchasi bir xil
@@ -349,17 +438,22 @@
   // Favicon + splash always run (before paint)
   injectFavicon();
   injectSplashCSS();
+  injectOfflineCSS();
   // Only show splash on fresh navigation (NOT internal SPA-ish transitions)
   const navType = performance && performance.getEntriesByType('navigation')[0];
   const isNav = !navType || navType.type === 'navigate';
   const notTransition = !sessionStorage.getItem('az:page-transition');
   if (isNav && notTransition) showSplash();
 
-  // Logos on DOM ready
+  // Logos + offline indicator on DOM ready
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', autoReplaceLogos, { once: true });
+    document.addEventListener('DOMContentLoaded', () => {
+      autoReplaceLogos();
+      setupOfflineIndicator();
+    }, { once: true });
   } else {
     autoReplaceLogos();
+    setupOfflineIndicator();
   }
 
   // Clear transition flag after 50ms so next navigation may splash again
