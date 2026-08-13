@@ -103,8 +103,8 @@
     .wm-tab{flex:1;padding:8px;text-align:center;border-radius:7px;border:none;background:transparent;color:var(--text-muted);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
     .wm-tab.active{background:var(--purple-main);color:#fff}
     .aw-form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .aw-form input{background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.875rem;outline:none}
-    .aw-form input:focus{border-color:var(--purple-main)}
+    .aw-form input,.aw-form select{background:var(--bg-deep);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text-main);font-family:'Inter',sans-serif;font-size:0.875rem;outline:none}
+    .aw-form input:focus,.aw-form select:focus{border-color:var(--purple-main)}
     .aw-form input.full{grid-column:1/-1}
     .word-row{display:flex;align-items:center;gap:12px;padding:11px 22px;border-bottom:1px solid var(--border);font-size:0.875rem}
     .word-row:last-child{border-bottom:none}
@@ -577,6 +577,19 @@
         <div class="aw-form">
           <input type="text" id="aw-en" placeholder="English (apple)"/>
           <input type="text" id="aw-uz" placeholder="Uzbekcha (olma)" onkeydown="if(event.key==='Enter')addWord()"/>
+          <input type="text" id="aw-ipa" placeholder="IPA /ˈæpəl/ (ixtiyoriy)"/>
+          <select id="aw-pos">
+            <option value="">Soz turi — ixtiyoriy</option>
+            <option value="noun">noun (ot)</option>
+            <option value="verb">verb (fe'l)</option>
+            <option value="adjective">adjective (sifat)</option>
+            <option value="adverb">adverb (ravish)</option>
+            <option value="pronoun">pronoun (olmosh)</option>
+            <option value="preposition">preposition (predlog)</option>
+            <option value="conjunction">conjunction (bog'lovchi)</option>
+            <option value="interjection">interjection (undov)</option>
+            <option value="phrase">phrase (ibora)</option>
+          </select>
           <input type="text" id="aw-ex" class="full" placeholder="Example sentence" onkeydown="if(event.key==='Enter')addWord()"/>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px">
@@ -715,6 +728,25 @@
     <div class="form-group">
       <label>Uzbek</label>
       <input type="text" id="word-uz" placeholder="tark etmoq"/>
+    </div>
+    <div class="form-group">
+      <label>IPA transkripsiya (ixtiyoriy)</label>
+      <input type="text" id="word-ipa" placeholder="/əˈbændən/"/>
+    </div>
+    <div class="form-group">
+      <label>Soz turi (ixtiyoriy)</label>
+      <select id="word-pos">
+        <option value="">— Tanlanmagan —</option>
+        <option value="noun">noun (ot)</option>
+        <option value="verb">verb (fe'l)</option>
+        <option value="adjective">adjective (sifat)</option>
+        <option value="adverb">adverb (ravish)</option>
+        <option value="pronoun">pronoun (olmosh)</option>
+        <option value="preposition">preposition (predlog)</option>
+        <option value="conjunction">conjunction (bog'lovchi)</option>
+        <option value="interjection">interjection (undov)</option>
+        <option value="phrase">phrase (ibora)</option>
+      </select>
     </div>
     <div class="form-group">
       <label>Example (ixtiyoriy)</label>
@@ -1108,9 +1140,9 @@ async function loadWords() {
       const row = document.createElement('div');
       row.className = 'word-row-admin';
       row.innerHTML = '<div class="wra-num">' + (++i) + '</div>' +
-        '<div class="wra-en">' + (w.en || '') + '</div>' +
+        '<div class="wra-en">' + (w.en || '') + (w.pos ? ' <span style="color:var(--text-dim);font-weight:400;font-size:0.72rem;font-style:italic">' + w.pos + '</span>' : '') + '</div>' +
         '<div class="wra-uz">' + (w.uz || '') + '</div>' +
-        '<div class="wra-ex">' + (w.example || '') + '</div>' +
+        '<div class="wra-ex">' + (w.ipa ? '<span style="color:var(--text-dim)">' + w.ipa + '</span> ' : '') + (w.example || '') + '</div>' +
         '<button class="wra-del" onclick="deleteWord(\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>';
       list.appendChild(row);
     });
@@ -1121,6 +1153,8 @@ window.openWordModal = function() {
   document.getElementById('word-id').value = '';
   document.getElementById('word-en').value = '';
   document.getElementById('word-uz').value = '';
+  document.getElementById('word-ipa').value = '';
+  document.getElementById('word-pos').value = '';
   document.getElementById('word-example').value = '';
   document.getElementById('word-modal-title').textContent = 'Yangi soz';
   document.getElementById('word-modal').classList.add('open');
@@ -1135,6 +1169,8 @@ window.saveWord = async function() {
   const data = {
     en: document.getElementById('word-en').value.trim(),
     uz: document.getElementById('word-uz').value.trim(),
+    ipa: document.getElementById('word-ipa').value.trim(),
+    pos: document.getElementById('word-pos').value,
     example: document.getElementById('word-example').value.trim()
   };
   if (!data.en || !data.uz) { toast('English va Uzbek kiriting', true); return; }
@@ -2118,7 +2154,7 @@ async function loadFolderWords(fid) {
     const w=d.data();
     const row=document.createElement('div');
     row.className='word-row';
-    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${escapeHtml(w.en)}</span><span class="wr-uz">${escapeHtml(w.uz)}</span><span class="wr-ex">${w.example?'"'+escapeHtml(w.example)+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
+    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${escapeHtml(w.en)}${w.pos?' <em style="color:var(--text-dim);font-weight:400;font-size:0.72rem">'+escapeHtml(w.pos)+'</em>':''}</span><span class="wr-uz">${escapeHtml(w.uz)}</span><span class="wr-ex">${w.ipa?'<span style="color:var(--text-dim)">'+escapeHtml(w.ipa)+'</span> ':''}${w.example?'"'+escapeHtml(w.example)+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
     body.appendChild(row);
   });
 }
@@ -2126,15 +2162,19 @@ window.addWord = async () => {
   if (!selFolder) return;
   const en = document.getElementById('aw-en').value.trim().toLowerCase();
   const uz = document.getElementById('aw-uz').value.trim();
+  const ipa = document.getElementById('aw-ipa').value.trim();
+  const pos = document.getElementById('aw-pos').value;
   const ex = document.getElementById('aw-ex').value.trim();
   if (!en || !uz) return toast('Ikkala maydonni toldiring', true);
   const btn = document.querySelector('#tab-manual-content .btn-confirm');
   if (btn) { btn.disabled=true; btn.textContent='...'; }
   try {
-    await addDoc(collection(db,'folders',selFolder,'words'),{ en, uz, example:ex||'', createdAt:serverTimestamp() });
+    await addDoc(collection(db,'folders',selFolder,'words'),{ en, uz, ipa: ipa||'', pos: pos||'', example:ex||'', createdAt:serverTimestamp() });
     await updateDoc(doc(db,'folders',selFolder),{ wordCount:increment(1) });
     document.getElementById('aw-en').value='';
     document.getElementById('aw-uz').value='';
+    document.getElementById('aw-ipa').value='';
+    document.getElementById('aw-pos').value='';
     document.getElementById('aw-ex').value='';
     document.getElementById('aw-en').focus();
     toast('Qoshildi');
