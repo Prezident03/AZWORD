@@ -304,7 +304,11 @@
     </div>
 
     <div class="lb-list" id="lb-list">
-      <div class="lb-loading"><span id="lb-loading-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span> Yuklanmoqda...</div>
+      <div class="az-skel"></div>
+      <div class="az-skel"></div>
+      <div class="az-skel"></div>
+      <div class="az-skel"></div>
+      <div class="az-skel"></div>
     </div>
 
     <div class="my-rank-banner" id="my-rank-banner" style="display:none">
@@ -354,7 +358,6 @@
       document.getElementById('lb-weekly-icon').innerHTML = icon('flame',{size:14,color:'#fb923c'});
       document.getElementById('lb-alltime-icon').innerHTML = icon('crown',{size:14,color:'#fbbf24'});
       document.getElementById('lb-cal-icon').innerHTML = icon('calendar',{size:14});
-      document.getElementById('lb-loading-icon').innerHTML = icon('clock',{size:16,color:'var(--text-dim)'});
 
       const letter = (user.displayName || user.email).charAt(0).toUpperCase();
       try {

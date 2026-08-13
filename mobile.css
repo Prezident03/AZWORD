@@ -594,3 +594,46 @@
 @media (prefers-reduced-motion: reduce) {
   .az-lp-fire { animation: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   8. SKELETON LOADING — umumiy shimmer utility
+   Ma'lumot Firestore'dan kelguncha bo'sh/statik "hech narsa yo'q"
+   holati ko'rsatilmasligi uchun (bu chalg'ituvchi — go'yo haqiqatan
+   ham bo'sh degandek tuyuladi). Buning o'rniga skelet-qatorlar
+   ko'rsatiladi, keyin JS ularni haqiqiy ma'lumot bilan almashtiradi.
+   Naqsh folders.html'dagi .lrn-skel'dan olingan, umumiy qilib
+   ko'chirildi — endi har qanday sahifada ishlatsa bo'ladi.
+   Ishlatilishi: konteynerning boshlang'ich HTML'iga
+     <div class="az-skel"></div>  (qator, ~78px balandlik)
+     <div class="az-skel az-skel-card"></div>  (kvadratroq karta)
+     <div class="az-skel az-skel-sm"></div>  (kichik qator, ~44px)
+   qo'yiladi; JS birinchi marta innerHTML'ni almashtirganda avtomatik
+   yo'qoladi (barcha sahifalarda render funksiyalari shunday ishlaydi).
+   FAQAT mobilda ko'rinadi — desktopda alohida hech narsa o'zgarmaydi
+   (bu klasslar hozircha faqat mobil markup'da ishlatilyapti).
+   ═══════════════════════════════════════════════════════════════════ */
+.az-skel {
+  height: 78px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, var(--bg-card, #1a1625) 25%, var(--bg-hover, #252033) 50%, var(--bg-card, #1a1625) 75%);
+  background-size: 200% 100%;
+  animation: az-skel-shimmer 1.4s ease-in-out infinite;
+  margin-bottom: 10px;
+  border: 1px solid var(--border, #2e2845);
+}
+.az-skel-sm { height: 44px; border-radius: 12px; }
+.az-skel-lg { height: 110px; border-radius: 18px; }
+.az-skel-card { height: 130px; border-radius: 16px; margin-bottom: 0; }
+.az-skel-circle { height: 44px; width: 44px; border-radius: 50%; margin-bottom: 0; flex-shrink: 0; }
+.az-skel-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@keyframes az-skel-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .az-skel { animation: none; opacity: 0.6; }
+}
