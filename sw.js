@@ -6,7 +6,7 @@
    alohida keshlanadi.
    ═══════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'azword-shell-v2';
+const CACHE_NAME = 'azword-shell-v3';
 
 const APP_SHELL = [
   'index.html',
@@ -47,6 +47,8 @@ const APP_SHELL = [
   'sidebar.js',
   'sound.js',
   'transition.js',
+  'touch-ux.js',
+  'pwa-init.js',
   'logo.png',
   'icon-192.png',
   'icon-512.png',
