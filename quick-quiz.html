@@ -306,8 +306,15 @@
 
     function optionsFor(word) {
       const maxOpts = Math.min(4, pool.length);
-      const others = pool.filter(w => w.id !== word.id).map(w => w.uz);
-      const distractors = shuffle(others).slice(0, maxOpts - 1);
+      const seen = new Set([word.uz]);
+      const others = shuffle(pool.filter(w => w.id !== word.id));
+      const distractors = [];
+      for (const w of others) {
+        if (distractors.length >= maxOpts - 1) break;
+        if (seen.has(w.uz)) continue;
+        seen.add(w.uz);
+        distractors.push(w.uz);
+      }
       return shuffle([word.uz, ...distractors]);
     }
 
@@ -365,15 +372,21 @@
         feedback.className = 'qq-feedback show ok';
         if (window.AzSound && window.AzSound.play) window.AzSound.play('correct');
         if (window.AzConfetti && Math.random() < 0.4) window.AzConfetti.preset('study-correct');
+        if (navigator.vibrate) navigator.vibrate(35);
       } else {
         btn.classList.remove('dim');
         btn.classList.add('wrong');
+        let markedCorrect = false;
         allOpts.forEach(b => {
-          if (b.getAttribute('data-answer') === correct) { b.classList.remove('dim'); b.classList.add('correct'); }
+          if (!markedCorrect && b !== btn && b.getAttribute('data-answer') === correct) {
+            b.classList.remove('dim'); b.classList.add('correct');
+            markedCorrect = true;
+          }
         });
         feedback.textContent = `To'g'ri javob: ${correct}`;
         feedback.className = 'qq-feedback show bad';
         if (window.AzSound && window.AzSound.play) window.AzSound.play('wrong');
+        if (navigator.vibrate) navigator.vibrate([25, 40, 25]);
       }
 
       setTimeout(() => { qIndex++; renderQuestion(); }, 950);

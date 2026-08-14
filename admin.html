@@ -593,7 +593,8 @@
           <input type="text" id="aw-ex" class="full" placeholder="Example sentence" onkeydown="if(event.key==='Enter')addWord()"/>
         </div>
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn-confirm" onclick="addWord()" style="flex:1">Qoshish</button>
+          <button class="btn-confirm" id="aw-submit-btn" onclick="addWord()" style="flex:1">Qoshish</button>
+          <button class="btn-cancel" id="aw-cancel-edit-btn" onclick="cancelEditFolderWord()" style="display:none">Bekor</button>
           <button class="btn-cancel" onclick="closeWords()">Yopish</button>
         </div>
       </div>
@@ -1124,6 +1125,7 @@ window.closeTopicWords = function() {
   document.getElementById(wordsSectionId).style.display = 'none';
 };
 
+let bookWordsCache = {};
 async function loadWords() {
   const list = document.getElementById(topicsUI[selCollection].wordsListId);
   if (!selBookId || !selTopicId) { list.innerHTML = ''; return; }
@@ -1134,20 +1136,36 @@ async function loadWords() {
       return;
     }
     list.innerHTML = '';
+    bookWordsCache = {};
     let i = 0;
     snap.forEach(d => {
       const w = d.data();
+      bookWordsCache[d.id] = w;
       const row = document.createElement('div');
       row.className = 'word-row-admin';
       row.innerHTML = '<div class="wra-num">' + (++i) + '</div>' +
         '<div class="wra-en">' + (w.en || '') + (w.pos ? ' <span style="color:var(--text-dim);font-weight:400;font-size:0.72rem;font-style:italic">' + w.pos + '</span>' : '') + '</div>' +
         '<div class="wra-uz">' + (w.uz || '') + '</div>' +
         '<div class="wra-ex">' + (w.ipa ? '<span style="color:var(--text-dim)">' + w.ipa + '</span> ' : '') + (w.example || '') + '</div>' +
+        '<button class="wra-del" style="color:var(--text-muted);margin-right:2px" onclick="editWordItem(\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button>' +
         '<button class="wra-del" onclick="deleteWord(\'' + d.id + '\')"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>';
       list.appendChild(row);
     });
   } catch(e) { console.error('loadWords:', e); }
 }
+
+window.editWordItem = function(id) {
+  const w = bookWordsCache[id];
+  if (!w) return;
+  document.getElementById('word-id').value = id;
+  document.getElementById('word-en').value = w.en || '';
+  document.getElementById('word-uz').value = w.uz || '';
+  document.getElementById('word-ipa').value = w.ipa || '';
+  document.getElementById('word-pos').value = w.pos || '';
+  document.getElementById('word-example').value = w.example || '';
+  document.getElementById('word-modal-title').textContent = 'Sozni tahrirlash';
+  document.getElementById('word-modal').classList.add('open');
+};
 
 window.openWordModal = function() {
   document.getElementById('word-id').value = '';
@@ -2134,13 +2152,17 @@ window.closeWords = () => {
   document.getElementById('wmodal').classList.remove('open');
   document.getElementById('aw-en').value='';
   document.getElementById('aw-uz').value='';
+  document.getElementById('aw-ipa').value='';
+  document.getElementById('aw-pos').value='';
   document.getElementById('aw-ex').value='';
+  document.getElementById('aw-submit-btn').textContent='Qoshish';
+  document.getElementById('aw-cancel-edit-btn').style.display='none';
   document.getElementById('up-preview').style.display='none';
   document.getElementById('up-preview').innerHTML='';
   document.getElementById('save-file-btn').style.display='none';
   document.getElementById('file-inp').value='';
   switchTab('manual');
-  selFolder=null; parsedWords=[];
+  selFolder=null; parsedWords=[]; awEditId=null;
 };
 async function loadFolderWords(fid) {
   const body = document.getElementById('wm-body');
@@ -2149,15 +2171,47 @@ async function loadFolderWords(fid) {
   document.getElementById('wm-meta').textContent = snap.size + ' ta soz';
   if (snap.empty) { body.innerHTML='<div style="padding:20px;text-align:center;color:var(--text-muted)">Soz yoq</div>'; return; }
   body.innerHTML='';
+  folderWordsCache = {};
   let i=1;
   snap.forEach(d=>{
     const w=d.data();
+    folderWordsCache[d.id] = w;
     const row=document.createElement('div');
     row.className='word-row';
-    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${escapeHtml(w.en)}${w.pos?' <em style="color:var(--text-dim);font-weight:400;font-size:0.72rem">'+escapeHtml(w.pos)+'</em>':''}</span><span class="wr-uz">${escapeHtml(w.uz)}</span><span class="wr-ex">${w.ipa?'<span style="color:var(--text-dim)">'+escapeHtml(w.ipa)+'</span> ':''}${w.example?'"'+escapeHtml(w.example)+'"':''}</span><button class="abtn red" onclick="delWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
+    row.innerHTML=`<span class="wr-num">${i++}</span><span class="wr-en">${escapeHtml(w.en)}${w.pos?' <em style="color:var(--text-dim);font-weight:400;font-size:0.72rem">'+escapeHtml(w.pos)+'</em>':''}</span><span class="wr-uz">${escapeHtml(w.uz)}</span><span class="wr-ex">${w.ipa?'<span style="color:var(--text-dim)">'+escapeHtml(w.ipa)+'</span> ':''}${w.example?'"'+escapeHtml(w.example)+'"':''}</span><button class="abtn" style="color:var(--text-muted)" onclick="editFolderWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></button><button class="abtn red" onclick="delWord('${fid}','${d.id}')"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>`;
     body.appendChild(row);
   });
 }
+
+let folderWordsCache = {};
+let awEditId = null;
+
+window.editFolderWord = function(fid, wid) {
+  const w = folderWordsCache[wid];
+  if (!w) return;
+  selFolder = fid;
+  awEditId = wid;
+  switchTab('manual');
+  document.getElementById('aw-en').value = w.en || '';
+  document.getElementById('aw-uz').value = w.uz || '';
+  document.getElementById('aw-ipa').value = w.ipa || '';
+  document.getElementById('aw-pos').value = w.pos || '';
+  document.getElementById('aw-ex').value = w.example || '';
+  document.getElementById('aw-submit-btn').textContent = 'Saqlash';
+  document.getElementById('aw-cancel-edit-btn').style.display = 'inline-flex';
+  document.getElementById('aw-en').focus();
+};
+
+window.cancelEditFolderWord = function() {
+  awEditId = null;
+  document.getElementById('aw-en').value = '';
+  document.getElementById('aw-uz').value = '';
+  document.getElementById('aw-ipa').value = '';
+  document.getElementById('aw-pos').value = '';
+  document.getElementById('aw-ex').value = '';
+  document.getElementById('aw-submit-btn').textContent = 'Qoshish';
+  document.getElementById('aw-cancel-edit-btn').style.display = 'none';
+};
 window.addWord = async () => {
   if (!selFolder) return;
   const en = document.getElementById('aw-en').value.trim().toLowerCase();
@@ -2166,21 +2220,28 @@ window.addWord = async () => {
   const pos = document.getElementById('aw-pos').value;
   const ex = document.getElementById('aw-ex').value.trim();
   if (!en || !uz) return toast('Ikkala maydonni toldiring', true);
-  const btn = document.querySelector('#tab-manual-content .btn-confirm');
+  const btn = document.getElementById('aw-submit-btn');
   if (btn) { btn.disabled=true; btn.textContent='...'; }
   try {
-    await addDoc(collection(db,'folders',selFolder,'words'),{ en, uz, ipa: ipa||'', pos: pos||'', example:ex||'', createdAt:serverTimestamp() });
-    await updateDoc(doc(db,'folders',selFolder),{ wordCount:increment(1) });
+    if (awEditId) {
+      await updateDoc(doc(db,'folders',selFolder,'words',awEditId), { en, uz, ipa: ipa||'', pos: pos||'', example: ex||'' });
+      toast('Yangilandi');
+      awEditId = null;
+      document.getElementById('aw-cancel-edit-btn').style.display = 'none';
+    } else {
+      await addDoc(collection(db,'folders',selFolder,'words'),{ en, uz, ipa: ipa||'', pos: pos||'', example:ex||'', createdAt:serverTimestamp() });
+      await updateDoc(doc(db,'folders',selFolder),{ wordCount:increment(1) });
+      toast('Qoshildi');
+    }
     document.getElementById('aw-en').value='';
     document.getElementById('aw-uz').value='';
     document.getElementById('aw-ipa').value='';
     document.getElementById('aw-pos').value='';
     document.getElementById('aw-ex').value='';
     document.getElementById('aw-en').focus();
-    toast('Qoshildi');
     await loadFolderWords(selFolder); await loadAdminFolders();
   } catch(e) { toast('Xato: '+e.message, true); }
-  finally { if(btn){btn.disabled=false;btn.textContent='Qoshish';} }
+  finally { if(btn){btn.disabled=false;btn.textContent=awEditId?'Saqlash':'Qoshish';} }
 };
 window.delWord = async (fid,wid) => {
   await deleteDoc(doc(db,'folders',fid,'words',wid));
