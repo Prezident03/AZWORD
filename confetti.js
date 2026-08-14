@@ -17,7 +17,10 @@
   var lastTs = 0;
   var width = 0;
   var height = 0;
-  var DPR = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+  var isMobile = (typeof navigator !== 'undefined') && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  // Baland DPR (masalan 3x) telefonlarda canvas piksel hajmini 9x ga oshirib,
+  // GPU'ni ortiqcha band qiladi — 2x'da vizual farq sezilmaydi, lekin ancha yengil.
+  var DPR = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) || 1, 2);
 
   var raf = (typeof window !== 'undefined' && window.requestAnimationFrame) ||
     function (fn) { return setTimeout(fn, 16); };
@@ -111,7 +114,7 @@
     if (!canvas || !ctx) return;
     width = window.innerWidth;
     height = window.innerHeight;
-    DPR = window.devicePixelRatio || 1;
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = Math.round(width * DPR);
     canvas.height = Math.round(height * DPR);
     canvas.style.width = width + 'px';
@@ -205,17 +208,22 @@
   }
 
   // ──────────────────── PUBLIC API ────────────────────────
+  // Mobilda zarrachalar sonini kamaytiramiz (GPU/CPU tejash uchun) —
+  // vizual effekt saqlanadi, lekin eski Android'da FPS tushmaydi.
+  var MOBILE_SCALE = 0.55;
+
   function burst(opts) {
     ensureCanvas();
     opts = opts || {};
     var count = opts.count || (opts.big ? 220 : 120);
+    if (isMobile) count = Math.max(20, Math.round(count * MOBILE_SCALE));
     var cx = opts.x != null ? opts.x : window.innerWidth / 2;
     var cy = opts.y != null ? opts.y : window.innerHeight / 2.6;
     for (var i = 0; i < count; i++) {
       particles.push(spawnParticle(cx, cy, opts));
     }
     // Slight delay to stagger the burst
-    if (opts.stagger) {
+    if (opts.stagger && !isMobile) {
       setTimeout(function () {
         for (var j = 0; j < Math.round(count * 0.5); j++) {
           particles.push(spawnParticle(cx, cy, opts));
@@ -230,6 +238,7 @@
     ensureCanvas();
     opts = opts || {};
     var count = opts.count || 45;
+    if (isMobile) count = Math.max(15, Math.round(count * MOBILE_SCALE));
     var merged = Object.assign({}, opts, {
       angle: opts.angle != null ? opts.angle : (-Math.PI / 2),
       spread: opts.spread != null ? opts.spread : Math.PI * 0.9,
