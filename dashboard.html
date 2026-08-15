@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="mobile.css"/>
+  <script src="error-state.js"></script>
   <script src="pwa-init.js"></script>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
@@ -2437,16 +2438,26 @@ async function loadUserStats(uid) {
 async function loadFolders() {
   let mySnap = { empty: true, forEach: () => {} };
   let adminSnap = { empty: true, forEach: () => {} };
+  let myFailed = false, adminFailed = false;
   try {
     const myQ = query(collection(db,'folders'), where('uid','==',currentUser.uid), where('isAdmin','==',false));
     mySnap = await getDocs(myQ);
-  } catch (err) { console.warn('loadFolders: user folders failed', err); }
+  } catch (err) { console.warn('loadFolders: user folders failed', err); myFailed = true; }
   try {
     const adminQ = query(collection(db,'folders'), where('isAdmin','==',true));
     adminSnap = await getDocs(adminQ);
-  } catch (err) { console.warn('loadFolders: admin folders failed', err); }
-  renderFolders(mySnap, 'my-folders', false);
-  renderFolders(adminSnap, 'admin-folders', true);
+  } catch (err) { console.warn('loadFolders: admin folders failed', err); adminFailed = true; }
+
+  if (myFailed && window.AzError) {
+    window.AzError.mount('my-folders', { inline: true, onRetry: loadFolders });
+  } else {
+    renderFolders(mySnap, 'my-folders', false);
+  }
+  if (adminFailed && window.AzError) {
+    window.AzError.mount('admin-folders', { inline: true, onRetry: loadFolders });
+  } else {
+    renderFolders(adminSnap, 'admin-folders', true);
+  }
 }
 
 // "Davom ettirish" tugmasi: oxirgi o'qilgan mavzuga qaytaradi;
@@ -2544,7 +2555,11 @@ async function loadBooks() {
     });
   } catch(e) {
     console.error('loadBooks:', e);
-    document.getElementById('books-grid').innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Kitoblar yuklanmadi</p></div>';
+    if (window.AzError) {
+      window.AzError.mount('books-grid', { onRetry: loadBooks });
+    } else {
+      document.getElementById('books-grid').innerHTML = '<div class="folders-empty" style="min-height:100px"><p style="font-weight:600;color:var(--text-muted);font-size:0.85rem">Kitoblar yuklanmadi</p></div>';
+    }
   }
 }
 

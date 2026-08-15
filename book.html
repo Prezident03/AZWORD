@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="premium-pages.css"/>
   <link rel="stylesheet" href="mobile.css"/>
+  <script src="error-state.js"></script>
   <script src="pwa-init.js"></script>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
@@ -596,6 +597,7 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
+  async function loadBook() {
   try {
     // Load book data
     const bookDoc = await getDoc(doc(db, 'books', bookId));
@@ -682,8 +684,16 @@ onAuthStateChanged(auth, async user => {
   } catch(e) {
     console.error('Book load error:', e);
     document.getElementById('book-loading').style.display = 'none';
-    document.getElementById('book-empty').style.display = 'block';
+    if (window.AzError) {
+      document.getElementById('book-content').style.display = 'block';
+      window.AzError.mount('topics-grid', { onRetry: loadBook });
+    } else {
+      document.getElementById('book-empty').style.display = 'block';
+    }
   }
+  }
+
+  await loadBook();
 });
 </script>
 </body>

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="premium-pages.css"/>
   <link rel="stylesheet" href="mobile.css"/>
+  <script src="error-state.js"></script>
   <script src="pwa-init.js"></script>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
@@ -483,17 +484,31 @@
       if (!user) return window.location.href = 'index.html';
       currentUser = user;
       document.getElementById('user-name').textContent = user.displayName || user.email;
-      await loadFolder();
+      await initFolderPage();
+    });
+
+    async function initFolderPage() {
+      const ok = await loadFolder();
+      if (!ok) return;
       if (folderTopicMode) {
         await loadFolderTopics();
       } else {
         await loadWords();
-        await loadAIUses(user);
+        await loadAIUses(currentUser);
       }
-    });
+    }
 
     async function loadFolder() {
-      const snap = await getDoc(doc(db, 'folders', folderId));
+      let snap;
+      try {
+        snap = await getDoc(doc(db, 'folders', folderId));
+      } catch (e) {
+        console.error('loadFolder:', e);
+        if (window.AzError) {
+          window.AzError.mount('words-list', { onRetry: initFolderPage });
+        }
+        return false;
+      }
       if (!snap.exists()) return window.location.href = 'dashboard.html';
       const data = snap.data();
       document.getElementById('folder-emoji').innerHTML = fromEmoji(data.emoji || 'folder', {size:40,color:'var(--purple-light)'});
@@ -510,12 +525,20 @@
         document.querySelector('.btn-add').style.display = 'none';
         document.getElementById('word-count').textContent = (data.topicCount || 0) + ' ta mavzu';
       }
+      return true;
     }
 
     async function loadFolderTopics() {
       const container = document.getElementById('words-list');
       container.innerHTML = '<div class="az-skel az-skel-card"></div><div class="az-skel az-skel-card"></div><div class="az-skel az-skel-card"></div>';
-      const snap = await getDocs(query(collection(db, 'folders', folderId, 'topics'), orderBy('order', 'asc')));
+      let snap;
+      try {
+        snap = await getDocs(query(collection(db, 'folders', folderId, 'topics'), orderBy('order', 'asc')));
+      } catch (e) {
+        console.error('loadFolderTopics:', e);
+        if (window.AzError) window.AzError.mount(container, { onRetry: loadFolderTopics });
+        return;
+      }
       if (snap.empty) {
         container.innerHTML = '<div class="words-empty"><p>Hozircha mavzular qoshilmagan.</p></div>';
         return;
@@ -559,7 +582,16 @@
 
     async function loadWords() {
       const q = query(collection(db, 'folders', folderId, 'words'), orderBy('createdAt', 'asc'));
-      const snap = await getDocs(q);
+      let snap;
+      try {
+        snap = await getDocs(q);
+      } catch (e) {
+        console.error('loadWords:', e);
+        if (window.AzError) {
+          window.AzError.mount('words-list', { onRetry: loadWords });
+        }
+        return;
+      }
       words = [];
       snap.forEach(d => words.push({ id: d.id, ...d.data() }));
       renderWords();

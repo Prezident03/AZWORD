@@ -4875,3 +4875,79 @@ input:focus:not(:focus-visible) {
   height: 52px;
   border-radius: 12px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   ERROR STATE — ma'lumot yuklashda xato bo'lganda (internet uzilgan,
+   server javob bermagan, ruxsat rad etilgan va h.k.) ko'rsatiladigan
+   umumiy, "Qayta urinish" tugmali blok. window.AzError orqali
+   boshqariladi (error-state.js). Bo'sh natija (data yo'q) uchun EMAS —
+   faqat haqiqiy so'rov xatoligi uchun ishlatiladi.
+   ═══════════════════════════════════════════════════════════════════ */
+.az-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 6px;
+  padding: 34px 20px;
+  min-height: 140px;
+  border-radius: var(--radius-lg);
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+}
+.az-error-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--danger-glow);
+  color: var(--danger-light);
+  margin-bottom: 4px;
+}
+.az-error-icon svg { width: 22px; height: 22px; }
+.az-error-text { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.az-error-state.az-error-inline .az-error-text { align-items: flex-start; gap: 2px; flex: 1; min-width: 0; }
+.az-error-title {
+  font-family: var(--font-display), sans-serif;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--text-main);
+}
+.az-error-sub {
+  font-family: var(--font-body), sans-serif;
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  max-width: 320px;
+  line-height: 1.5;
+}
+.az-error-retry {
+  margin-top: 10px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--danger), var(--danger-light));
+  color: #fff;
+  font-family: var(--font-body), sans-serif;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-fast) var(--ease-standard);
+}
+.az-error-retry:hover { opacity: 0.88; }
+.az-error-retry:active { transform: scale(0.96); }
+.az-error-retry:disabled { opacity: 0.6; cursor: default; }
+.az-error-state.az-error-inline {
+  flex-direction: row;
+  padding: 12px 14px;
+  min-height: 0;
+  text-align: left;
+  gap: 12px;
+}
+.az-error-state.az-error-inline .az-error-icon { width: 34px; height: 34px; margin-bottom: 0; flex-shrink: 0; }
+.az-error-state.az-error-inline .az-error-icon svg { width: 17px; height: 17px; }
+.az-error-state.az-error-inline .az-error-title { font-size: var(--font-size-sm); }
+.az-error-state.az-error-inline .az-error-sub { font-size: var(--font-size-xs); }
+.az-error-state.az-error-inline .az-error-retry { margin-top: 0; margin-left: auto; flex-shrink: 0; padding: 7px 14px; }

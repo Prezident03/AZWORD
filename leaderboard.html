@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="premium-pages.css"/>
   <link rel="stylesheet" href="mobile.css"/>
+  <script src="error-state.js"></script>
   <script src="pwa-init.js"></script>
   <script src="transition.js"></script>
   <script src="ripple.js"></script>
@@ -386,7 +387,11 @@
         snap = await getDocs(collection(db, 'users'));
       } catch(e) {
         console.error('loadAllUsers xato:', e);
-        document.getElementById('lb-list').innerHTML = `<div class="lb-empty"><div class="emoji">${icon('alert-triangle',{size:42,color:'#fbbf24'})}</div><p>Xato: ${e.message}</p></div>`;
+        if (window.AzError) {
+          window.AzError.mount('lb-list', { onRetry: async () => { await loadAllUsers(); renderBoard(currentTab); } });
+        } else {
+          document.getElementById('lb-list').innerHTML = `<div class="lb-empty"><div class="emoji">${icon('alert-triangle',{size:42,color:'#fbbf24'})}</div><p>Xato: ${e.message}</p></div>`;
+        }
         return;
       }
       allUsers = [];
