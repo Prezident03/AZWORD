@@ -366,10 +366,10 @@
     </div>
 
     <div class="words-list" id="words-list">
-      <div class="az-skel"></div>
-      <div class="az-skel"></div>
-      <div class="az-skel"></div>
-      <div class="az-skel"></div>
+      <div class="az-skel az-skel-row"></div>
+      <div class="az-skel az-skel-row"></div>
+      <div class="az-skel az-skel-row"></div>
+      <div class="az-skel az-skel-row"></div>
     </div>
 
   </div>
@@ -514,7 +514,7 @@
 
     async function loadFolderTopics() {
       const container = document.getElementById('words-list');
-      container.innerHTML = '<div style="padding:30px;text-align:center;color:var(--text-muted)">Yuklanmoqda...</div>';
+      container.innerHTML = '<div class="az-skel az-skel-card"></div><div class="az-skel az-skel-card"></div><div class="az-skel az-skel-card"></div>';
       const snap = await getDocs(query(collection(db, 'folders', folderId, 'topics'), orderBy('order', 'asc')));
       if (snap.empty) {
         container.innerHTML = '<div class="words-empty"><p>Hozircha mavzular qoshilmagan.</p></div>';

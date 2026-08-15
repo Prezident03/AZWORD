@@ -4823,3 +4823,55 @@ input:focus:not(:focus-visible) {
     border-width: 2px !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   SKELETON LOADING — ma'lumot kelayotgan paytda bo'sh ekran/matn
+   o'rniga shakli mos "shimmer" joy egallovchilar. Internet sekin
+   bo'lganda ham foydalanuvchi darhol biror narsa ko'radi.
+   Butun sayt bo'ylab bir xil klasslar: .az-skel-book, .az-skel-myf,
+   .az-skel-row, .az-skel-line, .az-skel-circle
+   ═══════════════════════════════════════════════════════════════════ */
+.az-skel {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.11) 50%, rgba(255,255,255,0.05) 100%);
+  background-size: 200% 100%;
+  animation: azSkelShimmer 1.6s ease-in-out infinite;
+  border-radius: 12px;
+}
+@keyframes azSkelShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .az-skel { animation: none; background: rgba(255,255,255,0.07); }
+}
+
+/* Kitob/umumiy-bo'lim poster kartochkasi joyi (2:3 nisbat) */
+.az-skel-book {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  border-radius: 14px;
+}
+
+/* "Mening bo'limlarim" gorizontal shisha-panel kartochkasi joyi */
+.az-skel-myf {
+  flex: 0 0 190px;
+  min-height: 168px;
+  border-radius: 18px;
+}
+
+/* Umumiy qator/matn joylari (masalan profil, statistika) */
+.az-skel-line { height: 14px; border-radius: 7px; }
+.az-skel-line.sm { height: 10px; width: 60%; }
+.az-skel-circle { border-radius: 50%; }
+
+/* Mavzu/so'z ro'yxati kartochkasi joyi (topic-card, word-row va h.k.) */
+.az-skel-card {
+  min-height: 140px;
+  border-radius: 18px;
+}
+.az-skel-row {
+  height: 52px;
+  border-radius: 12px;
+}
