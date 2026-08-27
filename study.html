@@ -481,6 +481,15 @@
       .btn-next, .btn-skip { min-height: 48px; }
       .btn-next { border-radius: 14px; font-size: 0.98rem; }
       .btn-skip { border-radius: 14px; }
+
+      /* mobile-nav.js har bir sahifaga pastki tab-panelni (Home/Learn/...)
+         avtomatik qo'shadi va uning z-index:500 qiymati bu sahifadagi
+         "Davom etish / O'tkazib yuborish" panelini (z-index:55) butunlay
+         yopib qo'yardi. Mashq ekrani — alohida rejim, shuning uchun
+         pastki tab-panel shu sahifada butunlay yashiriladi va uning
+         qo'shgan bo'sh joyi (padding) bekor qilinadi. */
+      .az-bottom-nav { display: none !important; }
+      body.has-bottom-nav { padding-bottom: 0 !important; }
     }
   </style>
 </head>
