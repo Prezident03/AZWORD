@@ -1,124 +1,283 @@
 rules_version = '2';
+
+// ═══════════════════════════════════════════════════════════════
+//  AzWord · Firestore xavfsizlik qoidalari
+//  Asosiy tamoyil: foydalanuvchi o'z hujjatidagi o'yin maydonlarini
+//  (yulduz, tanga, streak, xaridlar, yutuqlar) faqat ruxsat etilgan
+//  "amal" shaklida va cheklangan miqdorda o'zgartira oladi.
+//  js/game.js dagi MAX_SESSION_STARS va REWARD_COOLDOWN_SEC bilan mos.
+// ═══════════════════════════════════════════════════════════════
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users - hammaga read, ozi yoki admin write
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == userId || request.auth.token.email == "abdurasul1406z@gmail.com";
+    // ── Umumiy yordamchilar ───────────────────────────────────
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function ownerEmail() { return 'abdurasul1406z@gmail.com'; }
+    function settingsPath() { return /databases/$(database)/documents/settings/main; }
+    function isAdmin() {
+      return signedIn() && (
+        request.auth.token.get('email', '') == ownerEmail() ||
+        (request.auth.token.get('email_verified', false) == true &&
+         exists(settingsPath()) &&
+         get(settingsPath()).data.get('admins', []).hasAny([request.auth.token.get('email', '')]))
+      );
+    }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+    function newVal(f, d) { return request.resource.data.get(f, d); }
+    function oldVal(f, d) { return resource.data.get(f, d); }
+    function delta(f) { return newVal(f, 0) - oldVal(f, 0); }
+    function between(v, lo, hi) { return v is number && v >= lo && v <= hi; }
+    function shortString(v, max) { return v is string && v.size() <= max; }
 
-      match /purchases/{purchaseId} {
-        allow read, write: if request.auth.uid == userId;
+    // ── Foydalanuvchilar ──────────────────────────────────────
+    function profileKeys() {
+      return ['displayName', 'photoBase64', 'photoThumb', 'settings', 'lastSeen', 'updatedAt', 'email', 'uid'];
+    }
+    function profileValid() {
+      return (!('displayName' in request.resource.data) || shortString(newVal('displayName', ''), 40))
+        && (!('photoBase64' in request.resource.data) || shortString(newVal('photoBase64', ''), 90000))
+        && (!('photoThumb' in request.resource.data) || shortString(newVal('photoThumb', ''), 12000))
+        && (!('settings' in request.resource.data) || newVal('settings', {}) is map)
+        && newVal('email', '') == oldVal('email', newVal('email', ''))
+        && newVal('uid', request.auth.uid) == request.auth.uid;
+    }
+    function sessionKeys() {
+      return ['stars', 'coins', 'weeklyStars', 'weekKey', 'streakDays', 'longestStreak', 'lastStudyDate',
+              'todayWordsLearned', 'todayDate', 'totalWordsLearned', 'totalPerfectWords', 'wordsMastered',
+              'studyTimeMinutes', 'sessionsCount', 'lastRewardAt', 'streakFreezes'];
+    }
+    function rewardCooldownOk() {
+      return !('lastRewardAt' in resource.data)
+        || !(resource.data.lastRewardAt is timestamp)
+        || request.time > resource.data.lastRewardAt + duration.value(45, 's');
+    }
+    // Mashg'ulot yakuni: o'sish chegaralangan, yulduz = yangi o'zlashtirilgan so'zlar
+    function validSession() {
+      return changed().hasOnly(sessionKeys().concat(profileKeys()))
+        && profileValid()
+        && between(delta('stars'), 0, 100)
+        && between(delta('coins'), 0, 200)
+        && delta('wordsMastered') == delta('stars')
+        && ((delta('stars') == 0 && delta('coins') == 0 && !('lastRewardAt' in changed()))
+            || (newVal('lastRewardAt', null) == request.time && rewardCooldownOk()))
+        && between(delta('totalWordsLearned'), 0, 200)
+        && between(delta('totalPerfectWords'), 0, 200)
+        && between(delta('studyTimeMinutes'), 0, 240)
+        && between(delta('sessionsCount'), 0, 1)
+        && between(newVal('todayWordsLearned', 0), 0, 100000)
+        && ((newVal('weekKey', '') == oldVal('weekKey', '') && delta('weeklyStars') == delta('stars'))
+            || (newVal('weekKey', '') != oldVal('weekKey', '') && newVal('weeklyStars', 0) == delta('stars')))
+        && between(newVal('streakDays', 0), 0, oldVal('streakDays', 0) + 1)
+        && newVal('longestStreak', 0) == (newVal('streakDays', 0) > oldVal('longestStreak', 0) ? newVal('streakDays', 0) : oldVal('longestStreak', 0))
+        && between(delta('streakFreezes'), -1, 0)
+        && newVal('streakFreezes', 0) >= 0;
+    }
+    // Do'kondan xarid: narx shop hujjatidan olinadi
+    function specialPrice(id) {
+      return id == 'ai-generator-premium' ? 100 : (id == 'streak-freeze' ? 50 : -1);
+    }
+    function validPurchase() {
+      let id = request.resource.data.lastPurchase;
+      let special = specialPrice(id) > 0;
+      let item = special ? {} : get(/databases/$(database)/documents/shop/$(id)).data;
+      let price = special ? specialPrice(id) : item.price;
+      let aiUses = id == 'ai-generator-premium' ? 20 : (special ? 0 : item.get('aiUses', 0));
+      let freezes = id == 'streak-freeze' ? 1 : (special ? 0 : item.get('freezes', 0));
+      let consumable = special || item.get('consumable', false);
+      let owned = oldVal('ownedItems', []);
+      return changed().hasOnly(['coins', 'ownedItems', 'lastPurchase', 'aiGeneratorUses', 'streakFreezes', 'updatedAt'])
+        && id is string
+        && price is number && price > 0
+        && delta('coins') == -price
+        && newVal('coins', 0) >= 0
+        && delta('aiGeneratorUses') == aiUses
+        && delta('streakFreezes') == freezes
+        && (consumable
+              ? newVal('ownedItems', []) == owned
+              : (!(id in owned) && newVal('ownedItems', []) == owned.concat([id])));
+    }
+    function validEquip() {
+      return changed().hasOnly(['equippedItems', 'updatedAt'])
+        && newVal('equippedItems', {}) is map
+        && newVal('equippedItems', {}).values().toSet().difference(oldVal('ownedItems', []).toSet()).size() == 0;
+    }
+    function achProgress(a) {
+      return (a.type == 'stars' && oldVal('stars', 0) >= a.threshold)
+        || (a.type == 'coins' && oldVal('coins', 0) >= a.threshold)
+        || (a.type == 'words' && oldVal('wordsMastered', 0) >= a.threshold)
+        || (a.type == 'sessions' && oldVal('sessionsCount', 0) >= a.threshold)
+        || (a.type == 'streak' && (oldVal('longestStreak', 0) >= a.threshold || oldVal('streakDays', 0) >= a.threshold));
+    }
+    function validAchievement() {
+      let id = request.resource.data.lastAchievement;
+      let a = get(/databases/$(database)/documents/achievements/$(id)).data;
+      let have = oldVal('achievements', []);
+      return changed().hasOnly(['achievements', 'lastAchievement', 'stars', 'coins', 'updatedAt'])
+        && id is string
+        && !(id in have)
+        && newVal('achievements', []) == have.concat([id])
+        && delta('stars') == a.get('starReward', 0)
+        && delta('coins') == a.get('coinReward', 0)
+        && achProgress(a);
+    }
+    // AI generator ishlatilganda (server foydalanuvchi tokeni bilan kamaytiradi)
+    function validAiUse() {
+      return changed().hasOnly(['aiGeneratorUses']) && delta('aiGeneratorUses') == -1 && newVal('aiGeneratorUses', 0) >= 0;
+    }
+    // Amal turi o'zgargan maydonlarga qarab aniqlanadi — faqat bitta tekshiruv ishlaydi
+    function validOwnerUpdate() {
+      let ch = changed();
+      return newVal('blocked', false) == oldVal('blocked', false)
+        && oldVal('blocked', false) != true
+        && (ch.hasOnly(profileKeys()) ? profileValid()
+          : ch.hasAny(['achievements']) ? validAchievement()
+          : ch.hasOnly(['equippedItems', 'updatedAt']) ? validEquip()
+          : ch.hasOnly(['aiGeneratorUses']) ? validAiUse()
+          : (ch.hasAny(['coins']) && !ch.hasAny(['stars', 'sessionsCount'])) ? validPurchase()
+          : validSession());
+    }
+    function validUserCreate(uid) {
+      return request.resource.data.keys().hasOnly(profileKeys().concat(['createdAt', 'stars', 'coins', 'weeklyStars', 'blocked']))
+        && newVal('uid', uid) == uid
+        && newVal('stars', 0) == 0 && newVal('coins', 0) == 0 && newVal('weeklyStars', 0) == 0
+        && newVal('blocked', false) == false
+        && shortString(newVal('displayName', ''), 40)
+        && shortString(newVal('photoBase64', ''), 90000);
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if (isOwner(uid) && validUserCreate(uid)) || isAdmin();
+      allow update: if (isOwner(uid) && validOwnerUpdate()) || isAdmin();
+      allow delete: if isAdmin();
+
+      // Mavzu progressi va so'z statistikasi — faqat egasi
+      match /progress/{id} {
+        allow read, write: if isOwner(uid);
+        allow read: if isAdmin();
       }
-
-      match /studyLog/{logId} {
-        allow read, write: if request.auth.uid == userId;
+      match /wordStats/{id} {
+        allow read, write: if isOwner(uid);
+        allow read: if isAdmin();
+      }
+      // Tarix va xaridlar — faqat qo'shish mumkin, o'zgartirib bo'lmaydi
+      match /studyLog/{id} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isOwner(uid);
+        allow delete: if isAdmin();
+      }
+      match /purchases/{id} {
+        allow read: if isOwner(uid) || isAdmin();
+        allow create: if isOwner(uid) && request.resource.data.price is number;
+        allow delete: if isAdmin();
       }
     }
 
-    // Folders - faqat ega yoki admin write qila oladi
+    // ── Reyting (ommaviy, users hujjatidagi qiymatlar bilan bir xil bo'lishi shart) ──
+    match /leaderboard/{uid} {
+      function lbValid() {
+        let u = getAfter(/databases/$(database)/documents/users/$(uid)).data;
+        let d = request.resource.data;
+        return d.keys().hasOnly(['displayName', 'photoThumb', 'stars', 'weeklyStars', 'weekKey', 'equipped', 'updatedAt'])
+          && shortString(d.get('displayName', ''), 40)
+          && shortString(d.get('photoThumb', ''), 12000)
+          && d.get('stars', 0) == u.get('stars', 0)
+          && d.get('weeklyStars', 0) == u.get('weeklyStars', 0)
+          && d.get('weekKey', '') == u.get('weekKey', '')
+          && d.get('equipped', {}) is map
+          && d.get('equipped', {}).values().toSet().difference(u.get('ownedItems', []).toSet()).size() == 0;
+      }
+      allow read: if signedIn();
+      allow create, update: if (isOwner(uid) && lbValid()) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Bo'limlar: shaxsiy (isAdmin=false) va umumiy (isAdmin=true) ──
+    function folderPath(id) { return /databases/$(database)/documents/folders/$(id); }
+    function canReadFolder(id) {
+      let f = get(folderPath(id)).data;
+      return signedIn() && (f.get('isAdmin', false) == true || f.get('uid', '') == request.auth.uid || isAdmin());
+    }
+    function canWriteFolder(id) {
+      let f = get(folderPath(id)).data;
+      return signedIn() && ((f.get('isAdmin', false) == false && f.get('uid', '') == request.auth.uid) || isAdmin());
+    }
+    function wordValid() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['en', 'uz', 'example', 'ipa', 'pos', 'createdAt', 'difficulty', 'category'])
+        && shortString(d.get('en', ''), 120) && d.get('en', '').size() > 0
+        && shortString(d.get('uz', ''), 200) && d.get('uz', '').size() > 0
+        && shortString(d.get('example', ''), 400);
+    }
+
     match /folders/{folderId} {
-      // O'qish: umumiy (isAdmin:true) bo'limlar hammaga, shaxsiy bo'limlar faqat egasiga/adminga
-      allow read: if request.auth != null &&
-        (resource.data.isAdmin == true ||
-         resource.data.uid == request.auth.uid ||
-         request.auth.token.email == "abdurasul1406z@gmail.com");
-
-      // Yangi papka: faqat o'z uid'i bilan yoki admin (isAdmin papka) yarata oladi
-      allow create: if request.auth != null &&
-        (request.resource.data.uid == request.auth.uid ||
-         request.auth.token.email == "abdurasul1406z@gmail.com");
-
-      // O'zgartirish/o'chirish: faqat papka egasi yoki admin
-      allow update, delete: if request.auth != null &&
-        (resource.data.uid == request.auth.uid ||
-         request.auth.token.email == "abdurasul1406z@gmail.com");
+      allow read: if signedIn() && (resource.data.get('isAdmin', false) == true || resource.data.get('uid', '') == request.auth.uid || isAdmin());
+      allow create: if isAdmin() || (signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.isAdmin == false
+        && shortString(request.resource.data.get('name', ''), 60));
+      allow update: if isAdmin() || (signedIn()
+        && resource.data.get('isAdmin', false) == false
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.isAdmin == false
+        && shortString(request.resource.data.get('name', ''), 60));
+      allow delete: if isAdmin() || (signedIn() && resource.data.get('isAdmin', false) == false && resource.data.uid == request.auth.uid);
 
       match /words/{wordId} {
-        // O'qish: faqat shu papka umumiy bo'lsa yoki o'quvchi uning egasi/admin bo'lsa
-        allow read: if request.auth != null &&
-          (get(/databases/$(database)/documents/folders/$(folderId)).data.isAdmin == true ||
-           get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
-           request.auth.token.email == "abdurasul1406z@gmail.com");
-
-        // So'z yozish: faqat shu papkaning egasi yoki admin
-        allow write: if request.auth != null &&
-          (get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
-           request.auth.token.email == "abdurasul1406z@gmail.com");
+        allow read: if canReadFolder(folderId);
+        allow create, update: if canWriteFolder(folderId) && wordValid();
+        allow delete: if canWriteFolder(folderId);
       }
-
-      // Umumiy bo'limlar uchun mavzu qatlami (kitoblardagi kabi)
       match /topics/{topicId} {
-        allow read: if request.auth != null &&
-          (get(/databases/$(database)/documents/folders/$(folderId)).data.isAdmin == true ||
-           get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
-           request.auth.token.email == "abdurasul1406z@gmail.com");
-
-        allow write: if request.auth != null &&
-          (get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
-           request.auth.token.email == "abdurasul1406z@gmail.com");
-
+        allow read: if canReadFolder(folderId);
+        allow write: if canWriteFolder(folderId);
         match /words/{wordId} {
-          allow read: if request.auth != null &&
-            (get(/databases/$(database)/documents/folders/$(folderId)).data.isAdmin == true ||
-             get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
-             request.auth.token.email == "abdurasul1406z@gmail.com");
-
-          allow write: if request.auth != null &&
-            (get(/databases/$(database)/documents/folders/$(folderId)).data.uid == request.auth.uid ||
-             request.auth.token.email == "abdurasul1406z@gmail.com");
+          allow read: if canReadFolder(folderId);
+          allow create, update: if canWriteFolder(folderId) && wordValid();
+          allow delete: if canWriteFolder(folderId);
         }
       }
     }
 
-    // Shop - hammaga read, faqat admin write
-    match /shop/{itemId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
-    }
-
-    // Achievements - hammaga read, faqat admin write
-    match /achievements/{achId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
-    }
-
-    // Announcements - hammaga read, faqat admin write
-    match /announcements/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
-    }
-
-    // Settings - hammaga read, faqat admin write
-    match /settings/{docId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
-    }
-
-    // Books - hammaga read, faqat admin write
+    // ── Kitoblar: hammaga o'qish, faqat admin yozadi ──
     match /books/{bookId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
-
+      allow read: if signedIn();
+      allow write: if isAdmin();
       match /topics/{topicId} {
-        allow read: if request.auth != null;
-        allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
-
+        allow read: if signedIn();
+        allow write: if isAdmin();
         match /words/{wordId} {
-          allow read: if request.auth != null;
-          allow write: if request.auth.token.email == "abdurasul1406z@gmail.com";
+          allow read: if signedIn();
+          allow write: if isAdmin();
         }
       }
     }
 
-    // Study Results - faqat ozi yoki admin oqiy oladi, ozi yoza oladi
-    match /studyResults/{docId} {
-      allow read: if request.auth != null &&
-        (resource.data.uid == request.auth.uid ||
-         request.auth.token.email == "abdurasul1406z@gmail.com");
-      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if request.auth.token.email == "abdurasul1406z@gmail.com";
+    // ── Kontent: do'kon, yutuqlar, e'lonlar ──
+    match /shop/{itemId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /achievements/{achId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /announcements/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    // Sozlamalar: texnik ishlar rejimini kirishdan oldin ham tekshirish uchun hammaga ochiq
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
+    // ── Eski versiya natijalari (faqat o'qish) ──
+    match /studyResults/{docId} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
   }
 }

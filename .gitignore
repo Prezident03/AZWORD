@@ -1,0 +1,7 @@
+node_modules/
+tests/node_modules
+tests/screenshots/
+*-debug.log
+.firebase/
+.vercel
+.DS_Store
