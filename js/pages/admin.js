@@ -17,7 +17,7 @@ import {
   emptyState, errorState, fmtNum, fmtDate, timeAgo, debounce, avatar, safeImg
 } from '../ui.js';
 import { parseText, parseFile } from '../parse.js';
-import { aiWords } from '../ai.js';
+import { aiWords, aiPing } from '../ai.js';
 import { coverHtml } from '../widgets.js';
 
 await initPage({ title: 'Admin panel', active: 'admin', admin: true });
@@ -567,7 +567,22 @@ async function settings() {
       <div class="card-title mb-2">${ic('trophy', 17)} Reyting va ma'lumotlar</div>
       <p class="xs muted mb-3">Barcha foydalanuvchilarni reytingga qo'shadi va eski versiyadan qolgan hisoblagichlarni yangilaydi. Xavfsiz — istalgan vaqtda qayta ishga tushirish mumkin.</p>
       <button class="btn" id="st-migrate">${ic('refresh', 16)}<span> Reytingni qayta tiklash</span></button>
+    </div>
+    <div class="card">
+      <div class="card-title mb-2">${ic('sparkles', 17)} AI xizmati</div>
+      <p class="xs muted mb-3">Groq API kaliti va modelini tekshiradi. Xato bo'lsa, aniq sababi ko'rsatiladi.</p>
+      <button class="btn" id="st-ai">${ic('zap', 16)} AI holatini tekshirish</button>
+      <div class="mt-3" id="st-ai-out"></div>
     </div></div>`);
+  $('#st-ai').onclick = (e) => withLoading(e.currentTarget, async () => {
+    const out = $('#st-ai-out');
+    try {
+      const r = await aiPing();
+      setHTML(out, html`<div class="alert alert-success">${ic('circle-check', 18)}<div>AI ishlayapti. Model: <b>${r.model}</b> · ${r.ms} ms</div></div>`);
+    } catch (err) {
+      setHTML(out, html`<div class="alert alert-danger">${ic('alert-triangle', 18)}<div style="word-break:break-word">${err.message}</div></div>`);
+    }
+  });
   $('#st-migrate').onclick = (e) => runMigration(e.currentTarget);
   $('#st-save').onclick = (e) => withLoading(e.currentTarget, async () => {
     const on = $('#st-maint').checked;

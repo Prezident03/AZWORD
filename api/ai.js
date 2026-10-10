@@ -20,7 +20,9 @@ import { Buffer } from 'node:buffer';
 
 const OWNER_EMAIL = 'abdurasul1406z@gmail.com';
 const PROJECT = process.env.FIREBASE_PROJECT_ID || 'azword-30a2e';
-const MODEL = process.env.AI_MODEL || 'llama-3.3-70b-versatile';
+/* Birinchi ishlagan model eslab qolinadi; model o'chirilgan bo'lsa keyingisiga o'tiladi */
+const MODELS = [...new Set([process.env.AI_MODEL, 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'llama-3.1-8b-instant'].filter(Boolean))];
+let workingModel = null;
 const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1') + '/chat/completions';
 const FS_HOST = process.env.FIRESTORE_EMULATOR_HOST ? `http://${process.env.FIRESTORE_EMULATOR_HOST}` : 'https://firestore.googleapis.com';
 const FS_BASE = `${FS_HOST}/v1/projects/${PROJECT}/databases/(default)/documents`;
@@ -29,7 +31,7 @@ const LIMITS = { example: 30, translate: 30, words: 6, chat: 20 }; // daqiqasiga
 const hits = new Map();
 
 class HttpError extends Error {
-  constructor(status, message, code) { super(message); this.status = status; this.code = code; }
+  constructor(status, message, code, detail) { super(message); this.status = status; this.code = code; this.detail = detail; }
 }
 
 function rateLimit(uid, task) {
@@ -119,18 +121,51 @@ async function consumeGeneratorUse(user) {
   };
 }
 
+function upstreamError(status, err) {
+  const msg = String((err && err.message) || '').slice(0, 300);
+  if (status === 401 || status === 403) return new HttpError(502, "AI kaliti (GROQ_API_KEY) noto'g'ri, muddati o'tgan yoki bloklangan.", 'bad-key', msg);
+  if (status === 429) return new HttpError(429, "AI xizmati limiti vaqtincha tugadi. Birozdan so'ng qayta urinib ko'ring.", 'upstream-limit', msg);
+  return new HttpError(502, 'AI xizmati vaqtincha javob bermayapti.', 'upstream', `${status}: ${msg}`);
+}
+const isModelError = (status, err) => {
+  const t = `${err && err.code} ${err && err.type} ${err && err.message}`.toLowerCase();
+  return status === 404 || /model_not_found|model_decommissioned|decommissioned|does not exist|not found|no longer supported/.test(t);
+};
+
 async function groq(messages, { maxTokens = 400, temperature = 0.6, json = false } = {}) {
-  if (!process.env.GROQ_API_KEY) throw new HttpError(500, 'AI xizmati sozlanmagan (GROQ_API_KEY).', 'not-configured');
-  const body = { model: MODEL, messages, max_tokens: maxTokens, temperature };
-  if (json) body.response_format = { type: 'json_object' };
-  const r = await fetch(GROQ_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
-    body: JSON.stringify(body)
-  });
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok) throw new HttpError(502, 'AI xizmati vaqtincha javob bermayapti.', 'upstream');
-  return String(data.choices?.[0]?.message?.content || '').trim();
+  if (!process.env.GROQ_API_KEY) throw new HttpError(500, 'AI xizmati sozlanmagan: Vercel\'da GROQ_API_KEY qo\'shilmagan.', 'not-configured');
+  const order = workingModel ? [workingModel, ...MODELS.filter(m => m !== workingModel)] : MODELS;
+  let lastErr = null;
+  for (const model of order) {
+    let useJson = json;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const body = { model, messages, max_tokens: maxTokens, temperature };
+      if (useJson) body.response_format = { type: 'json_object' };
+      let r, data;
+      try {
+        r = await fetch(GROQ_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+          body: JSON.stringify(body)
+        });
+        data = await r.json().catch(() => ({}));
+      } catch (e) {
+        throw new HttpError(502, "AI xizmatiga ulanib bo'lmadi.", 'upstream', String(e.message || e));
+      }
+      if (r.ok) {
+        workingModel = model;
+        return String(data.choices?.[0]?.message?.content || '').trim();
+      }
+      const err = data && data.error;
+      console.error('[api/ai] groq', model, r.status, JSON.stringify(err || data).slice(0, 400));
+      /* JSON rejimini qo'llamaydigan model — oddiy rejimda qayta urinamiz */
+      if (r.status === 400 && useJson && /response_format|json/i.test(String(err && err.message))) { useJson = false; continue; }
+      lastErr = upstreamError(r.status, err);
+      if (isModelError(r.status, err)) break; // keyingi model
+      throw lastErr;
+    }
+  }
+  throw lastErr || new HttpError(502, 'AI xizmati vaqtincha javob bermayapti.', 'upstream');
 }
 
 const str = (v, max) => String(v ?? '').replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, max);
@@ -186,6 +221,14 @@ const TASKS = {
     return { words, usesLeft, unlimited: !credit };
   },
 
+  /* Admin uchun: AI ulanishini tekshirish */
+  async ping(body, user) {
+    if (!(await isAdmin(user))) throw new HttpError(403, 'Faqat admin uchun', 'forbidden');
+    const t0 = Date.now();
+    const text = await groq([{ role: 'user', content: 'Reply with the single word: OK' }], { maxTokens: 5, temperature: 0 });
+    return { ok: true, model: workingModel, reply: text, ms: Date.now() - t0 };
+  },
+
   async chat(body) {
     const msgs = Array.isArray(body.messages) ? body.messages.slice(-12) : [];
     const clean = msgs
@@ -202,6 +245,7 @@ const TASKS = {
 };
 
 export default async function handler(req, res) {
+  let reqUser = null;
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -212,12 +256,15 @@ export default async function handler(req, res) {
     const task = TASKS[body.task] ? body.task : null;
     if (!task) throw new HttpError(400, "Noma'lum vazifa", 'bad-task');
     const user = await verifyToken(req);
+    reqUser = user;
     rateLimit(user.uid, task);
     const result = await TASKS[task](body, user);
     return res.status(200).json(result);
   } catch (e) {
     const status = e instanceof HttpError ? e.status : 500;
     if (status >= 500) console.error('[api/ai]', e);
-    return res.status(status).json({ error: e instanceof HttpError ? e.message : 'Server xatosi', code: e.code || 'error' });
+    const out = { error: e instanceof HttpError ? e.message : 'Server xatosi', code: e.code || 'error' };
+    if (e.detail && reqUser && await isAdmin(reqUser).catch(() => false)) out.detail = e.detail;
+    return res.status(status).json(out);
   }
 }
