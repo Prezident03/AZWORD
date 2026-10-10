@@ -3,7 +3,7 @@
 import { initPage } from '../core.js';
 import { db, collection, query, orderBy, limit, getDocs } from '../firebase.js';
 import { SRS_DAYS } from '../game.js';
-import { $, html, raw, ic, setHTML, emptyState, errorState, loadingBlock, fmtDate, fmtNum } from '../ui.js';
+import { $, html, ic, setHTML, emptyState, errorState, loadingBlock, fmtDate, fmtNum } from '../ui.js';
 import { playSound, speak, canSpeak } from '../fx.js';
 import { getPrefs } from '../prefs.js';
 import { loadReview, saveGrouped, storeResult } from '../session.js';

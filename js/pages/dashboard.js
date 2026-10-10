@@ -6,7 +6,7 @@ import {
 import { levelInfo, streakState, todayWords, dailyGoal, dateKey, addDays, sourceQuery } from '../game.js';
 import { icon, iconName } from '../icons.js';
 import {
-  $, html, raw, ic, setHTML, ring, animateRings, countUp, fmtNum, timeAgo, emptyState, errorState,
+  $, html, raw, ic, setHTML, ring, animateRings, countUp, timeAgo, emptyState, errorState,
   skeletonCards, confirmDialog, toast, toastError, WEEKDAYS
 } from '../ui.js';
 import {

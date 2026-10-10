@@ -1,0 +1,6 @@
+tests
+README.md
+firebase.json
+firestore.rules
+firestore.indexes.json
+.gitignore

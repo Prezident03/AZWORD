@@ -12,7 +12,8 @@ import {
 import { levelInfo, streakState } from './game.js';
 import { icon, LOGO_SVG, starIcon } from './icons.js';
 import { esc, html, raw, setHTML, fmtNum, toast } from './ui.js';
-import { getPrefs } from './prefs.js';
+import { getPrefs, setAccent } from './prefs.js';
+import { db, doc, getDoc } from './firebase.js';
 
 const NAV = [
   { section: 'Asosiy' },
@@ -126,11 +127,26 @@ export async function initPage({ title = '', active = '', admin = false, shell =
   }
   if (shell) refreshDueBadge();
   checkReminder(profile);
+  syncAccent(profile);
 
   return {
     user, u: profile, settings, isAdmin,
     setUser(next) { state.u = next; renderStats(); }
   };
+}
+
+/* Boshqa qurilmada taqilgan mavzu rangini shu qurilmaga ham qo'llash */
+async function syncAccent(u) {
+  const id = (u.equippedItems && u.equippedItems.theme) || '';
+  let cur = '';
+  try { cur = localStorage.getItem('az:accent-id') || ''; } catch (e) { /* ignore */ }
+  if (id === cur) return;
+  try {
+    let color = null;
+    if (id) { const s = await getDoc(doc(db, 'shop', id)); color = s.exists() ? s.data().color : null; }
+    setAccent(color);
+    localStorage.setItem('az:accent-id', id);
+  } catch (e) { /* ignore */ }
 }
 
 /* ── Shell ─────────────────────────────────────────────── */

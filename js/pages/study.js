@@ -48,6 +48,7 @@ async function start() {
   $('#meta-title').textContent = session.title || "O'rganish";
   document.title = `${session.title || "O'rganish"} · AzWord`;
   if (words.length < 2) {
+    if (!session.container) { try { localStorage.removeItem('az:last'); } catch (e) { /* ignore */ } home = 'folders.html'; }
     setHTML('card', emptyState({
       iconName: 'file-text', title: words.length ? "Kamida 2 ta so'z kerak" : "Bu yerda hali so'z yo'q",
       sub: "O'rganishni boshlash uchun bo'limga so'zlar qo'shing.",

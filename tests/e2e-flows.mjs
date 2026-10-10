@@ -117,3 +117,202 @@ export async function mobile({ newPage, base, settle, shot }) {
   }
   await context.close();
 }
+
+/* Do'kon: tanga berib, xarid qilish va taqish; yutuqlar avtomatik ochilishi */
+export async function shopAch({ page, base, settle, shot, env }) {
+  const { doc, updateDoc, getDocs, collection, query, where } = await import('firebase/firestore');
+  let uid;
+  await env.withSecurityRulesDisabled(async (c) => {
+    const db = c.firestore();
+    const snap = await getDocs(query(collection(db, 'users'), where('email', '==', 'student@test.uz')));
+    uid = snap.docs[0].id;
+    await updateDoc(doc(db, 'users', uid), { coins: 700 });
+  });
+  await page.goto(base + 'shop.html');
+  await settle(page);
+  await page.click('[data-buy="badge-gold"]');
+  await page.click('#buy-ok');
+  await page.waitForSelector('[data-equip="badge-gold"]', { timeout: 10000 });
+  await page.click('[data-equip="badge-gold"]');
+  await page.waitForTimeout(800);
+  await page.click('[data-buy="theme-pink"]');
+  await page.click('#buy-ok');
+  await page.waitForSelector('[data-equip="theme-pink"]', { timeout: 10000 });
+  await page.click('[data-equip="theme-pink"]');
+  await page.waitForTimeout(800);
+  await page.click('[data-special="ai-generator-premium"]');
+  await page.click('#buy-ok');
+  await page.waitForTimeout(1200);
+  await shot(page, 'shop-after');
+  let u;
+  await env.withSecurityRulesDisabled(async (c) => {
+    const { getDoc } = await import('firebase/firestore');
+    u = (await getDoc(doc(c.firestore(), 'users', uid))).data();
+  });
+  if (u.coins !== 700 - 10 - 500 - 100) throw new Error('coins wrong: ' + u.coins);
+  if ((u.aiGeneratorUses || 0) < 20) throw new Error('ai uses not added');
+  if (!u.equippedItems || u.equippedItems.badge !== 'badge-gold') throw new Error('badge not equipped');
+  await page.goto(base + 'achievements.html');
+  await settle(page);
+  await page.waitForTimeout(1500);
+  await shot(page, 'achievements');
+  await env.withSecurityRulesDisabled(async (c) => {
+    const { getDoc } = await import('firebase/firestore');
+    u = (await getDoc(doc(c.firestore(), 'users', uid))).data();
+  });
+  if (!(u.achievements || []).includes('first')) throw new Error('achievement not claimed');
+  await page.goto(base + 'leaderboard.html');
+  await settle(page);
+  await shot(page, 'leaderboard');
+  const lb = await page.textContent('#podium, #list');
+  if (!/Test Talaba/.test(await page.content())) throw new Error('user not in leaderboard: ' + lb);
+}
+
+/* AI generator, so'z qo'shish va shaxsiy bo'lim */
+export async function folderFlow({ page, base, settle, shot }) {
+  await page.goto(base + 'folders.html?new=1');
+  await settle(page);
+  await page.fill('#fd-name', "Sayohat so'zlari");
+  await page.click('#fd-save');
+  await page.waitForURL(/folder\.html\?id=/);
+  await settle(page);
+  await page.click('#list [data-add], #add-word');
+  await page.fill('#wf-en', 'luggage');
+  await page.fill('#wf-uz', 'yuk');
+  await page.click('#wf-more');
+  await page.waitForTimeout(500);
+  await page.fill('#wf-en', 'ticket');
+  await page.fill('#wf-uz', 'chipta');
+  await page.click('#wf-save');
+  await page.waitForTimeout(1500);
+  await page.click('#ai-gen');
+  await page.waitForSelector('#ag-go');
+  await page.click('#ag-go');
+  await page.waitForSelector('#ag-result:not([hidden])');
+  await page.click('#ag-go');
+  await page.waitForTimeout(1500);
+  await shot(page, 'folder-mine');
+  const n = await page.$$eval('#list .list-row', r => r.length);
+  if (n < 4) throw new Error('expected 4 words, got ' + n);
+  await page.goto(base + 'upload.html?id=' + new URL(page.url()).searchParams.get('id'));
+  await settle(page);
+  await page.click('[data-m="text"]');
+  await page.fill('#text', 'hotel - mehmonxona\nmap, xarita, I need a map.\nluggage - yuk');
+  await page.click('#parse-text');
+  await shot(page, 'upload');
+  await page.click('#save');
+  await page.waitForURL(/folder\.html/, { timeout: 10000 });
+  await settle(page);
+  const n2 = await page.$$eval('#list .list-row', r => r.length);
+  if (n2 !== 6) throw new Error('expected 6 words after upload, got ' + n2);
+}
+
+/* Admin: kitob → mavzu → so'zlar, import, AI, foydalanuvchi balansi, do'kon, sozlamalar */
+export async function adminFlow({ newPage, base, settle, shot }) {
+  const { page, context } = await newPage();
+  await page.goto(base + 'index.html');
+  await page.fill('#login-email', 'abdurasul1406z@gmail.com');
+  await page.fill('#login-password', 'secret123');
+  await page.click('#form-login button[type=submit]');
+  await page.waitForURL(/dashboard\.html/);
+  await page.goto(base + 'admin.html');
+  await settle(page);
+  await shot(page, 'admin-overview');
+  // Kitob yaratish
+  await page.goto(base + 'admin.html#books');
+  await page.waitForSelector('#c-new');
+  await page.click('#c-new');
+  await page.fill('#f-title', 'Test Kitob');
+  await page.fill('#f-description', 'E2E kitob');
+  await page.click('#fd-ok');
+  await page.waitForSelector('#t-new');
+  await page.click('#t-new');
+  await page.fill('#f-title', 'Lesson 1');
+  await page.click('#fd-ok');
+  await page.waitForSelector('a.btn[href*="#books/"]');
+  await page.click('a.btn[href*="#books/"]');
+  await page.waitForSelector('#w-new');
+  await page.click('#w-new');
+  await page.fill('#f-en', 'river');
+  await page.fill('#f-uz', 'daryo');
+  await page.click('#fd-ok');
+  await page.waitForTimeout(800);
+  await page.click('#w-bulk');
+  await page.fill('#bk-text', 'mountain - tog\nforest, o\'rmon, The forest is dark.\nriver - daryo');
+  await page.click('#bk-parse');
+  await page.click('#bk-save');
+  await page.waitForTimeout(1000);
+  await page.click('#w-ai');
+  await page.click('#ai-go');
+  await page.waitForSelector('#ai-save:not([disabled])');
+  await page.click('#ai-save');
+  await page.waitForTimeout(1200);
+  const n = await page.$$eval('#w-list .list-row', r => r.length);
+  await shot(page, 'admin-words');
+  if (n !== 5) throw new Error('admin words expected 5, got ' + n);
+  // Foydalanuvchi balansi
+  await page.goto(base + 'admin.html#users');
+  await page.waitForSelector('[data-u]');
+  await shot(page, 'admin-users');
+  // Do'kon mahsuloti
+  await page.goto(base + 'admin.html#shop');
+  await page.waitForSelector('#s-new');
+  await page.click('#s-new');
+  await page.fill('#f-name', 'Kumush nishon');
+  await page.fill('#f-price', '25');
+  await page.click('#fd-ok');
+  await page.waitForTimeout(800);
+  await page.goto(base + 'admin.html#ach');
+  await page.waitForSelector('#a-new');
+  await shot(page, 'admin-ach');
+  await page.goto(base + 'admin.html#settings');
+  await shot(page, 'admin-settings');
+  await page.goto(base + 'admin.html#news');
+  await page.waitForSelector('#n-send');
+  await page.fill('#n-text', 'Admin test e\'loni');
+  await page.click('#n-send');
+  await page.waitForTimeout(800);
+  await context.close();
+}
+
+/* Oddiy foydalanuvchi admin sahifasiga kira olmasligi */
+export async function adminGuard({ page, base }) {
+  await page.goto(base + 'admin.html');
+  await page.waitForURL(/dashboard\.html/, { timeout: 15000 });
+}
+
+/* Yorug' mavzu va asosiy sahifalar */
+export async function lightTheme({ page, base, settle, shot }) {
+  await page.evaluate(() => localStorage.setItem('az:prefs', JSON.stringify({ theme: 'light' })));
+  for (const p of ['dashboard', 'book', 'stats']) {
+    await page.goto(base + p + '.html' + (p === 'book' ? '?id=b1' : ''));
+    await settle(page);
+    await shot(page, 'light-' + p);
+  }
+  await page.evaluate(() => localStorage.removeItem('az:prefs'));
+}
+
+/* Flashcard va kviz to'liq o'tish */
+export async function practice({ page, base, settle, shot }) {
+  await page.goto(base + 'flashcards.html?book=b1&topic=t2');
+  await settle(page);
+  await shot(page, 'flashcards');
+  for (let i = 0; i < 4; i++) { await page.click('#actions [data-v="yes"]'); await page.waitForTimeout(300); }
+  await page.waitForURL(/results\.html/, { timeout: 15000 });
+  await page.goto(base + 'quick-quiz.html?book=b1&topic=t1');
+  await settle(page);
+  await shot(page, 'quiz');
+  for (let i = 0; i < 6; i++) {
+    await page.waitForSelector('#opts .option:not([disabled])', { timeout: 8000 });
+    await page.click('#opts .option >> nth=0');
+    await page.waitForTimeout(1800);
+  }
+  await page.waitForURL(/results\.html/, { timeout: 15000 });
+  await settle(page);
+  await shot(page, 'quiz-results');
+  await page.goto(base + 'vocabulary.html');
+  await settle(page);
+  await shot(page, 'vocabulary');
+  const rows = await page.$$eval('#list .list-row', r => r.length);
+  if (rows < 10) throw new Error('vocabulary rows ' + rows);
+}

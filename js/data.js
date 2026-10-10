@@ -1,7 +1,7 @@
 /* AzWord · Firestore ma'lumotlar qatlami.
    Sahifalar Firestore yo'llarini bilishi shart emas — hammasi shu yerda. */
 import {
-  db, collection, doc, getDoc, getDocs, getDocFromServer, setDoc, updateDoc, addDoc, deleteDoc,
+  db, collection, doc, getDoc, getDocs, getDocFromServer, setDoc, updateDoc, addDoc,
   query, where, orderBy, limit, serverTimestamp, increment, writeBatch, runTransaction, Timestamp
 } from './firebase.js';
 import {

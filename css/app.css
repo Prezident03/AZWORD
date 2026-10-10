@@ -627,7 +627,7 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
 .hero-actions .btn:not(.btn-gradient):hover { background: rgba(255, 255, 255, 0.18); }
 .hero-side { display: grid; gap: 16px; }
 .goal-card { display: flex; align-items: center; gap: 18px; }
-.week-dots { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 12px; }
+.week-dots { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 12px; }
 .week-dot { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 0.7rem; color: var(--text-3); font-weight: 600; }
 .week-dot i { width: 100%; max-width: 30px; aspect-ratio: 1; border-radius: 9px; background: var(--surface-3); display: grid; place-items: center; }
 .week-dot.done i { background: linear-gradient(150deg, #f97316, #fbbf24); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); }
@@ -746,7 +746,7 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
 .fc-stamp.no { left: 22px; color: var(--danger-light); border-color: var(--danger); transform: rotate(-10deg); }
 
 /* Stats/streak calendar */
-.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .cal-head { font-size: 0.72rem; font-weight: 700; color: var(--text-3); text-align: center; padding-bottom: 4px; }
 .cal-day { aspect-ratio: 1; border-radius: 10px; display: grid; place-items: center; font-size: 0.85rem; font-weight: 600; background: var(--surface-2); color: var(--text-2); }
 .cal-day.empty { background: transparent; }
@@ -798,7 +798,7 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
 
 /* Chat (AI assistant) */
 .chat { display: flex; flex-direction: column; height: calc(100dvh - var(--topbar-h) - 48px); min-height: 420px; }
-@media (max-width: 960px) { .chat { height: calc(100dvh - var(--topbar-h) - var(--bottomnav-h) - 36px - var(--safe-b)); } }
+@media (max-width: 960px) { .chat { height: calc(100dvh - var(--topbar-h) - var(--bottomnav-h) - 52px - var(--safe-b)); min-height: 360px; } }
 .chat-log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 2px 12px; }
 .msg { max-width: 84%; padding: 11px 15px; border-radius: 18px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; font-size: 0.94rem; }
 .msg.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 6px; }

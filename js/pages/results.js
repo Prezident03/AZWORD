@@ -1,7 +1,7 @@
 import { initPage } from '../core.js';
 import { listAchievements, claimAchievements, listTopics } from '../data.js';
 import { sourceQuery, achievementReady } from '../game.js';
-import { icon, iconName, starIcon } from '../icons.js';
+import { iconName, starIcon } from '../icons.js';
 import { $, html, raw, ic, setHTML, ring, animateRings, emptyState } from '../ui.js';
 import { readResult } from '../session.js';
 import { playSound, confetti } from '../fx.js';
@@ -23,7 +23,7 @@ function render() {
   const total = words.length;
   const perfect = words.filter(w => results[w.id] && !results[w.id].mistakes.length).length;
   const pct = total ? Math.round((perfect / total) * 100) : 0;
-  const [title, sub, tone] = pct === 100 ? ['Mukammal natija!', "Barcha so'zlarni xatosiz bajardingiz.", 'success']
+  const [title, sub] = pct === 100 ? ['Mukammal natija!', "Barcha so'zlarni xatosiz bajardingiz.", 'success']
     : pct >= 70 ? ["Zo'r natija!", 'Juda yaxshi — shu ruhda davom eting.', 'success']
     : pct >= 40 ? ['Yaxshi urinish!', "Xato qilgan so'zlaringizni yana takrorlang.", 'warning']
     : ["O'rganishda davom eting", "Bu so'zlar takrorlash ro'yxatiga qo'shildi — ertaga yana uchrashamiz.", 'danger'];

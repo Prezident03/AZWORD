@@ -1,38 +1,26 @@
 {
-  "name": "AzWord — Ingliz so'z o'rganish",
+  "id": "/dashboard.html",
+  "name": "AzWord — Ingliz so'zlarini o'rganish",
   "short_name": "AzWord",
-  "description": "Ingliz tilidagi so'zlarni flashcard, quiz va AI yordamida oson o'zlashtiring.",
+  "description": "Ingliz tilidagi so'zlarni 5 bosqichli mashqlar, aqlli takrorlash va AI yordamida o'zlashtiring.",
   "start_url": "dashboard.html",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#0f0d1a",
-  "theme_color": "#7c3aed",
+  "background_color": "#0e0b1f",
+  "theme_color": "#0e0b1f",
   "orientation": "portrait-primary",
   "lang": "uz",
+  "categories": ["education"],
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-maskable-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Takrorlash", "url": "review.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Mashq", "url": "quiz.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Lug'atim", "url": "vocabulary.html", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
   ]
 }
