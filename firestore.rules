@@ -34,11 +34,13 @@ service cloud.firestore {
     function profileKeys() {
       return ['displayName', 'photoBase64', 'photoThumb', 'settings', 'lastSeen', 'updatedAt', 'email', 'uid'];
     }
+    // Faqat o'zgargan maydonlar tekshiriladi (eski hujjatlardagi qiymatlar to'sqinlik qilmasin)
     function profileValid() {
-      return (!('displayName' in request.resource.data) || shortString(newVal('displayName', ''), 40))
-        && (!('photoBase64' in request.resource.data) || shortString(newVal('photoBase64', ''), 90000))
-        && (!('photoThumb' in request.resource.data) || shortString(newVal('photoThumb', ''), 12000))
-        && (!('settings' in request.resource.data) || newVal('settings', {}) is map)
+      let ch = changed();
+      return (!ch.hasAny(['displayName']) || shortString(newVal('displayName', ''), 40))
+        && (!ch.hasAny(['photoBase64']) || shortString(newVal('photoBase64', ''), 90000))
+        && (!ch.hasAny(['photoThumb']) || shortString(newVal('photoThumb', ''), 12000))
+        && (!ch.hasAny(['settings']) || newVal('settings', {}) is map)
         && newVal('email', '') == oldVal('email', newVal('email', ''))
         && newVal('uid', request.auth.uid) == request.auth.uid;
     }
@@ -203,9 +205,12 @@ service cloud.firestore {
       let f = get(folderPath(id)).data;
       return signedIn() && ((f.get('isAdmin', false) == false && f.get('uid', '') == request.auth.uid) || isAdmin());
     }
+    function wordKeys() { return ['en', 'uz', 'example', 'ipa', 'pos', 'createdAt', 'difficulty', 'category']; }
+    // Yangi so'z: faqat ruxsat etilgan maydonlar; tahrir: faqat ruxsat etilganlar o'zgaradi
+    // (eski so'zlardagi rewarded/mistakeCount kabi maydonlar qolib ketishi mumkin)
     function wordValid() {
       let d = request.resource.data;
-      return d.keys().hasOnly(['en', 'uz', 'example', 'ipa', 'pos', 'createdAt', 'difficulty', 'category'])
+      return (resource == null ? d.keys().hasOnly(wordKeys()) : d.diff(resource.data).affectedKeys().hasOnly(wordKeys()))
         && shortString(d.get('en', ''), 120) && d.get('en', '').size() > 0
         && shortString(d.get('uz', ''), 200) && d.get('uz', '').size() > 0
         && shortString(d.get('example', ''), 400);
@@ -221,8 +226,8 @@ service cloud.firestore {
         && resource.data.get('isAdmin', false) == false
         && resource.data.uid == request.auth.uid
         && request.resource.data.uid == resource.data.uid
-        && request.resource.data.isAdmin == false
-        && shortString(request.resource.data.get('name', ''), 60));
+        && request.resource.data.get('isAdmin', false) == false
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['name']) || shortString(request.resource.data.get('name', ''), 60)));
       allow delete: if isAdmin() || (signedIn() && resource.data.get('isAdmin', false) == false && resource.data.uid == request.auth.uid);
 
       match /words/{wordId} {

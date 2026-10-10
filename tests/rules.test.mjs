@@ -228,3 +228,24 @@ test('studyLog: faqat qo\'shish, o\'zgartirish yo\'q', async () => {
   await assertFails(updateDoc(doc(alice(), 'users/alice/studyLog', ref.id), { totalWords: 1000 }));
   await assertFails(addDoc(collection(bob(), 'users/alice/studyLog'), { totalWords: 1 }));
 });
+
+/* ── Eski versiyadan qolgan ma'lumotlar ── */
+test('eski so\'zni (qo\'shimcha maydonlar bilan) tahrirlash mumkin', async () => {
+  await env.withSecurityRulesDisabled(async (c) => {
+    await setDoc(doc(c.firestore(), 'folders/alicef/words/old'), { en: 'cat', uz: 'mushuk', rewarded: true, mistakeCount: 3 });
+  });
+  await assertSucceeds(updateDoc(doc(alice(), 'folders/alicef/words/old'), { uz: 'mushukcha', example: 'A cat.' }));
+  await assertFails(updateDoc(doc(alice(), 'folders/alicef/words/old'), { hacked: true }));
+});
+test('uzun ismli eski foydalanuvchi natijani saqlay oladi', async () => {
+  await env.withSecurityRulesDisabled(async (c) => {
+    await updateDoc(doc(c.firestore(), 'users/alice'), { displayName: 'x'.repeat(60) });
+  });
+  await assertSucceeds(updateDoc(doc(alice(), 'users/alice'), session()));
+});
+test('eski bo\'lim (isAdmin maydonisiz) hisoblagichini yangilash', async () => {
+  await env.withSecurityRulesDisabled(async (c) => {
+    await setDoc(doc(c.firestore(), 'folders/oldf'), { name: 'Old', uid: 'alice', wordCount: 1 });
+  });
+  await assertSucceeds(updateDoc(doc(alice(), 'folders/oldf'), { wordCount: 2 }));
+});

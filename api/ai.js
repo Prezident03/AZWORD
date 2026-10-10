@@ -3,7 +3,7 @@
    Body: { task: 'example' | 'translate' | 'words' | 'chat', ... }
 
    Xavfsizlik:
-   - Har bir so'rov Firebase ID token bilan tekshiriladi (Identity Toolkit).
+   - Har bir so'rov Firebase ID token bilan tekshiriladi (Google sertifikatlari, RS256).
    - Ixtiyoriy prompt yuborib bo'lmaydi — faqat oldindan belgilangan vazifalar.
    - 'words' (AI so'z generatori) oddiy foydalanuvchi uchun aiGeneratorUses
      hisobidan ishlaydi: server foydalanuvchi tokeni bilan Firestore'dan
@@ -12,16 +12,16 @@
 
    Vercel → Settings → Environment Variables:
      GROQ_API_KEY            (majburiy)
-     FIREBASE_API_KEY        (ixtiyoriy, standart — ilovaning web API kaliti)
      FIREBASE_PROJECT_ID     (ixtiyoriy, standart — azword-30a2e)
      AI_MODEL                (ixtiyoriy, standart — llama-3.3-70b-versatile) */
 
+import crypto from 'node:crypto';
+import { Buffer } from 'node:buffer';
+
 const OWNER_EMAIL = 'abdurasul1406z@gmail.com';
-const API_KEY = process.env.FIREBASE_API_KEY || 'AIzaSyD6XSx__Bwq7UyuP5ZiMqohkvKOC0G1eXI';
 const PROJECT = process.env.FIREBASE_PROJECT_ID || 'azword-30a2e';
 const MODEL = process.env.AI_MODEL || 'llama-3.3-70b-versatile';
 const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1') + '/chat/completions';
-const AUTH_HOST = process.env.FIREBASE_AUTH_EMULATOR_HOST ? `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}/identitytoolkit.googleapis.com` : 'https://identitytoolkit.googleapis.com';
 const FS_HOST = process.env.FIRESTORE_EMULATOR_HOST ? `http://${process.env.FIRESTORE_EMULATOR_HOST}` : 'https://firestore.googleapis.com';
 const FS_BASE = `${FS_HOST}/v1/projects/${PROJECT}/databases/(default)/documents`;
 
@@ -42,17 +42,39 @@ function rateLimit(uid, task) {
   if (hits.size > 5000) hits.clear();
 }
 
+/* Firebase ID tokenni Google'ning ochiq sertifikatlari bilan tekshirish (API kalit kerak emas) */
+const CERTS_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com';
+let certCache = { certs: null, exp: 0 };
+async function googleCerts() {
+  if (certCache.certs && Date.now() < certCache.exp) return certCache.certs;
+  const r = await fetch(CERTS_URL);
+  if (!r.ok) throw new HttpError(503, "Autentifikatsiya xizmatiga ulanib bo'lmadi");
+  const m = /max-age=(\d+)/.exec(r.headers.get('cache-control') || '');
+  certCache = { certs: await r.json(), exp: Date.now() + (m ? Number(m[1]) : 3600) * 1000 };
+  return certCache.certs;
+}
+const b64json = (part) => JSON.parse(Buffer.from(part, 'base64url').toString('utf8'));
+
 async function verifyToken(req) {
   const h = req.headers.authorization || req.headers.Authorization || '';
   const token = h.startsWith('Bearer ') ? h.slice(7) : '';
   if (!token) throw new HttpError(401, 'Avval tizimga kiring', 'unauthenticated');
-  const r = await fetch(`${AUTH_HOST}/v1/accounts:lookup?key=${API_KEY}`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken: token })
-  });
-  const data = await r.json().catch(() => ({}));
-  const user = data.users && data.users[0];
-  if (!r.ok || !user) throw new HttpError(401, 'Sessiya muddati tugagan. Qayta kiring.', 'unauthenticated');
-  return { uid: user.localId, email: user.email || '', emailVerified: !!user.emailVerified, token };
+  const bad = () => new HttpError(401, 'Sessiya muddati tugagan. Qayta kiring.', 'unauthenticated');
+  const parts = token.split('.');
+  if (parts.length !== 3) throw bad();
+  let header, payload;
+  try { header = b64json(parts[0]); payload = b64json(parts[1]); } catch (e) { throw bad(); }
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.aud !== PROJECT || payload.iss !== `https://securetoken.google.com/${PROJECT}`) throw bad();
+  if (!payload.sub || typeof payload.exp !== 'number' || payload.exp < now || (payload.iat || 0) > now + 300) throw bad();
+  if (!process.env.FIREBASE_AUTH_EMULATOR_HOST) {
+    if (header.alg !== 'RS256') throw bad();
+    const cert = (await googleCerts())[header.kid];
+    if (!cert) throw bad();
+    const ok = crypto.createVerify('RSA-SHA256').update(parts[0] + '.' + parts[1]).verify(cert, Buffer.from(parts[2], 'base64url'));
+    if (!ok) throw bad();
+  }
+  return { uid: payload.sub, email: payload.email || '', emailVerified: !!payload.email_verified, token };
 }
 
 /* Firestore REST — foydalanuvchining o'z tokeni bilan (xavfsizlik qoidalari amal qiladi) */

@@ -316,3 +316,113 @@ export async function practice({ page, base, settle, shot }) {
   const rows = await page.$$eval('#list .list-row', r => r.length);
   if (rows < 10) throw new Error('vocabulary rows ' + rows);
 }
+
+/* Eski versiyadan qolgan ma'lumotlar bilan foydalanuvchi (haqiqiy saytdagidek) */
+export async function legacy({ newPage, base, settle, shot, env, signUp }) {
+  const { doc, setDoc, Timestamp } = await import('firebase/firestore');
+  const others = [];
+  for (const [email, stars, wk] of [['old1@test.uz', 900, '2026-W40'], ['old2@test.uz', 450, '2026-W41'], ['old3@test.uz', 120, '2026-W39']]) {
+    const r = await signUp(email);
+    others.push({ uid: r.localId, email, stars, wk });
+  }
+  const me = await signUp('legacy@test.uz');
+  const uid = me.localId;
+  await env.withSecurityRulesDisabled(async (c) => {
+    const db = c.firestore();
+    for (const o of others) {
+      await setDoc(doc(db, 'users', o.uid), { uid: o.uid, displayName: o.email.split('@')[0], email: o.email, photoURL: '', stars: o.stars, coins: 40, weeklyStars: 30, weekKey: o.wk, blocked: false, createdAt: Timestamp.now(), lastSeen: new Date() });
+    }
+    await setDoc(doc(db, 'users', uid), {
+      uid, displayName: 'Eski Foydalanuvchi', email: 'legacy@test.uz', photoURL: '',
+      stars: 340, coins: 260, weeklyStars: 50, weekKey: '2026-W40', streakDays: 5, lastStudyDate: '2026-10-05', longestStreak: 7,
+      todayWordsLearned: 12, totalWordsLearned: 300, studyTimeMinutes: 120, totalPerfectWords: 200,
+      ownedItems: ['ai-generator-premium', 'oldbadge'], equippedItems: { badge: 'oldbadge' }, achievements: ['oldach'],
+      aiGeneratorUses: 3, blocked: false, createdAt: Timestamp.now(), lastSeen: new Date(), updatedAt: new Date()
+    });
+    await setDoc(doc(db, 'shop/oldbadge'), { name: 'Eski nishon', emoji: '??', category: 'badge', price: 30, description: '' });
+    await setDoc(doc(db, 'shop/oldboost'), { name: 'Boost', emoji: '🚀', category: 'boost', price: 40 });
+    await setDoc(doc(db, 'achievements/oldach'), { name: 'Top 3', type: 'rank', threshold: 3, starReward: 10, coinReward: 10, emoji: '🏆' });
+    await setDoc(doc(db, 'folders/legacyf'), { name: 'Mening eski so\'zlarim', uid, isAdmin: false, wordCount: 3, progress: 0, lastScore: '2/3', createdAt: Timestamp.now(), emoji: '📚' });
+    for (const [i, [en, uz]] of [['cat', 'mushuk'], ['dog', 'it'], ['bird', 'qush']].entries()) {
+      await setDoc(doc(db, `folders/legacyf/words/w${i}`), { en, uz, example: '', createdAt: Timestamp.fromMillis(Date.now() + i), rewarded: true, mistakeCount: 2 });
+    }
+    await setDoc(doc(db, `users/${uid}/studyLog/old1`), { folderId: 'legacyf', totalWords: 3, correctWords: 2, accuracy: 67, studiedAt: Timestamp.now(), dateKey: '2026-10-05' });
+    await setDoc(doc(db, `users/${uid}/purchases/old1`), { itemId: 'oldbadge', itemName: 'Eski nishon', itemEmoji: '??', price: 30, purchasedAt: Timestamp.now() });
+    await setDoc(doc(db, 'announcements/old'), { text: 'Eski e\'lon', emoji: '🎉', createdAt: Timestamp.fromMillis(Date.now() - 86400e3) });
+  });
+
+  const { page, context } = await newPage();
+  const errs = [];
+  page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.text().slice(0, 200)); });
+  await page.goto(base + 'index.html');
+  await page.fill('#login-email', 'legacy@test.uz');
+  await page.fill('#login-password', 'secret123');
+  await page.click('#form-login button[type=submit]');
+  await page.waitForURL(/dashboard\.html/);
+  await settle(page);
+  await shot(page, 'legacy-dashboard');
+  for (const p of ['leaderboard', 'shop', 'achievements', 'profile', 'stats', 'streak', 'vocabulary', 'folders', 'review', 'settings']) {
+    await page.goto(base + p + '.html');
+    await settle(page);
+    await page.waitForTimeout(800);
+    await shot(page, 'legacy-' + p);
+  }
+  await page.goto(base + 'leaderboard.html');
+  await settle(page);
+  await page.waitForTimeout(1000);
+  const lb = await page.textContent('main');
+  console.log('    reyting:', lb.replace(/\s+/g, ' ').slice(0, 260));
+  await page.goto(base + 'study.html?id=legacyf');
+  await settle(page);
+  await shot(page, 'legacy-study');
+  console.log('    ogohlantirishlar:', JSON.stringify(errs.filter(e => !/Failed to load resource/.test(e)).slice(0, 10)));
+  await context.close();
+}
+
+/* Admin panel ochilganda reyting eski foydalanuvchilar bilan to'ldirilishi */
+export async function legacyAdmin({ newPage, base, settle, shot, env }) {
+  const { page, context } = await newPage();
+  await page.goto(base + 'index.html');
+  await page.fill('#login-email', 'abdurasul1406z@gmail.com');
+  await page.fill('#login-password', 'secret123');
+  await page.click('#form-login button[type=submit]');
+  await page.waitForURL(/dashboard\.html/);
+  await page.goto(base + 'admin.html');
+  await settle(page);
+  await page.waitForTimeout(3000);
+  const { getDocs, collection, getDoc, doc } = await import('firebase/firestore');
+  let n = 0, wm;
+  await env.withSecurityRulesDisabled(async (c) => {
+    const fdb = c.firestore();
+    n = (await getDocs(collection(fdb, 'leaderboard'))).size;
+    const users = await getDocs(collection(fdb, 'users'));
+    wm = users.docs.map(d => d.data()).find(u => u.email === 'legacy@test.uz').wordsMastered;
+  });
+  await context.close();
+  if (n < 5) throw new Error('leaderboard not backfilled: ' + n);
+  if (wm !== 200) throw new Error('wordsMastered not migrated: ' + wm);
+  // Eski foydalanuvchi: reyting va eski so'zni tahrirlash
+  const s = await newPage();
+  const p = s.page;
+  await p.goto(base + 'index.html');
+  await p.fill('#login-email', 'legacy@test.uz');
+  await p.fill('#login-password', 'secret123');
+  await p.click('#form-login button[type=submit]');
+  await p.waitForURL(/dashboard\.html/);
+  await p.goto(base + 'leaderboard.html');
+  await settle(p);
+  await p.click('#tabs [data-t="all"]');
+  await p.waitForTimeout(1200);
+  await shot(p, 'legacy-leaderboard-all');
+  const txt = await p.textContent('main');
+  if (!/old1/.test(txt) || !/Eski Foydalanuvchi/.test(txt)) throw new Error('all-time leaderboard missing users: ' + txt.replace(/\s+/g, ' ').slice(0, 200));
+  await p.goto(base + 'folder.html?id=legacyf');
+  await settle(p);
+  await p.click('[data-edit="w0"]');
+  await p.fill('#wf-uz', 'mushukcha');
+  await p.click('#wf-save');
+  await p.waitForTimeout(1200);
+  const list = await p.textContent('#list');
+  if (!/mushukcha/.test(list)) throw new Error('legacy word edit failed');
+  await s.context.close();
+}
