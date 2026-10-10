@@ -1,92 +1,39 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" data-theme="dark">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AzWord � Vocabulary</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lug'atim · AzWord</title>
+  <meta name="description" content="O'rganilgan so'zlar lug'ati.">
+  <meta name="theme-color" content="#0e0b1f">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css"/>
-  <link rel="stylesheet" href="premium-pages.css"/>
-  <script src="error-state.js"></script>
-  <script src="pwa-init.js"></script>
-  <script src="transition.js"></script>
-  <script src="ripple.js"></script>
-  <script src="cursor-glow.js"></script>
-  <script src="brand.js"></script>
-  <script src="confetti.js"></script>
-  <script src="sound.js"></script>
-  <script src="search.js"></script>
-  <script src="effects.js"></script>
-  <script src="parallax.js"></script>
-  <style>
-    .simple-wrap { max-width: 920px; margin: 0 auto; padding: 36px 24px; }
-    .simple-head { display:flex; align-items:center; justify-content:space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      color: var(--text-muted); font-size: 0.9rem; cursor: pointer;
-      border: none; background: none; padding: 0;
-      font-family: var(--font-body);
-      transition: color var(--dur-fast);
-    }
-    .back-btn:hover { color: var(--text-main); }
-    .simple-card {
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: var(--elev-card);
-      overflow: hidden;
-      position: relative;
-    }
-    .simple-card::before {
-      content:'';
-      position:absolute;
-      inset:0;
-      background: radial-gradient(ellipse at 85% 10%, rgba(59,130,246,0.18), transparent 55%),
-                  radial-gradient(ellipse at 20% 90%, rgba(124,58,237,0.12), transparent 55%);
-      pointer-events:none;
-    }
-    .simple-card > * { position: relative; z-index: 1; }
-    .simple-title {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1.35rem;
-      margin: 0 0 8px;
-      color: var(--text-main);
-    }
-    .simple-sub { margin: 0; color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
-    .simple-actions { margin-top: 16px; display:flex; gap: 10px; flex-wrap: wrap; }
-  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="css/app.css">
+  <script>try{var p=JSON.parse(localStorage.getItem('az:prefs')||'{}'),t=p.theme||'dark';if(t==='system')t=matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';document.documentElement.dataset.theme=t;if(p.effects===false)document.documentElement.classList.add('no-motion')}catch(e){}</script>
+  <script type="module" src="js/pages/vocabulary.js"></script>
 </head>
 <body>
-  <main class="simple-wrap">
-    <div class="simple-head">
-      <button class="back-btn" onclick="window.location.href='dashboard.html'">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Dashboard
-      </button>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <a class="btn-add" href="flashcards.html" style="text-decoration:none">Flashcards</a>
-        <a class="btn-add" href="quiz.html" style="text-decoration:none">Quiz</a>
+  <div class="boot" aria-hidden="true"><div class="boot-mark"><div class="boot-logo"><svg viewBox="0 0 64 64" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 50 L32 14 L47 50"/><path d="M22.5 38 L41.5 38"/></svg></div></div></div>
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Lug'atim</h1>
+        <p class="page-sub">Mashq qilgan barcha so'zlaringiz bir joyda</p>
       </div>
     </div>
-
-    <section class="simple-card">
-      <h1 class="simple-title">Vocabulary</h1>
-      <p class="simple-sub">Bu sahifa hozircha tayyorlanmoqda. Tez orada barcha so�zlar, filterlar va qidiruv shu yerda bo�ladi.</p>
-      <div class="simple-actions">
-        <a class="btn-add" href="study.html" style="text-decoration:none">Study</a>
-        <a class="btn-add" href="stats.html" style="text-decoration:none">Statistics</a>
+    <div class="grid-4 mb-4" id="summary"></div>
+    <div class="row wrap mb-4">
+      <div class="tabs" id="filters"></div>
+      <div class="input-icon grow" style="min-width:200px;max-width:340px;margin-left:auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input class="input" id="search" type="search" placeholder="Inglizcha yoki o'zbekcha..." aria-label="Qidirish">
       </div>
-    </section>
+    </div>
+    <div id="list"></div>
   </main>
-
-  <script type="module">
-    import { auth } from './firebase.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    onAuthStateChanged(auth, user => { if (!user) location.href = 'index.html'; });
-  </script>
 </body>
 </html>

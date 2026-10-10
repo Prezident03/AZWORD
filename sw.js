@@ -1,103 +1,88 @@
-/* ═══════════════════════════════════════════════════════
-   AzWord · Service Worker
-   Sayt qobig'ini (HTML/CSS/JS/logo) keshlaydi, shunda internet
-   bo'lmasa ham ilova ochiladi. Firestore ma'lumotlari (so'zlar,
-   papkalar) esa firebase.js ichidagi persistentLocalCache orqali
-   alohida keshlanadi.
-   ═══════════════════════════════════════════════════════ */
-
-const CACHE_NAME = 'azword-shell-v4';
-
-const APP_SHELL = [
-  'index.html',
-  'dashboard.html',
-  'folders.html',
-  'folder.html',
-  'flashcards.html',
-  'quiz.html',
-  'quick-quiz.html',
-  'results.html',
-  'vocabulary.html',
-  'study.html',
-  'stats.html',
-  'streak.html',
-  'achievements.html',
-  'leaderboard.html',
-  'shop.html',
-  'profile.html',
-  'settings.html',
-  'ai.html',
-  'book.html',
-  'upload.html',
-  'style.css',
-  'premium-pages.css',
-  'mobile.css',
-  'brand.js',
-  'mobile-nav.js',
-  'confetti.js',
-  'cursor-glow.js',
-  'dash-enhance.js',
-  'effects.js',
-  'firebase.js',
-  'generate-words.js',
-  'icons.js',
-  'parallax.js',
-  'ripple.js',
-  'search.js',
-  'sidebar.js',
-  'sound.js',
-  'transition.js',
-  'touch-ux.js',
-  'pwa-init.js',
-  'error-state.js',
-  'logo.png',
-  'icon-192.png',
-  'icon-512.png',
-  'icon-maskable-192.png',
-  'icon-maskable-512.png',
-  'manifest.json'
+/* AzWord · Service Worker
+   - HTML sahifalar: avval tarmoq, internet bo'lmasa — keshdan (oflayn rejim)
+   - JS/CSS/rasm: keshdan darhol beriladi va fonda yangilanadi
+   - Firebase SDK va shriftlar (versiyali URL): kesh birinchi
+   - /api/* va Firestore so'rovlari keshlanmaydi
+   Yangi versiya chiqarganda VERSION ni oshiring. */
+const VERSION = 'azword-v6';
+const SHELL = [
+  'index.html', 'dashboard.html', 'folders.html', 'folder.html', 'book.html', 'study.html', 'results.html',
+  'flashcards.html', 'quick-quiz.html', 'quiz.html', 'review.html', 'vocabulary.html', 'stats.html', 'streak.html',
+  'achievements.html', 'leaderboard.html', 'shop.html', 'profile.html', 'settings.html', 'ai.html', '404.html',
+  'css/app.css', 'favicon.svg', 'manifest.json', 'icon-192.png',
+  'js/firebase.js', 'js/core.js', 'js/ui.js', 'js/data.js', 'js/game.js', 'js/icons.js', 'js/icon-paths.js',
+  'js/prefs.js', 'js/fx.js', 'js/widgets.js', 'js/session.js', 'js/ai.js'
 ];
+const CDN = /^https:\/\/(www\.gstatic\.com\/firebasejs\/|fonts\.googleapis\.com\/|fonts\.gstatic\.com\/|cdnjs\.cloudflare\.com\/)/;
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).catch(() => {
-      /* Ba'zi fayllar topilmasa ham o'rnatish to'xtamasin */
-    })
+    caches.open(VERSION)
+      .then((cache) => Promise.allSettled(SHELL.map((u) => cache.add(u))))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
+
+async function networkFirst(request) {
+  const cache = await caches.open(VERSION);
+  try {
+    const res = await fetch(request);
+    if (res && res.ok) cache.put(request, res.clone());
+    return res;
+  } catch (e) {
+    const cached = await cache.match(request, { ignoreSearch: true });
+    return cached || (await cache.match('dashboard.html')) || Response.error();
+  }
+}
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(VERSION);
+  const cached = await cache.match(request);
+  const network = fetch(request).then((res) => {
+    if (res && res.ok) cache.put(request, res.clone());
+    return res;
+  }).catch(() => cached);
+  return cached || network;
+}
+async function cacheFirst(request) {
+  const cache = await caches.open(VERSION);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const res = await fetch(request);
+  if (res && (res.ok || res.type === 'opaque')) cache.put(request, res.clone());
+  return res;
+}
 
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-
-  // Faqat GET so'rovlar va o'zimiz bilan bir manbadan (Firestore/Google API'ga tegmaymiz)
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) {
+  if (request.method !== 'GET') return;
+  const url = new URL(request.url);
+  if (url.origin === self.location.origin) {
+    if (url.pathname.startsWith('/api/')) return;
+    if (request.mode === 'navigate' || request.destination === 'document') {
+      event.respondWith(networkFirst(request));
+      return;
+    }
+    event.respondWith(staleWhileRevalidate(request));
     return;
   }
+  if (CDN.test(request.url)) event.respondWith(cacheFirst(request));
+});
 
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      const network = fetch(request)
-        .then((response) => {
-          if (response && response.status === 200) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached || caches.match('dashboard.html'));
-
-      // Stale-while-revalidate: kesh bo'lsa darrov qaytar, fonda yangilaydi
-      return cached || network;
+/* Eslatma bildirishnomasi bosilganda ilovani ochish */
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) if ('focus' in c) return c.focus();
+      return self.clients.openWindow('dashboard.html');
     })
   );
 });
