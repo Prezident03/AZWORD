@@ -18,7 +18,7 @@ export async function callAI(task, payload = {}) {
   let data = {};
   try { data = await res.json(); } catch (e) { /* bo'sh javob */ }
   if (!res.ok) {
-    const err = new Error(data.error || 'AI xizmatida xatolik yuz berdi');
+    const err = new Error((data.error || 'AI xizmatida xatolik yuz berdi') + (data.detail ? ` (${data.detail})` : ''));
     err.status = res.status;
     err.code = data.code;
     throw err;
@@ -29,4 +29,5 @@ export async function callAI(task, payload = {}) {
 export const aiExample = (en, uz) => callAI('example', { en, uz }).then(d => d.text || '');
 export const aiTranslate = (text) => callAI('translate', { text }).then(d => d.text || '');
 export const aiWords = (topic, level, count) => callAI('words', { topic, level, count });
+export const aiPing = () => callAI('ping');
 export const aiChat = (messages) => callAI('chat', { messages }).then(d => d.text || '');
