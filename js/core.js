@@ -6,12 +6,12 @@
    - PWA, oflayn banner va kutilayotgan mashg'ulotlarni sinxronlaydi */
 import { auth, onAuthStateChanged, signOut } from './firebase.js';
 import {
-  loadUserDoc, getSettings, isAdminUser, touchLastSeen, syncLeaderboard, flushPending,
+  loadUserDoc, getSettings, isAdminUser, touchLastSeen, syncLeaderboard, flushPending, updateProfileDoc,
   listMyFolders, listBooks, listPublicFolders, countDue
 } from './data.js';
 import { levelInfo, streakState } from './game.js';
 import { icon, LOGO_SVG, starIcon } from './icons.js';
-import { esc, html, raw, setHTML, fmtNum, toast } from './ui.js';
+import { esc, html, raw, setHTML, fmtNum, toast, thumbFromDataUrl } from './ui.js';
 import { getPrefs, setAccent } from './prefs.js';
 import { db, doc, getDoc } from './firebase.js';
 
@@ -122,7 +122,15 @@ export async function initPage({ title = '', active = '', admin = false, shell =
     flushPending(user.uid).then(() => {});
     if (!sessionStorage.getItem('az:lb-sync')) {
       sessionStorage.setItem('az:lb-sync', '1');
-      syncLeaderboard(user.uid, u);
+      (async () => {
+        let cur = u;
+        /* Eski versiyada yuklangan rasm uchun reytingga kichik nusxa yaratish */
+        if (u.photoBase64 && /^data:image\//.test(u.photoBase64) && !u.photoThumb) {
+          const photoThumb = await thumbFromDataUrl(u.photoBase64);
+          if (photoThumb) { try { await updateProfileDoc(user.uid, { photoThumb }); cur = { ...u, photoThumb }; state.u = cur; } catch (e) { /* ignore */ } }
+        }
+        syncLeaderboard(user.uid, cur);
+      })();
     }
   }
   if (shell) refreshDueBadge();

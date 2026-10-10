@@ -92,3 +92,40 @@ export async function readSettings() {
   return s.exists() ? s.data() : {};
 }
 export { serverTimestamp, Timestamp };
+
+/* Eski versiyadan o'tish: har bir foydalanuvchi uchun reyting hujjatini yaratadi
+   va yangi hisoblagichlarni (wordsMastered) eski ma'lumotlardan to'ldiradi. */
+export async function migrateUsers(onProgress) {
+  const users = await listUsers(5000);
+  let done = 0, migrated = 0;
+  for (let i = 0; i < users.length; i += 200) {
+    const b = writeBatch(db);
+    for (const u of users.slice(i, i + 200)) {
+      let cur = u;
+      /* Eski versiyadagi haftalik yulduzlar hech qachon nolga tushmagan — yangi haftalik reytingdan chiqaramiz */
+      if (typeof u.sessionsCount !== 'number' && (u.weeklyStars || u.weekKey)) {
+        b.update(doc(db, 'users', u.id), { weeklyStars: 0, weekKey: '' });
+        cur = { ...cur, weeklyStars: 0, weekKey: '' };
+      }
+      if (typeof u.wordsMastered !== 'number') {
+        const mastered = Math.min(Number(u.totalPerfectWords) || 0, Number(u.stars) || 0);
+        b.update(doc(db, 'users', u.id), { wordsMastered: mastered });
+        cur = { ...cur, wordsMastered: mastered };
+        migrated++;
+      }
+      if (cur.photoBase64 && /^data:image\//.test(cur.photoBase64) && !cur.photoThumb && typeof document !== 'undefined') {
+        const { thumbFromDataUrl } = await import('./ui.js');
+        const photoThumb = await thumbFromDataUrl(cur.photoBase64);
+        if (photoThumb) { b.update(doc(db, 'users', u.id), { photoThumb }); cur = { ...cur, photoThumb }; }
+      }
+      b.set(doc(db, 'leaderboard', u.id), leaderboardData(cur));
+      done++;
+    }
+    await b.commit();
+    if (onProgress) onProgress(done, users.length);
+  }
+  return { total: users.length, migrated };
+}
+export async function leaderboardCount() {
+  return getCountFromServer(collection(db, 'leaderboard')).then(s => s.data().count).catch(() => null);
+}

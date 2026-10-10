@@ -288,3 +288,19 @@ export function safeImg(url) {
   if (/^https:\/\//i.test(s) || /^data:image\//i.test(s) || /^[a-z0-9_\-/]+\.(png|jpe?g|webp|svg|gif)$/i.test(s)) return s;
   return '';
 }
+
+/* Rasmni kvadrat qilib kichraytirish (data URL qaytaradi) */
+export function thumbFromDataUrl(src, size = 64, quality = 0.7) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const side = Math.min(img.width, img.height);
+      const c = document.createElement('canvas');
+      c.width = c.height = Math.max(1, Math.min(size, side));
+      c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve('');
+    img.src = src;
+  });
+}

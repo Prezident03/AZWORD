@@ -4,7 +4,7 @@
    - Firebase SDK va shriftlar (versiyali URL): kesh birinchi
    - /api/* va Firestore so'rovlari keshlanmaydi
    Yangi versiya chiqarganda VERSION ni oshiring. */
-const VERSION = 'azword-v6';
+const VERSION = 'azword-v7';
 const SHELL = [
   'index.html', 'dashboard.html', 'folders.html', 'folder.html', 'book.html', 'study.html', 'results.html',
   'flashcards.html', 'quick-quiz.html', 'quiz.html', 'review.html', 'vocabulary.html', 'stats.html', 'streak.html',
@@ -24,11 +24,17 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    const old = keys.filter((k) => k !== VERSION);
+    await Promise.all(old.map((k) => caches.delete(k)));
+    await self.clients.claim();
+    /* Eski versiya (azword-shell-*) keshidan ochilgan sahifalarni yangi kod bilan qayta yuklash */
+    if (old.some((k) => k.startsWith('azword-shell'))) {
+      const wins = await self.clients.matchAll({ type: 'window' });
+      wins.forEach((c) => c.navigate(c.url).catch(() => {}));
+    }
+  })());
 });
 
 async function networkFirst(request) {

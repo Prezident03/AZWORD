@@ -8,7 +8,7 @@ import {
 } from '../data.js';
 import {
   counts, listUsers, adminUpdateUser, saveContainer, saveTopic, recount, listCol, saveDoc, removeDoc,
-  saveSettings, readSettings, serverTimestamp
+  saveSettings, readSettings, serverTimestamp, migrateUsers, leaderboardCount
 } from '../admin-data.js';
 import { ACH_TYPES, levelInfo, streakState } from '../game.js';
 import { icon, iconName, PICKER_ICONS } from '../icons.js';
@@ -90,8 +90,20 @@ function formDialog({ title, fields, submit = 'Saqlash', size = '', extra = null
 }
 
 /* ── 1. Umumiy ko'rinish ───────────────────────────────── */
+async function runMigration(btn) {
+  const go = async () => {
+    try {
+      const r = await migrateUsers((d, t) => { if (btn) btn.lastChild.textContent = ` ${d}/${t}`; });
+      toast(`Reyting yangilandi: ${r.total} foydalanuvchi${r.migrated ? `, ${r.migrated} tasi yangi formatga o'tkazildi` : ''}`);
+    } catch (e) { toastError('Reytingni yangilab bo\'lmadi: ' + e.message); }
+  };
+  return btn ? withLoading(btn, go) : go();
+}
+
 async function overview() {
   const c = await counts();
+  const lb = await leaderboardCount();
+  if (c.users && lb !== null && lb < c.users) runMigration(null);
   let recent = [];
   try { recent = (await listUsers(500)).sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0)).slice(0, 8); } catch (e) { /* ignore */ }
   const card = (i, t, v, l) => `<div class="card stat"><span class="tile-icon ${t}">${icon(i, 22)}</span><div><div class="stat-value">${v === null ? '—' : fmtNum(v)}</div><div class="stat-label">${l}</div></div></div>`;
@@ -550,7 +562,13 @@ async function settings() {
       <div class="list mb-3"><div class="list-row">${ic('crown', 18)}<div class="list-main"><div class="list-title">${OWNER_EMAIL}</div><div class="list-sub">Asosiy admin</div></div></div>
         ${admins.map(e => html`<div class="list-row">${ic('shield', 18)}<div class="list-main"><div class="list-title">${e}</div></div><button class="icon-btn danger" data-adm-del="${e}" aria-label="Olib tashlash">${ic('x', 16)}</button></div>`)}</div>
       <form class="row" id="adm-form"><input class="input" id="adm-email" type="email" placeholder="email@example.com"><button class="btn" type="submit">${ic('plus', 16)} Qo'shish</button></form>
+    </div>
+    <div class="card">
+      <div class="card-title mb-2">${ic('trophy', 17)} Reyting va ma'lumotlar</div>
+      <p class="xs muted mb-3">Barcha foydalanuvchilarni reytingga qo'shadi va eski versiyadan qolgan hisoblagichlarni yangilaydi. Xavfsiz — istalgan vaqtda qayta ishga tushirish mumkin.</p>
+      <button class="btn" id="st-migrate">${ic('refresh', 16)}<span> Reytingni qayta tiklash</span></button>
     </div></div>`);
+  $('#st-migrate').onclick = (e) => runMigration(e.currentTarget);
   $('#st-save').onclick = (e) => withLoading(e.currentTarget, async () => {
     const on = $('#st-maint').checked;
     if (on && !s.maintenance && !await confirmDialog({ title: 'Saytni yopish', message: 'Oddiy foydalanuvchilar ilovadan foydalana olmaydi. Davom etasizmi?', confirmText: 'Yopish', danger: true })) return;
