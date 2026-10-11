@@ -317,6 +317,57 @@ export async function practice({ page, base, settle, shot }) {
   if (rows < 10) throw new Error('vocabulary rows ' + rows);
 }
 
+/* Diktant: so'zni va gapni harfma-harf yozish (bitta xato, bitta yordam) */
+const EXAMPLES = { beautiful: 'What a beautiful day!', quickly: 'She runs quickly.', window: 'Open the window.', teacher: 'Our teacher is kind.' };
+export async function dictation({ newPage, base, settle, shot }) {
+  for (const [vw, tag] of [[{ width: 1366, height: 860 }, ''], [{ width: 390, height: 844 }, '-mobile']]) {
+    const { page, context } = await newPage(vw);
+    await page.goto(base + 'index.html');
+    await page.fill('#login-email', 'student@test.uz');
+    await page.fill('#login-password', 'secret123');
+    await page.click('#form-login button[type=submit]');
+    await page.waitForURL(/dashboard\.html/);
+    await page.goto(base + 'dictation.html?book=b1&topic=t2');
+    await settle(page);
+    let n = 0, wrongDone = false, revealDone = false;
+    for (let guard = 0; guard < 30 && !/results\.html/.test(page.url()); guard++) {
+      await page.waitForSelector('#ti', { timeout: 8000 });
+      const sentence = await page.$eval('#slots', el => el.classList.contains('sm'));
+      let en;
+      if (sentence) en = await page.$eval('.dict-hint b', el => el.textContent.trim());
+      else en = UZ2EN[await page.$eval('.word-trans', el => el.textContent.trim())];
+      if (!en) throw new Error('unknown word');
+      if (n === 0 && tag === '') await shot(page, 'dictation-word');
+      if (!sentence) {
+        if (!wrongDone) { await page.keyboard.type('z'); wrongDone = true; await page.waitForTimeout(450); }
+        await page.keyboard.type(en, { delay: 15 });
+      } else if (!revealDone && n >= 3) {
+        await page.keyboard.type(EXAMPLES[en].slice(0, 4), { delay: 15 });
+        if (tag === '') await shot(page, 'dictation-sentence');
+        await page.click('#reveal');
+        revealDone = true;
+      } else {
+        await page.keyboard.type(EXAMPLES[en], { delay: 10 });
+      }
+      await page.waitForSelector('#next', { timeout: 5000 });
+      if (sentence) {
+        await page.waitForSelector('.gloss-w', { timeout: 5000 });
+        if (n === 1) await shot(page, 'dictation-gloss' + tag);
+      }
+      await page.keyboard.press('Enter');
+      n++;
+      await page.waitForTimeout(250);
+    }
+    await page.waitForURL(/results\.html/, { timeout: 15000 });
+    await settle(page);
+    await shot(page, 'dictation-results' + tag);
+    const label = await page.$eval('.score-ring', el => el.textContent);
+    if (!/2\/4/.test(label) || !/yordamsiz/.test(label)) throw new Error('dictation score ' + label);
+    if (n !== 8) throw new Error('dictation steps ' + n);
+    await context.close();
+  }
+}
+
 /* Eski versiyadan qolgan ma'lumotlar bilan foydalanuvchi (haqiqiy saytdagidek) */
 export async function legacy({ newPage, base, settle, shot, env, signUp }) {
   const { doc, setDoc, Timestamp } = await import('firebase/firestore');

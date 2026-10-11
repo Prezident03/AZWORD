@@ -27,6 +27,7 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '
 function fakeAI(body) {
   if (body.task === 'example') return { text: `This is an example with ${body.en}.` };
   if (body.task === 'translate') return { text: 'Bu tarjima.' };
+  if (body.task === 'gloss') return { text: 'Bu gap tarjimasi.', words: String(body.text).split(/\s+/).map(w => ({ en: w.replace(/[^\w']/g, ''), uz: 'tarj' })) };
   if (body.task === 'words') return { words: [{ en: 'suitcase', uz: 'chamadon', example: 'My suitcase is heavy.' }, { en: 'passport', uz: 'pasport', example: 'Show your passport.' }], usesLeft: 4 };
   if (body.task === 'chat') return { text: "Salom! Men AzWord AI yordamchisiman.\n- \"apple\" — olma" };
   return { error: 'bad' };

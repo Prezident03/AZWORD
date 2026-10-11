@@ -28,6 +28,7 @@ export async function callAI(task, payload = {}) {
 
 export const aiExample = (en, uz) => callAI('example', { en, uz }).then(d => d.text || '');
 export const aiTranslate = (text) => callAI('translate', { text }).then(d => d.text || '');
+export const aiGloss = (text) => callAI('gloss', { text });
 export const aiWords = (topic, level, count) => callAI('words', { topic, level, count });
 export const aiPing = () => callAI('ping');
 export const aiChat = (messages) => callAI('chat', { messages }).then(d => d.text || '');

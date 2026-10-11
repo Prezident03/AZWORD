@@ -8,8 +8,8 @@ import { playSound, confetti } from '../fx.js';
 
 const ctx = await initPage({ title: 'Natija', active: 'practice' });
 const data = readResult();
-const STAGE_NAMES = { 1: 'Tanishish', 2: 'Variantlar', 3: "Bo'laklash", 4: 'Moslashtirish', 5: 'Yozish', 6: 'Kviz', 7: 'Flashcard', 8: 'Tinglash' };
-const MODE_LABEL = { study: "O'rganish", quiz: 'Tezkor kviz', flashcards: 'Flashcard', review: 'Takrorlash', listening: 'Tinglab tushunish' };
+const STAGE_NAMES = { 1: 'Tanishish', 2: 'Variantlar', 3: "Bo'laklash", 4: 'Moslashtirish', 5: 'Yozish', 6: 'Kviz', 7: 'Flashcard', 8: 'Tinglash', 9: "Diktant: so'z", 10: 'Diktant: gap' };
+const MODE_LABEL = { study: "O'rganish", quiz: 'Tezkor kviz', flashcards: 'Flashcard', review: 'Takrorlash', listening: 'Tinglab tushunish', dictation: 'Diktant' };
 
 if (!data || !data.words || !data.words.length) {
   setHTML('hero', emptyState({ iconName: 'activity', title: "Natija topilmadi", sub: "Mashg'ulotni yakunlaganingizdan keyin natijalar shu yerda ko'rinadi.", action: html`<a class="btn btn-primary" href="dashboard.html">Bosh sahifa</a>` }));
@@ -30,7 +30,7 @@ function render() {
 
   setHTML('hero', html`
     <span class="badge badge-primary">${ic('layers', 12)} ${MODE_LABEL[mode] || 'Mashg\'ulot'} · ${data.title || ''}</span>
-    <div class="score-ring mt-4">${ring(pct, { size: 140, stroke: 12, label: `${perfect}/${total}`, sub: 'xatosiz' })}</div>
+    <div class="score-ring mt-4">${ring(pct, { size: 140, stroke: 12, label: `${perfect}/${total}`, sub: mode === 'dictation' ? 'yordamsiz' : 'xatosiz' })}</div>
     <h1 class="page-title">${title}</h1>
     <p class="muted mt-1">${sub}</p>
     <div class="reward-row">
@@ -54,6 +54,7 @@ function render() {
   const q = data.src ? sourceQuery(data.src) : '';
   const retryHref = mode === 'review' ? 'review.html'
     : mode === 'quiz' ? `quick-quiz.html?${q}` : mode === 'listening' ? `quick-quiz.html?${q}&mode=listen`
+    : mode === 'dictation' ? `dictation.html?${q}`
     : mode === 'flashcards' ? `flashcards.html?${q}` : `study.html?${q}`;
   setHTML('actions', html`
     <a class="btn btn-lg" href="${retryHref}">${ic('rotate-ccw', 18)} Qayta</a>
@@ -80,7 +81,7 @@ function render() {
     const ok = !results[w.id].mistakes.length;
     return html`<div class="list-row"><span style="color:${ok ? 'var(--success-light)' : 'var(--danger-light)'}">${ic(ok ? 'circle-check' : 'x-circle', 20)}</span>
       <div class="list-main"><div class="list-title">${w.en}</div><div class="list-sub">${w.uz}</div></div>
-      <span class="badge ${ok ? 'badge-success' : 'badge-danger'}">${ok ? 'Xatosiz' : `${results[w.id].mistakes.length} xato`}</span></div>`;
+      <span class="badge ${ok ? 'badge-success' : 'badge-danger'}">${ok ? (mode === 'dictation' ? 'Yordamsiz' : 'Xatosiz') : `${results[w.id].mistakes.length} xato`}</span></div>`;
   })}</div>`);
 
   checkAchievements(res);

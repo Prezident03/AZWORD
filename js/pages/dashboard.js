@@ -181,7 +181,7 @@ $('#new-folder').onclick = newFolder;
 loadContent();
 
 /* ── So'nggi faollik ── */
-const MODE = { study: ["O'rganish", 'layers'], quiz: ['Tezkor kviz', 'zap'], flashcards: ['Flashcard', 'copy'], review: ['Takrorlash', 'repeat'], listening: ['Tinglash', 'headphones'] };
+const MODE = { study: ["O'rganish", 'layers'], quiz: ['Tezkor kviz', 'zap'], flashcards: ['Flashcard', 'copy'], review: ['Takrorlash', 'repeat'], listening: ['Tinglash', 'headphones'], dictation: ['Diktant', 'pen-line'] };
 async function renderRecent() {
   try {
     const logs = await recentLogs(user.uid, 6);

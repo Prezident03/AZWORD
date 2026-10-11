@@ -297,7 +297,8 @@ async function paletteItems() {
     { group: 'Amallar', title: "Yangi bo'lim yaratish", icon: 'folder-plus', href: 'folders.html?new=1' },
     { group: 'Amallar', title: 'Tezkor kviz', icon: 'zap', href: 'quick-quiz.html' },
     { group: 'Amallar', title: 'Flashcard takrorlash', icon: 'layers', href: 'flashcards.html' },
-    { group: 'Amallar', title: 'Tinglab tushunish', icon: 'headphones', href: 'quick-quiz.html?mode=listen' }
+    { group: 'Amallar', title: 'Tinglab tushunish', icon: 'headphones', href: 'quick-quiz.html?mode=listen' },
+    { group: 'Amallar', title: 'Diktant', icon: 'pen-line', href: 'dictation.html' }
   ];
   if (!paletteCache) {
     paletteCache = [];
