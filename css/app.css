@@ -709,18 +709,18 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
   .pg-home .topbar .topbar-search, .pg-home .topbar .stat-pill { background: rgba(255, 255, 255, 0.14); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
   .pg-home .topbar .topbar-search svg { color: #fff; }
   /* Bosh sahifa bo'limlari: gorizontal suriladigan qatorlar (karusel) */
-  .pg-home :is(#kpis, #books, #public, #mine) {
+  :is(.pg-home, .page:has(> .hero)) :is(#kpis, #books, #public, #mine) {
     display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory; scroll-padding-inline: 16px; -webkit-overflow-scrolling: touch;
     margin: 0 -16px; padding: 4px 16px 12px; scrollbar-width: none;
   }
-  .pg-home :is(#kpis, #books, #public, #mine)::-webkit-scrollbar { display: none; }
-  .pg-home :is(#kpis, #books, #public, #mine) > * { flex: 0 0 auto; scroll-snap-align: start; }
+  :is(.pg-home, .page:has(> .hero)) :is(#kpis, #books, #public, #mine)::-webkit-scrollbar { display: none; }
+  :is(.pg-home, .page:has(> .hero)) :is(#kpis, #books, #public, #mine) > * { flex: 0 0 auto; scroll-snap-align: start; }
   .pg-home #kpis > * { width: 180px; }
   .pg-home :is(#books, #public) > * { width: 148px; }
   .pg-home #mine > * { width: 236px; }
   /* Bo'sh yoki xato holat — butun en bo'ylab */
-  .pg-home :is(#kpis, #books, #public, #mine):has(.empty) { display: block; margin: 0; padding: 0; }
+  :is(.pg-home, .page:has(> .hero)) :is(#kpis, #books, #public, #mine):has(.empty) { display: block; margin: 0; padding: 0; }
   .pg-home :is(#books, #public, #mine):has(.empty) > * { width: auto; }
 }
 @media (max-width: 380px) { .hero-stat b { font-size: 1.3rem; } .hero-level-xp { display: none; } }
