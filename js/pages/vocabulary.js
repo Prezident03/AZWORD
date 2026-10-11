@@ -31,7 +31,7 @@ const match = {
 async function load() {
   setHTML('list', loadingBlock());
   try { all = await allWordStats(user.uid); }
-  catch (e) { errorState('list', load); return; }
+  catch (e) { errorState('list', load, e, e); return; }
   all.sort((a, b) => String(a.en).localeCompare(String(b.en)));
   const counts = Object.fromEntries(FILTERS.map(([k]) => [k, all.filter(match[k]).length]));
   setHTML('summary', raw([

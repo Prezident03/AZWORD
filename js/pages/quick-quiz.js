@@ -4,7 +4,7 @@ import { completeSession } from '../data.js';
 import { sourceFromParams, sourceHome, normalizeAnswer } from '../game.js';
 import { icon } from '../icons.js';
 import { $, html, raw, ic, setHTML, params, shuffle, confirmDialog, errorState, emptyState } from '../ui.js';
-import { playSound, speak, canSpeak, vibrate } from '../fx.js';
+import { playSound, speak, canSpeak, vibrate, preloadSpeech } from '../fx.js';
 import { resolveSource, loadSession, finishPayload, storeResult } from '../session.js';
 
 const P = params();
@@ -35,6 +35,7 @@ async function start() {
   }
   quiz = shuffle(pool).slice(0, Math.min(COUNT, pool.length));
   quiz.forEach(w => { results[w.id] = { mistakes: [] }; });
+  preloadSpeech(quiz.map(w => w.en));
   ask();
 }
 

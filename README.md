@@ -13,7 +13,7 @@ Ingliz tilidagi so'zlarni o'zbek tilida o'rganish uchun veb-ilova (PWA): kitobla
 | **Lug'atim** | Mashq qilingan barcha so'zlar: o'zlashtirilgan / qiyin / takrorlash kerak |
 | **O'yinlashtirish** | XP va darajalar, tanga, kunlik maqsad, streak (+ streak muzlatish), yutuqlar, haftalik reyting |
 | **Do'kon** | AI so'z generatori, streak muzlatish, nishon, avatar ramkasi, ilova rangi |
-| **AI** | Misol gap yozish, tarjima, diktant gaplarining so'zma-so'z tarjimasi, mavzu bo'yicha so'z generatsiyasi, AI yordamchi (chat) |
+| **AI** | Tabiiy ingliz talaffuzi (Groq Orpheus TTS, 6 ta ovoz, brauzer ovozi zaxira), misol gap yozish, tarjima, diktant gaplarining so'zma-so'z tarjimasi, mavzu bo'yicha so'z generatsiyasi, AI yordamchi (chat) |
 | **Admin panel** | Foydalanuvchilar (balans, bloklash), kitob/mavzu/so'z CRUD, Excel/Word import, AI generatsiya, e'lonlar, do'kon, yutuqlar, texnik ishlar rejimi, adminlar ro'yxati |
 | **PWA** | O'rnatish, oflayn ishlash (oxirgi ma'lumotlar keshda), oflayn natijalar keyin yuboriladi |
 
@@ -87,6 +87,7 @@ Statik sayt + `api/` funksiyalari. Environment Variables:
 |---|---|---|
 | `GROQ_API_KEY` | ha | Groq API kaliti (AI funksiyalari uchun) |
 | `AI_MODEL` | yo'q | standart `llama-3.3-70b-versatile` |
+| `TTS_MODEL` | yo'q | standart `canopylabs/orpheus-v1-english` (Groq hisobida model shartlarini bir marta qabul qilish kerak) |
 | `FIREBASE_API_KEY`, `FIREBASE_PROJECT_ID` | yo'q | standart qiymatlar `js/firebase.js` dagi bilan bir xil |
 
 ### 3. Firebase Authentication

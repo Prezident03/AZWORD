@@ -6,7 +6,7 @@ import { completeSession } from '../data.js';
 import { sourceFromParams, sourceHome } from '../game.js';
 import { icon } from '../icons.js';
 import { $, html, raw, ic, setHTML, params, shuffle, confirmDialog, errorState, emptyState } from '../ui.js';
-import { playSound, speak, canSpeak, vibrate } from '../fx.js';
+import { playSound, speak, canSpeak, vibrate, preloadSpeech } from '../fx.js';
 import { aiGloss } from '../ai.js';
 import { resolveSource, loadSession, finishPayload, storeResult } from '../session.js';
 
@@ -60,6 +60,7 @@ function show() {
   const chars = Array.from(step.text);
   cur = { step, chars, typable: chars.map(isTypable), filled: chars.map(() => null), pos: 0, wrongHere: 0, mistakes: 0, helped: false, done: false };
   skipFixed();
+  preloadSpeech(steps.slice(si, si + 3).map(x => x.text));
   const wordNo = words.indexOf(step.w) + 1;
   $('#bar').style.width = Math.round((si / steps.length) * 100) + '%';
   $('#meta-count').textContent = `${wordNo} / ${words.length}`;

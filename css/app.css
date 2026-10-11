@@ -69,6 +69,8 @@
   --sidebar-w: 256px;
   --topbar-h: 64px;
   --bottomnav-h: 64px;
+  --bottomnav-gap: 12px;   /* suzuvchi panel pastdan masofasi */
+  --bottomnav-space: calc(var(--bottomnav-h) + var(--bottomnav-gap) * 2 + var(--safe-b));
   --safe-b: env(safe-area-inset-bottom, 0px);
   --safe-t: env(safe-area-inset-top, 0px);
 
@@ -236,28 +238,57 @@ html.no-motion *, html.no-motion *::before, html.no-motion *::after { animation-
 /* Bottom nav (mobil) */
 .bottom-nav {
   display: none;
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
-  height: calc(var(--bottomnav-h) + var(--safe-b));
-  padding-bottom: var(--safe-b);
-  background: color-mix(in srgb, var(--bg-elev) 90%, transparent);
-  backdrop-filter: saturate(160%) blur(16px);
-  -webkit-backdrop-filter: saturate(160%) blur(16px);
-  border-top: 1px solid var(--border);
+  position: fixed; z-index: 60;
+  left: var(--bottomnav-gap); right: var(--bottomnav-gap);
+  bottom: calc(var(--bottomnav-gap) + var(--safe-b));
+  max-width: 520px; margin: 0 auto;
+  height: var(--bottomnav-h);
+  padding: 6px;
+  gap: 2px;
+  border-radius: 32px;
+  /* Liquid glass: shaffof qatlam + kuchli blur + yorug' qirralar */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 55%, rgba(255, 255, 255, 0.08) 100%),
+    color-mix(in srgb, var(--bg-elev) 52%, transparent);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.38),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+[data-theme="light"] .bottom-nav {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.55) 100%),
+    color-mix(in srgb, var(--bg-elev) 40%, transparent);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 32px rgba(40, 20, 90, 0.16), 0 2px 8px rgba(40, 20, 90, 0.08), inset 0 1px 0 #fff;
 }
 .bn-item {
-  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
-  color: var(--text-3); font-size: 0.68rem; font-weight: 600; text-decoration: none !important;
-  position: relative;
+  flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  color: var(--text-2); font-size: 0.66rem; font-weight: 600; text-decoration: none !important;
+  position: relative; border-radius: 26px;
+  transition: color var(--t-fast), background var(--t-base, 220ms) var(--ease), box-shadow var(--t-base, 220ms) var(--ease);
+  -webkit-tap-highlight-color: transparent;
 }
-.bn-item svg { width: 22px; height: 22px; transition: transform var(--t-fast) var(--ease); }
-.bn-item.active { color: var(--primary-light); }
-.bn-item.active::before { content: ''; position: absolute; top: 0; width: 28px; height: 3px; border-radius: 0 0 3px 3px; background: var(--primary); }
-.bn-item:active svg { transform: scale(0.88); }
+.bn-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.bn-item svg { width: 22px; height: 22px; transition: transform 260ms cubic-bezier(.34, 1.56, .64, 1); }
+.bn-item.active {
+  color: var(--primary-light);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 14px color-mix(in srgb, var(--primary) 30%, transparent);
+}
+.bn-item.active svg { transform: translateY(-1px) scale(1.08); }
+[data-theme="light"] .bn-item { color: var(--text-2); }
+[data-theme="light"] .bn-item.active { color: var(--primary); background: linear-gradient(180deg, #fff, color-mix(in srgb, var(--primary) 10%, #fff)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 18%, transparent), 0 4px 14px color-mix(in srgb, var(--primary) 22%, transparent); }
+.bn-item:active svg { transform: scale(0.86); }
 
 @media (max-width: 960px) {
   .sidebar { display: none; }
   .bottom-nav { display: flex; }
-  .app-main { padding-bottom: calc(var(--bottomnav-h) + var(--safe-b)); }
+  .app-main { padding-bottom: var(--bottomnav-space); }
   .topbar { padding: 0 16px; padding-top: var(--safe-t); height: calc(var(--topbar-h) + var(--safe-t)); }
   .topbar-search { min-width: 0; width: 38px; padding: 0; justify-content: center; }
   .topbar-search span, .topbar-search kbd { display: none; }
@@ -417,6 +448,8 @@ html.no-motion *, html.no-motion *::before, html.no-motion *::after { animation-
 .setting-row:last-child { border-bottom: 0; padding-bottom: 0; }
 .setting-row:first-child { padding-top: 0; }
 .setting-info { min-width: 0; }
+.setting-row > .tabs, .setting-row > .select, .setting-row > .btn, .setting-row > .switch { flex-shrink: 0; }
+@media (max-width: 560px) { .setting-row:has(> .tabs) { flex-wrap: wrap; } }
 .setting-name { font-weight: 600; }
 .setting-desc { font-size: 0.82rem; color: var(--text-3); margin-top: 2px; }
 
@@ -555,7 +588,7 @@ kbd { display: inline-flex; align-items: center; justify-content: center; min-wi
 
 /* Toast */
 .toast-stack { position: fixed; z-index: 1100; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px); }
-@media (max-width: 960px) { .toast-stack { bottom: calc(var(--bottomnav-h) + var(--safe-b) + 16px); } }
+@media (max-width: 960px) { .toast-stack { bottom: calc(var(--bottomnav-space) + 8px); } }
 .toast { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--border-strong); box-shadow: var(--shadow-md); font-size: 0.9rem; font-weight: 500; pointer-events: auto; animation: toastIn 260ms var(--ease-out); }
 .toast.leaving { animation: toastOut 200ms var(--ease) forwards; }
 .toast svg { width: 18px; height: 18px; flex-shrink: 0; }
@@ -635,7 +668,62 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
 .week-dot.done i::after { content: ''; width: 10px; height: 6px; border-left: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg) translate(1px, -1px); }
 .week-dot.today { color: var(--text); }
 .week-dot.today i { outline: 2px solid var(--primary-light); outline-offset: 2px; }
-@media (max-width: 960px) { .hero { grid-template-columns: 1fr; } .hero-name { font-size: 1.6rem; } .hero-main { padding: 22px; } }
+/* Hero: daraja belgisi va shisha ko'rsatkichlar paneli */
+.hero-main::before, .hero-main::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; filter: blur(40px); opacity: 0.55; }
+.hero-main::before { width: 220px; height: 220px; right: -60px; top: -80px; background: color-mix(in srgb, var(--primary) 70%, #ec4899); }
+.hero-main::after { width: 180px; height: 180px; left: -70px; bottom: -90px; background: color-mix(in srgb, var(--primary) 60%, #60a5fa); opacity: 0.35; }
+.hero-main > * { position: relative; z-index: 1; }
+#announce:empty { display: none; }
+.hero-level { position: absolute !important; top: 20px; right: 20px; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; color: #fff; text-decoration: none !important; background: rgba(255, 255, 255, 0.14); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.hero-level svg { width: 15px; height: 15px; color: #fde68a; }
+.hero-level-xp { font-weight: 500; opacity: 0.75; font-size: 0.74rem; }
+.hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 20px; border-radius: 22px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.18); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22); max-width: 520px; }
+.hero-stat { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 14px 6px; color: #fff; text-decoration: none !important; text-align: center; border-radius: 22px; transition: background var(--t-fast); }
+.hero-stat:hover { background: rgba(255, 255, 255, 0.06); }
+.hero-stat + .hero-stat::before { content: ''; position: absolute; left: 0; top: 24%; bottom: 24%; width: 1px; background: rgba(255, 255, 255, 0.2); }
+.hero-stat b { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-display); font-size: 1.55rem; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.hero-stat b small { font-size: 0.95rem; font-weight: 600; opacity: 0.7; }
+.hero-stat b svg { width: 18px; height: 18px; color: rgba(255, 255, 255, 0.55); }
+.hero-stat b.lit svg { color: #fdba74; filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.7)); }
+.hero-stat span { font-size: 0.74rem; color: rgba(255, 255, 255, 0.72); }
+@media (max-width: 960px) {
+  .hero { grid-template-columns: 1fr; }
+  /* Mobil: hero ekran enini to'liq egallaydi, pastki burchaklari yumaloq */
+  .hero-main {
+    margin: -18px -16px 0; padding: 24px 20px 22px; border: 0; border-radius: 0 0 32px 32px;
+    background:
+      radial-gradient(420px 220px at 100% 0%, rgba(255, 255, 255, 0.16), transparent 70%),
+      linear-gradient(165deg, color-mix(in srgb, var(--primary) 78%, #1e1b4b) 0%, var(--primary) 52%, color-mix(in srgb, var(--primary) 55%, #db2777) 100%);
+    box-shadow: 0 18px 40px color-mix(in srgb, var(--primary) 28%, transparent);
+  }
+  .hero-name { font-size: 2rem; }
+  .hero-level { top: 18px; right: 16px; }
+  .hero-stats { max-width: none; }
+  .hero-actions { margin-top: 18px; }
+  .hero-actions .btn { flex: 1 1 auto; }
+  .hero-actions .btn-gradient { background: #fff; color: var(--primary); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18); }
+  .hero-actions .btn-gradient svg { color: var(--primary); }
+  .hero-actions .btn-gradient:hover { background: #fff; filter: none; }
+  /* Bosh sahifa: yuqori panel hero bilan bir rangda — yaxlit sarlavha */
+  .pg-home .topbar { background: color-mix(in srgb, var(--primary) 78%, #1e1b4b); border-bottom-color: transparent; color: #fff; }
+  .pg-home .topbar .topbar-search, .pg-home .topbar .stat-pill { background: rgba(255, 255, 255, 0.14); border-color: rgba(255, 255, 255, 0.2); color: #fff; }
+  .pg-home .topbar .topbar-search svg { color: #fff; }
+  /* Bosh sahifa bo'limlari: gorizontal suriladigan qatorlar (karusel) */
+  .pg-home :is(#kpis, #books, #public, #mine) {
+    display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; scroll-padding-inline: 16px; -webkit-overflow-scrolling: touch;
+    margin: 0 -16px; padding: 4px 16px 12px; scrollbar-width: none;
+  }
+  .pg-home :is(#kpis, #books, #public, #mine)::-webkit-scrollbar { display: none; }
+  .pg-home :is(#kpis, #books, #public, #mine) > * { flex: 0 0 auto; scroll-snap-align: start; }
+  .pg-home #kpis > * { width: 180px; }
+  .pg-home :is(#books, #public) > * { width: 148px; }
+  .pg-home #mine > * { width: 236px; }
+  /* Bo'sh yoki xato holat — butun en bo'ylab */
+  .pg-home :is(#kpis, #books, #public, #mine):has(.empty) { display: block; margin: 0; padding: 0; }
+  .pg-home :is(#books, #public, #mine):has(.empty) > * { width: auto; }
+}
+@media (max-width: 380px) { .hero-stat b { font-size: 1.3rem; } .hero-level-xp { display: none; } }
 
 /* Books */
 .book-card { display: flex; flex-direction: column; gap: 10px; }
@@ -837,7 +925,7 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
 
 /* Chat (AI assistant) */
 .chat { display: flex; flex-direction: column; height: calc(100dvh - var(--topbar-h) - 48px); min-height: 420px; }
-@media (max-width: 960px) { .chat { height: calc(100dvh - var(--topbar-h) - var(--bottomnav-h) - 52px - var(--safe-b)); min-height: 360px; } }
+@media (max-width: 960px) { .chat { height: calc(100dvh - var(--topbar-h) - var(--bottomnav-space) - 52px); min-height: 360px; } }
 .chat-log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 4px 2px 12px; }
 .msg { max-width: 84%; padding: 11px 15px; border-radius: 18px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; font-size: 0.94rem; }
 .msg.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 6px; }

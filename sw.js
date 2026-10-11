@@ -26,7 +26,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    const old = keys.filter((k) => k !== VERSION);
+    const old = keys.filter((k) => k !== VERSION && !k.startsWith('az-tts'));
     await Promise.all(old.map((k) => caches.delete(k)));
     await self.clients.claim();
     /* Eski versiya (azword-shell-*) keshidan ochilgan sahifalarni yangi kod bilan qayta yuklash */

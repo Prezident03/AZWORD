@@ -3,7 +3,7 @@ import { updateProfileDoc, allWordStats, listProgress, recentLogs } from '../dat
 import { dailyGoal } from '../game.js';
 import { $, html, raw, ic, setHTML, toast, toastError, confirmDialog } from '../ui.js';
 import { getPrefs, setPrefs } from '../prefs.js';
-import { speak, canSpeak, playSound } from '../fx.js';
+import { speak, canSpeak, playSound, TTS_VOICES, resetSpeech } from '../fx.js';
 
 const ctx = await initPage({ title: 'Sozlamalar', active: 'settings' });
 const { user } = ctx;
@@ -27,9 +27,13 @@ setHTML('groups', html`
   ${group('volume', 'Ovoz va talaffuz', html`
     ${row('Ovoz effektlari', "To'g'ri/noto'g'ri javob ovozlari", sw('sound', p.sound))}
     ${row('Avtomatik talaffuz', "Yangi so'z ko'rsatilganda o'qib beradi", sw('autoSpeak', p.autoSpeak))}
+    ${row('Ovoz turi', "Tabiiy AI ovoz — haqiqiy odamdek, ona tilida so'zlashuvchi talaffuzi (internet kerak)", html`<div class="tabs" id="engine">
+      <button class="tab ${p.voiceEngine !== 'browser' ? 'active' : ''}" data-v="ai">${ic('sparkles', 15)} Tabiiy</button>
+      <button class="tab ${p.voiceEngine === 'browser' ? 'active' : ''}" data-v="browser">${ic('smartphone', 15)} Brauzer</button></div>`)}
+    ${row('Ovoz', 'Amerika talaffuzi', html`<select class="select" id="voice" style="width:auto">${TTS_VOICES.map(v => opt(v.id, `${v.name} (${v.desc})`, p.voice))}</select>`)}
     ${row('Talaffuz', 'Britaniya yoki Amerika talaffuzi', html`<select class="select" id="accent" style="width:auto">${opt('en-GB', 'Britaniya (UK)', p.accent)}${opt('en-US', 'Amerika (US)', p.accent)}</select>`)}
     ${row("O'qish tezligi", '', html`<select class="select" id="rate" style="width:auto">${opt(0.7, 'Sekin', p.voiceRate)}${opt(0.9, "O'rtacha", p.voiceRate)}${opt(1.05, 'Tez', p.voiceRate)}</select>`)}
-    ${canSpeak() ? row('Sinab ko\'rish', '', html`<button class="btn btn-sm" id="test-voice">${ic('volume', 15)} "Hello, world"</button>`) : row("Talaffuz mavjud emas", "Brauzeringiz ovozli o'qishni qo'llab-quvvatlamaydi", '')}
+    ${canSpeak() ? row('Sinab ko\'rish', '', html`<button class="btn btn-sm" id="test-voice">${ic('volume', 15)} Tinglash</button>`) : row("Talaffuz mavjud emas", "Brauzeringiz ovozli o'qishni qo'llab-quvvatlamaydi", '')}
   `)}
   ${group('target', "O'rganish", html`
     ${row('Kunlik maqsad', "Har kuni o'rganiladigan so'zlar soni", html`<select class="select" id="goal" style="width:auto">${[10, 20, 30, 50, 100].map(v => opt(v, `${v} ta so'z`, goal))}</select>`)}
@@ -47,6 +51,11 @@ setHTML('groups', html`
   <p class="xs dim center">AzWord · Ingliz so'zlarini o'rganish platformasi</p>
 `);
 
+$('#voice').closest('.setting-row').id = 'ai-voice-row';
+$('#accent').closest('.setting-row').id = 'accent-row';
+$('#ai-voice-row').hidden = p.voiceEngine === 'browser';
+$('#accent-row').hidden = p.voiceEngine !== 'browser';
+
 const save = (patch, msg = 'Saqlandi') => { setPrefs(patch); toast(msg, 'success', 1600); };
 document.querySelectorAll('#theme .tab').forEach(b => b.onclick = () => {
   document.querySelectorAll('#theme .tab').forEach(x => x.classList.toggle('active', x === b));
@@ -56,7 +65,18 @@ document.querySelectorAll('#theme .tab').forEach(b => b.onclick = () => {
 $('#accent').onchange = (e) => save({ accent: e.target.value });
 $('#rate').onchange = (e) => save({ voiceRate: Number(e.target.value) });
 $('#size').onchange = (e) => save({ sessionSize: Number(e.target.value) });
-const tv = $('#test-voice'); if (tv) tv.onclick = () => speak('Hello, world');
+const SAMPLE = 'Hello! Nice to meet you. Learning new words every day is easy.';
+const tv = $('#test-voice'); if (tv) tv.onclick = () => speak(SAMPLE);
+document.querySelectorAll('#engine .tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#engine .tab').forEach(x => x.classList.toggle('active', x === b));
+  const ai = b.dataset.v === 'ai';
+  $('#ai-voice-row').hidden = !ai;
+  $('#accent-row').hidden = ai;
+  if (ai) resetSpeech();
+  save({ voiceEngine: b.dataset.v });
+  speak(SAMPLE);
+});
+$('#voice').onchange = (e) => { save({ voice: e.target.value }); speak(SAMPLE); };
 
 $('#goal').onchange = async (e) => {
   const v = Number(e.target.value);

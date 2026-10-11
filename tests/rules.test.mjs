@@ -249,3 +249,21 @@ test('eski bo\'lim (isAdmin maydonisiz) hisoblagichini yangilash', async () => {
   });
   await assertSucceeds(updateDoc(doc(alice(), 'folders/oldf'), { wordCount: 2 }));
 });
+
+/* Eski hisoblar: son maydonlari null yoki matn bo'lib qolgan */
+test('eski hisob (null/matn qiymatlar) natijani va reytingni saqlay oladi', async () => {
+  await env.withSecurityRulesDisabled(async (c) => {
+    await setDoc(doc(c.firestore(), 'users/carol'), {
+      uid: 'carol', email: 'carol@x.com', displayName: 'Carol', stars: null, coins: '7', weeklyStars: null, weekKey: null,
+      streakDays: null, longestStreak: '3', streakFreezes: null, totalWordsLearned: '40', ownedItems: null, equippedItems: { badge: 'gone' }
+    });
+  });
+  const db = env.authenticatedContext('carol', { email: 'carol@x.com' }).firestore();
+  await assertSucceeds(updateDoc(doc(db, 'users/carol'), {
+    streakDays: 1, longestStreak: 1, lastStudyDate: '2026-10-09', todayDate: '2026-10-09', todayWordsLearned: 6,
+    totalWordsLearned: 6, totalPerfectWords: 6, studyTimeMinutes: 3, sessionsCount: 1, weekKey: '2026-W41', weeklyStars: 0
+  }));
+  await assertSucceeds(setDoc(doc(db, 'leaderboard/carol'), { displayName: 'Carol', photoThumb: '', stars: 0, weeklyStars: 0, weekKey: '2026-W41', equipped: {}, updatedAt: serverTimestamp() }));
+  /* Son maydoniga matn yozib aldash mumkin emas */
+  await assertFails(updateDoc(doc(db, 'users/carol'), { stars: '999999', sessionsCount: 1 }));
+});

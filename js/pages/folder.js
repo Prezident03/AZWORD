@@ -66,7 +66,7 @@ async function loadTopicsMode() {
 
 /* ── So'zlar rejimi ── */
 async function loadWordsMode() {
-  try { words = await listWords(src); } catch (e) { errorState('list', loadWordsMode); return; }
+  try { words = await listWords(src); } catch (e) { errorState('list', loadWordsMode, e, e); return; }
   let prog = null;
   try { prog = (await listProgress(user.uid))[`folder_${folderId}__`] || null; } catch (e) { /* ignore */ }
   renderHead({ prog });

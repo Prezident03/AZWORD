@@ -14,7 +14,7 @@ let tab = 'all';
 async function load() {
   setHTML('grid', skeletonCards(6));
   try { all = await listAchievements(); }
-  catch (e) { errorState('grid', load); return; }
+  catch (e) { errorState('grid', load, e, e); return; }
   const ready = all.filter(a => !(u.achievements || []).includes(a.id) && achievementReady(a, u));
   if (ready.length) {
     const got = await claimAchievements(user.uid, ready);

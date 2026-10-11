@@ -52,7 +52,7 @@ async function load() {
 }
 
 async function loadMine() {
-  try { mine = await listMyFolders(user.uid); } catch (e) { errorState('mine', loadMine); return; }
+  try { mine = await listMyFolders(user.uid); } catch (e) { errorState('mine', loadMine, e, e); return; }
   const box = $('#mine');
   if (!mine.length) {
     setHTML(box, html`<div class="card" style="grid-column:1/-1">${emptyState({

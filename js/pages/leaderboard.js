@@ -32,7 +32,7 @@ async function load() {
   try {
     if (!shop.length) shop = await listShop().catch(() => []);
     rows = tab === 'weekly' ? await weeklyLeaders(weekKey()) : await allTimeLeaders(100);
-  } catch (e) { errorState('list', load); return; }
+  } catch (e) { errorState('list', load, e); return; }
   const score = (r) => (tab === 'weekly' ? r.weeklyStars : r.stars) || 0;
   const myScore = tab === 'weekly' ? weeklyStars(u) : (u.stars || 0);
   const myIdx = rows.findIndex(r => r.id === user.uid);

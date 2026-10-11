@@ -91,7 +91,9 @@ export function confetti({ count = 110, x = innerWidth / 2, y = innerHeight * 0.
   if (!raf) raf = requestAnimationFrame(loop);
 }
 
-/* ── Talaffuz (Text-to-Speech) ──────────────────────────── */
+/* ── Talaffuz ──────────────────────────────────────────────
+   1) Tabiiy AI ovoz (Groq Orpheus, /api/ai tts) — qurilmada keshlanadi.
+   2) Ishlamasa — brauzerning o'z ovozi (SpeechSynthesis). */
 let voices = [];
 function loadVoices() { voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
 if (window.speechSynthesis) {
@@ -104,16 +106,162 @@ function pickVoice(lang) {
     || voices.find(v => v.lang === lang)
     || voices.find(v => v.lang && v.lang.startsWith('en'));
 }
-export const canSpeak = () => 'speechSynthesis' in window;
-export function speak(text, { rate, onend } = {}) {
-  if (!canSpeak() || !text) { onend && onend(); return; }
+export const TTS_VOICES = [
+  { id: 'troy', name: 'Troy', desc: 'erkak' },
+  { id: 'austin', name: 'Austin', desc: 'erkak' },
+  { id: 'daniel', name: 'Daniel', desc: 'erkak' },
+  { id: 'hannah', name: 'Hannah', desc: 'ayol' },
+  { id: 'autumn', name: 'Autumn', desc: 'ayol' },
+  { id: 'diana', name: 'Diana', desc: 'ayol' }
+];
+const TTS_MAX = 200;
+const CACHE_NAME = 'az-tts-v1';
+const mem = new Map();      // kalit → Promise<Blob|null>
+let seq = 0;
+/* Bitta audio element: iOS Safari'da birinchi teginishda "ochiladi", keyin async ijro ham ishlaydi */
+let el = null, unlocked = false;
+const SILENT = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+function audioEl() {
+  if (!el && typeof Audio !== 'undefined') { el = new Audio(); el.preload = 'auto'; }
+  return el;
+}
+function unlock() {
+  if (unlocked) return;
+  const a = audioEl();
+  if (!a) return;
+  unlocked = true;
+  if (!a.src) { a.src = SILENT; a.play().catch(() => {}); }
+  removeEventListener('pointerdown', unlock, true);
+  removeEventListener('keydown', unlock, true);
+}
+addEventListener('pointerdown', unlock, true);
+addEventListener('keydown', unlock, true);
+let curUrl = null;
+let aiDown = false;
+try { aiDown = sessionStorage.getItem('az:tts-down') === '1'; } catch (e) { /* ignore */ }
+
+const useAI = (p) => p.voiceEngine !== 'browser' && !aiDown && typeof Audio !== 'undefined';
+const ttsKey = (text, voice) => `https://tts.azword/${voice}/${encodeURIComponent(text)}`;
+const clean = (t) => String(t || '').replace(/\s+/g, ' ').trim();
+
+/* Bir vaqtda ko'pi bilan 4 ta so'rov — qolganlari navbatda */
+let active = 0;
+const queue = [];
+function limited(key, fn) {
+  return new Promise((resolve, reject) => {
+    const run = () => { active++; fn().then(resolve, reject).finally(() => { active--; if (queue.length) queue.shift().run(); }); };
+    if (active < 4) run(); else queue.push({ key, run });
+  });
+}
+/* Hozir eshitilishi kerak bo'lgan matn navbat boshiga o'tadi */
+function bump(key) {
+  const i = queue.findIndex(q => q.key === key);
+  if (i > 0) queue.unshift(queue.splice(i, 1)[0]);
+}
+
+async function fetchSpeech(text, voice, urgent = false) {
+  const key = ttsKey(text, voice);
+  if (mem.has(key)) { if (urgent) bump(key); return mem.get(key); }
+  const job = (async () => {
+    let cache = null;
+    try { cache = 'caches' in window ? await caches.open(CACHE_NAME) : null; } catch (e) { cache = null; }
+    if (cache) { const hit = await cache.match(key).catch(() => null); if (hit) return hit.blob(); }
+    const { auth } = await import('./firebase.js');
+    const user = auth.currentUser;
+    if (!user) return null;
+    if (aiDown) return null;
+    const token = await user.getIdToken();
+    if (urgent) bump(key);
+    const res = await limited(key, () => fetch('/api/ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ task: 'tts', text, voice })
+    }));
+    if (!res.ok || !/audio/.test(res.headers.get('Content-Type') || '')) {
+      let code = '';
+      try { code = (await res.json()).code || ''; } catch (e) { /* ignore */ }
+      /* Sozlash xatosi bo'lsa bu sessiyada qayta urinmaymiz — darhol brauzer ovozi */
+      if (res.status !== 429 && code !== 'rate-limited' && code !== 'upstream-limit') {
+        aiDown = true;
+        try { sessionStorage.setItem('az:tts-down', '1'); } catch (e) { /* ignore */ }
+      }
+      return null;
+    }
+    const blob = await res.blob();
+    if (cache) cache.put(key, new Response(blob, { headers: { 'Content-Type': 'audio/wav' } })).then(() => { if (Math.random() < 0.05) pruneCache(cache); }).catch(() => {});
+    return blob;
+  })().catch(() => null);
+  mem.set(key, job);
+  job.then(b => { if (!b) mem.delete(key); });
+  if (mem.size > 150) mem.delete(mem.keys().next().value);
+  return job;
+}
+
+/* Qurilmadagi ovoz keshi cheksiz o'smasin: eng eskilari o'chiriladi */
+async function pruneCache(cache) {
+  const keys = await cache.keys();
+  const extra = keys.length - 500;
+  for (let i = 0; i < extra; i++) await cache.delete(keys[i]);
+}
+
+/* Keyingi so'z/gapni oldindan yuklab qo'yish (kutish bo'lmasin) */
+export function preloadSpeech(texts) {
+  const p = getPrefs();
+  if (!useAI(p)) return;
+  for (const t of [].concat(texts)) {
+    const c = clean(t);
+    if (c && c.length <= TTS_MAX) fetchSpeech(c, p.voice || 'troy');
+  }
+}
+
+export function resetSpeech() {
+  aiDown = false;
+  try { sessionStorage.removeItem('az:tts-down'); } catch (e) { /* ignore */ }
+}
+
+export const canSpeak = () => 'speechSynthesis' in window || typeof Audio !== 'undefined';
+
+export function stopSpeaking() {
+  seq++;
+  if (el && !el.paused) { try { el.pause(); } catch (e) { /* ignore */ } }
+  if (window.speechSynthesis) speechSynthesis.cancel();
+}
+
+function browserSpeak(text, rate, onend) {
+  if (!window.speechSynthesis) { onend && onend(); return; }
   const p = getPrefs();
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(String(text));
+  const u = new SpeechSynthesisUtterance(text);
   u.lang = p.accent;
   u.rate = rate || p.voiceRate || 0.9;
   const v = pickVoice(p.accent);
   if (v) u.voice = v;
   if (onend) { u.onend = onend; u.onerror = onend; }
   speechSynthesis.speak(u);
+}
+
+export function speak(text, { rate, onend, engine } = {}) {
+  const t = clean(text);
+  stopSpeaking();
+  if (!t) { onend && onend(); return; }
+  const p = getPrefs();
+  const r = rate || p.voiceRate || 0.9;
+  if (engine === 'browser' || !useAI(p) || t.length > TTS_MAX) return browserSpeak(t, r, onend);
+  const my = seq;
+  /* AI ovoz 4 soniyada kelmasa — kutib o'tirmasdan brauzer ovozi */
+  const timeout = new Promise(res => setTimeout(() => res(null), 4000));
+  Promise.race([fetchSpeech(t, p.voice || 'troy', true), timeout]).then((blob) => {
+    if (my !== seq) return;
+    if (!blob) return browserSpeak(t, r, onend);
+    const a = audioEl();
+    if (curUrl) URL.revokeObjectURL(curUrl);
+    curUrl = URL.createObjectURL(blob);
+    a.onended = () => { if (my === seq) onend && onend(); };
+    a.onerror = () => { if (my === seq) browserSpeak(t, r, onend); };
+    a.src = curUrl;
+    /* Tezlik: 0.9 — tabiiy; sekin rejim 0.55 → ~0.6x (ohang o'zgarmaydi) */
+    a.defaultPlaybackRate = a.playbackRate = Math.max(0.6, Math.min(1.25, r / 0.9));
+    a.preservesPitch = true;
+    a.play().catch(() => { if (my === seq) browserSpeak(t, r, onend); });
+  });
 }

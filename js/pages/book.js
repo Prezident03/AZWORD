@@ -14,7 +14,7 @@ async function load() {
   let book, topics, progress;
   try {
     [book, topics, progress] = await Promise.all([getBook(bookId), listTopics('book', bookId), listProgress(user.uid).catch(() => ({}))]);
-  } catch (e) { errorState('topics', load); setHTML('head', ''); return; }
+  } catch (e) { errorState('topics', load, e); setHTML('head', ''); return; }
   if (!book) {
     setHTML('head', '');
     setHTML('topics', html`<div class="card" style="grid-column:1/-1">${emptyState({ iconName: 'book', title: 'Kitob topilmadi', sub: "Kitob o'chirilgan yoki havola noto'g'ri.", action: html`<a class="btn" href="folders.html">Kitoblarga qaytish</a>` })}</div>`);
