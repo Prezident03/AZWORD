@@ -1,0 +1,6 @@
+{
+  "name": "azword",
+  "private": true,
+  "type": "module",
+  "description": "AzWord — statik sayt (build yo'q) va Vercel serverless funksiya (api/ai.js, ESM)"
+}
