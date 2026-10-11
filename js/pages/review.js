@@ -17,7 +17,7 @@ let startedAt = 0;
 async function load() {
   setHTML('content', loadingBlock());
   try { items = await loadReview(user.uid, 30); preloadSpeech(items.map(w => w.en)); }
-  catch (e) { errorState('content', load); return; }
+  catch (e) { errorState('content', load, e, e); return; }
   if (!items.length) return renderEmpty();
   renderIntro();
 }

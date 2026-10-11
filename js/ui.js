@@ -170,6 +170,14 @@ export function errorState(container, onRetry, message) {
   const el = typeof container === 'string' ? document.getElementById(container) : container;
   if (!el) return;
   const offline = navigator.onLine === false;
+  /* Xato obyekti berilsa — sababini tushunarli qilib aytamiz */
+  if (message && typeof message === 'object') {
+    const code = message.code || '';
+    message = code === 'permission-denied'
+      ? "Serverda ruxsat yo'q — Firebase'dagi xavfsizlik qoidalari yangilanmagan bo'lishi mumkin (admin xabardor qilinsin)."
+      : code === 'resource-exhausted' ? 'Firebase kunlik limiti tugadi. Keyinroq urinib ko\'ring.'
+      : '';
+  }
   setHTML(el, html`<div class="empty">
     <div class="empty-icon" style="background:var(--danger-soft);color:var(--danger-light)">${ic(offline ? 'wifi-off' : 'alert-triangle', 30)}</div>
     <div class="empty-title">${offline ? "Internet aloqasi yo'q" : "Ma'lumotni yuklab bo'lmadi"}</div>

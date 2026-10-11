@@ -14,6 +14,7 @@ import {
 } from '../widgets.js';
 
 const ctx = await initPage({ title: 'Bosh sahifa', active: 'dashboard' });
+document.body.classList.add('pg-home');
 const { user } = ctx;
 let u = ctx.u;
 
@@ -36,6 +37,21 @@ const done = todayWords(u);
 $('#hero-sub').textContent = st.doneToday
   ? (done >= goal ? "Bugungi maqsad bajarildi — ajoyib! Xohlasangiz takrorlashni davom ettiring." : `Bugun ${done} ta so'z o'rgandingiz. Maqsadgacha ${goal - done} ta qoldi.`)
   : st.atRisk ? `${st.current} kunlik streak'ingiz xavf ostida — bugun kamida bitta mashg'ulot qiling.` : "Bugungi mashg'ulotni boshlashga tayyormisiz?";
+
+/* Hero ichidagi asosiy ko'rsatkichlar (shisha panel) */
+function renderHeroStats() {
+  const s = streakState(u);
+  const d = todayWords(u), g = dailyGoal(u);
+  const lv = levelInfo(u.stars);
+  setHTML('hero-level', html`${ic('award', 15)} ${lv.level}-daraja <span class="hero-level-xp">${lv.xp}/${lv.need} XP</span>`);
+  setHTML('hero-stats', html`
+    <a class="hero-stat" href="vocabulary.html"><b data-v="${Number(u.wordsMastered) || 0}">0</b><span>o'zlashtirilgan so'z</span></a>
+    <a class="hero-stat" href="settings.html"><b>${Math.min(d, 9999)}<small> / ${g}</small></b><span>bugun</span></a>
+    <a class="hero-stat" href="streak.html"><b class="${s.doneToday ? 'lit' : ''}">${ic('flame', 18)}${s.current}</b><span>kunlik streak</span></a>`);
+  const el = $('#hero-stats b[data-v]');
+  if (el) countUp(el, Number(el.dataset.v));
+}
+renderHeroStats();
 
 const last = getLast();
 const due = await countDue(user.uid);
@@ -142,7 +158,7 @@ async function loadContent() {
 let myFolders = [];
 async function loadMine() {
   try { myFolders = await listMyFolders(user.uid); }
-  catch (e) { errorState('mine', loadMine); return; }
+  catch (e) { errorState('mine', loadMine, e, e); return; }
   const box = $('#mine');
   if (!myFolders.length) {
     setHTML(box, html`<div class="card" style="grid-column:1/-1">${emptyState({
@@ -200,6 +216,6 @@ async function renderRecent() {
         <span class="badge ${tone}">${l.accuracy || 0}%</span>
       </div>`.value;
     }).join('') + '</div>'));
-  } catch (e) { errorState('recent', renderRecent); }
+  } catch (e) { errorState('recent', renderRecent, e); }
 }
 renderRecent();

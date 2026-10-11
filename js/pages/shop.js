@@ -44,7 +44,7 @@ async function load() {
   renderSpecials();
   setHTML('grid', skeletonCards(6));
   try { items = await listShop(); }
-  catch (e) { errorState('grid', load); return; }
+  catch (e) { errorState('grid', load, e, e); return; }
   items = items.filter(it => !SPECIAL_ITEMS[it.id]);
   renderTabs();
   renderGrid();
