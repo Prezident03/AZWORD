@@ -119,7 +119,7 @@ export async function initPage({ title = '', active = '', admin = false, shell =
   /* Fon vazifalari */
   if (u) {
     touchLastSeen(user.uid);
-    flushPending(user.uid).then(() => {});
+    flushPending(user.uid).then((n) => { if (n) toast(`${n} ta saqlanmagan natija serverga yuborildi`); }).catch(() => {});
     if (!sessionStorage.getItem('az:lb-sync')) {
       sessionStorage.setItem('az:lb-sync', '1');
       (async () => {

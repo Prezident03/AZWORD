@@ -8,8 +8,7 @@ import {
 } from '../data.js';
 import {
   counts, listUsers, adminUpdateUser, saveContainer, saveTopic, recount, listCol, saveDoc, removeDoc,
-  saveSettings, readSettings, serverTimestamp, migrateUsers, leaderboardCount
-} from '../admin-data.js';
+  saveSettings, readSettings, serverTimestamp, migrateUsers, leaderboardCount, checkRules } from '../admin-data.js';
 import { ACH_TYPES, levelInfo, streakState } from '../game.js';
 import { icon, iconName, PICKER_ICONS } from '../icons.js';
 import {
@@ -44,6 +43,19 @@ function route() {
   handlers[sec]().catch(e => { console.error(e); errorState(view, route, e.code === 'permission-denied' ? "Ruxsat yo'q" : e.message); });
 }
 addEventListener('hashchange', route);
+
+/* Firebase'dagi qoidalar eskirgan bo'lsa — mashg'ulot natijalari saqlanmaydi. Darhol ogohlantiramiz. */
+(async () => {
+  const uid = (await import('../firebase.js')).auth.currentUser?.uid;
+  if (!uid) return;
+  const failed = await checkRules(uid).catch(() => []);
+  if (!failed.length) return;
+  const box = document.createElement('div');
+  box.className = 'alert alert-danger mb-4';
+  setHTML(box, html`${ic('alert-triangle', 20)}<div><b>Firebase'dagi xavfsizlik qoidalari eskirgan!</b> Foydalanuvchilar natijalari saqlanmaydi (ruxsat yo'q: ${failed.join(', ')}).
+    <div class="mt-1">Firebase Console → Firestore Database → <b>Rules</b> bo'limiga repodagi <code>firestore.rules</code> faylining to'liq matnini qo'yib, <b>Publish</b> bosing.</div></div>`);
+  view.before(box);
+})();
 
 /* ── Umumiy forma oynasi ────────────────────────────────── */
 function fieldHtml(f) {

@@ -51,8 +51,9 @@ export function weekRange(d = new Date()) {
    Bitta kun o'tkazib yuborilgan va "streak muzlatish" bo'lsa — hali tiklash mumkin. */
 export function streakState(u = {}, today = dateKey()) {
   const last = u.lastStudyDate || null;
-  const days = Number(u.streakDays) || 0;
-  const freezes = Number(u.streakFreezes) || 0;
+  const num = (v) => (typeof v === 'number' && isFinite(v) ? v : 0); // firestore.rules bilan mos
+  const days = num(u.streakDays);
+  const freezes = num(u.streakFreezes);
   if (!last || !days) return { current: 0, doneToday: false, atRisk: false, broken: !!last };
   if (last === today) return { current: days, doneToday: true, atRisk: false, broken: false };
   if (last === addDays(today, -1)) return { current: days, doneToday: false, atRisk: true, broken: false };
@@ -62,15 +63,16 @@ export function streakState(u = {}, today = dateKey()) {
 /* Mashg'ulot tugaganda yangi streak qiymatlari */
 export function nextStreak(u = {}, today = dateKey()) {
   const last = u.lastStudyDate || null;
-  const days = Number(u.streakDays) || 0;
-  const freezes = Number(u.streakFreezes) || 0;
+  const num = (v) => (typeof v === 'number' && isFinite(v) ? v : 0); // firestore.rules bilan mos
+  const days = num(u.streakDays);
+  const freezes = num(u.streakFreezes);
   let streakDays;
   let usedFreeze = false;
   if (last === today) streakDays = Math.max(1, days);
   else if (last === addDays(today, -1)) streakDays = days + 1;
   else if (last === addDays(today, -2) && freezes > 0 && days > 0) { streakDays = days + 1; usedFreeze = true; }
   else streakDays = 1;
-  const longestStreak = Math.max(Number(u.longestStreak) || 0, streakDays);
+  const longestStreak = Math.max(num(u.longestStreak), streakDays);
   return { streakDays, longestStreak, usedFreeze };
 }
 export function todayWords(u = {}, today = dateKey()) {

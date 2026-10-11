@@ -26,7 +26,12 @@ service cloud.firestore {
     function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
     function newVal(f, d) { return request.resource.data.get(f, d); }
     function oldVal(f, d) { return resource.data.get(f, d); }
-    function delta(f) { return newVal(f, 0) - oldVal(f, 0); }
+    // Eski hujjatlarda null yoki matn bo'lib qolgan sonlar 0 deb olinadi
+    function num(v) { return v is number ? v : 0; }
+    function oldNum(f) { return num(oldVal(f, 0)); }
+    function delta(f) { return num(newVal(f, 0)) - oldNum(f); }
+    // Mashg'ulot uchun: o'zgarmagan maydon = 0; o'zgargan maydon son bo'lmasa — xato (rad etiladi)
+    function d2(ch, f) { return ch.hasAny([f]) ? newVal(f, 0) - oldNum(f) : 0; }
     function between(v, lo, hi) { return v is number && v >= lo && v <= hi; }
     function shortString(v, max) { return v is string && v.size() <= max; }
 
@@ -56,24 +61,25 @@ service cloud.firestore {
     }
     // Mashg'ulot yakuni: o'sish chegaralangan, yulduz = yangi o'zlashtirilgan so'zlar
     function validSession() {
-      return changed().hasOnly(sessionKeys().concat(profileKeys()))
+      let ch = changed();
+      return ch.hasOnly(sessionKeys().concat(profileKeys()))
         && profileValid()
-        && between(delta('stars'), 0, 100)
-        && between(delta('coins'), 0, 200)
-        && delta('wordsMastered') == delta('stars')
-        && ((delta('stars') == 0 && delta('coins') == 0 && !('lastRewardAt' in changed()))
+        && between(d2(ch, 'stars'), 0, 100)
+        && between(d2(ch, 'coins'), 0, 200)
+        && d2(ch, 'wordsMastered') == d2(ch, 'stars')
+        && ((d2(ch, 'stars') == 0 && d2(ch, 'coins') == 0 && !ch.hasAny(['lastRewardAt']))
             || (newVal('lastRewardAt', null) == request.time && rewardCooldownOk()))
-        && between(delta('totalWordsLearned'), 0, 200)
-        && between(delta('totalPerfectWords'), 0, 200)
-        && between(delta('studyTimeMinutes'), 0, 240)
-        && between(delta('sessionsCount'), 0, 1)
+        && between(d2(ch, 'totalWordsLearned'), 0, 200)
+        && between(d2(ch, 'totalPerfectWords'), 0, 200)
+        && between(d2(ch, 'studyTimeMinutes'), 0, 240)
+        && between(d2(ch, 'sessionsCount'), 0, 1)
         && between(newVal('todayWordsLearned', 0), 0, 100000)
-        && ((newVal('weekKey', '') == oldVal('weekKey', '') && delta('weeklyStars') == delta('stars'))
-            || (newVal('weekKey', '') != oldVal('weekKey', '') && newVal('weeklyStars', 0) == delta('stars')))
-        && between(newVal('streakDays', 0), 0, oldVal('streakDays', 0) + 1)
-        && newVal('longestStreak', 0) == (newVal('streakDays', 0) > oldVal('longestStreak', 0) ? newVal('streakDays', 0) : oldVal('longestStreak', 0))
-        && between(delta('streakFreezes'), -1, 0)
-        && newVal('streakFreezes', 0) >= 0;
+        && ((newVal('weekKey', '') == oldVal('weekKey', '') && d2(ch, 'weeklyStars') == d2(ch, 'stars'))
+            || (newVal('weekKey', '') != oldVal('weekKey', '') && newVal('weeklyStars', 0) == d2(ch, 'stars')))
+        && between(newVal('streakDays', 0), 0, oldNum('streakDays') + 1)
+        && newVal('longestStreak', 0) == (newVal('streakDays', 0) > oldNum('longestStreak') ? newVal('streakDays', 0) : oldNum('longestStreak'))
+        && between(d2(ch, 'streakFreezes'), -1, 0)
+        && num(newVal('streakFreezes', 0)) >= 0;
     }
     // Do'kondan xarid: narx shop hujjatidan olinadi
     function specialPrice(id) {
@@ -184,11 +190,11 @@ service cloud.firestore {
         return d.keys().hasOnly(['displayName', 'photoThumb', 'stars', 'weeklyStars', 'weekKey', 'equipped', 'updatedAt'])
           && shortString(d.get('displayName', ''), 40)
           && shortString(d.get('photoThumb', ''), 12000)
-          && d.get('stars', 0) == u.get('stars', 0)
-          && d.get('weeklyStars', 0) == u.get('weeklyStars', 0)
-          && d.get('weekKey', '') == u.get('weekKey', '')
+          && d.get('stars', 0) == (u.get('stars', 0) is number ? u.get('stars', 0) : 0)
+          && d.get('weeklyStars', 0) == (u.get('weeklyStars', 0) is number ? u.get('weeklyStars', 0) : 0)
+          && d.get('weekKey', '') == (u.get('weekKey', '') is string ? u.get('weekKey', '') : '')
           && d.get('equipped', {}) is map
-          && d.get('equipped', {}).values().toSet().difference(u.get('ownedItems', []).toSet()).size() == 0;
+          && d.get('equipped', {}).values().toSet().difference((u.get('ownedItems', []) is list ? u.get('ownedItems', []) : []).toSet()).size() == 0;
       }
       allow read: if signedIn();
       allow create, update: if (isOwner(uid) && lbValid()) || isAdmin();

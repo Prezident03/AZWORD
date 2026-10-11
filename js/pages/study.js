@@ -3,7 +3,7 @@
    Xato qilingan so'zlar oxirida qisqa "mustahkamlash" bosqichidan o'tadi
    (natija o'zgarmaydi — xato xato bo'lib qoladi). */
 import { initPage } from '../core.js';
-import { completeSession } from '../data.js';
+import { completeSession, saveErrorText } from '../data.js';
 import { sourceFromParams, sourceHome, normalizeAnswer } from '../game.js';
 import { icon } from '../icons.js';
 import { $, html, raw, ic, setHTML, esc, params, shuffle, confirmDialog, toastError, withLoading, errorState, emptyState } from '../ui.js';
@@ -401,7 +401,7 @@ async function finish() {
     console.error(e);
     finished = false;
     card(html`<div class="empty-icon" style="background:var(--danger-soft);color:var(--danger-light)">${ic('alert-triangle', 30)}</div>
-      <div class="word-mid">Natijani saqlab bo'lmadi</div><p class="muted">Internet aloqasini tekshirib, qayta urinib ko'ring.</p>`);
+      <div class="word-mid">Natijani saqlab bo'lmadi</div><p class="muted">${saveErrorText(e)}</p><p class="xs dim">Kod: ${(e && e.code) || '—'}</p>`);
     setActions(html`<button class="btn btn-primary btn-lg grow" id="again">${ic('refresh', 18)} Qayta urinish</button>`);
     $('#again').onclick = finish;
     return;

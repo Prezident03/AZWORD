@@ -83,14 +83,22 @@ export async function touchLastSeen(uid) {
 }
 
 /* Reyting hujjati — users hujjatidagi qiymatlar bilan bir xil bo'lishi shart (rules tekshiradi) */
+/* Faqat egalik qilingan buyumlar reytingda ko'rinadi (qoidalar shuni talab qiladi) */
+function equippedFor(u) {
+  const eq = u.equippedItems && typeof u.equippedItems === 'object' && !Array.isArray(u.equippedItems) ? u.equippedItems : {};
+  const owned = new Set(Array.isArray(u.ownedItems) ? u.ownedItems : []);
+  const out = {};
+  for (const [k, v] of Object.entries(eq)) if (owned.has(v)) out[k] = v;
+  return out;
+}
 export function leaderboardData(u) {
   const data = {
     displayName: String(u.displayName || (u.email || '').split('@')[0] || 'Foydalanuvchi').slice(0, 40),
     photoThumb: typeof u.photoThumb === 'string' && u.photoThumb.length < 12000 ? u.photoThumb : '',
-    stars: Number(u.stars) || 0,
-    weeklyStars: Number(u.weeklyStars) || 0,
-    weekKey: u.weekKey || '',
-    equipped: u.equippedItems && typeof u.equippedItems === 'object' ? u.equippedItems : {},
+    stars: typeof u.stars === 'number' && isFinite(u.stars) ? u.stars : 0,
+    weeklyStars: typeof u.weeklyStars === 'number' && isFinite(u.weeklyStars) ? u.weeklyStars : 0,
+    weekKey: typeof u.weekKey === 'string' ? u.weekKey : '',
+    equipped: equippedFor(u),
     updatedAt: serverTimestamp()
   };
   return data;
@@ -293,38 +301,82 @@ export async function allWordStats(uid) {
    Boshqa rejimlar streak, kunlik maqsad va takrorlash jadvalini yangilaydi. */
 const PENDING_KEY = 'az:pending-sessions';
 
+/* Saqlash xatosini foydalanuvchiga tushunarli qilib aytish */
+export function saveErrorText(e) {
+  const code = (e && e.code) || '';
+  if (navigator.onLine === false || code === 'unavailable' || code === 'deadline-exceeded') return "Internet aloqasi yo'q.";
+  if (code === 'permission-denied') return "Server ruxsat bermadi (Firestore qoidalari eskirgan bo'lishi mumkin — admin firestore.rules faylini qayta joylashi kerak).";
+  if (code === 'resource-exhausted') return 'Firebase kunlik limiti tugadi.';
+  if (code === 'aborted' || code === 'failed-precondition') return "Bir vaqtda boshqa o'zgarish bo'ldi.";
+  if (code === 'unauthenticated') return 'Hisobga qayta kirish kerak.';
+  return (e && e.message ? String(e.message).slice(0, 160) : "Noma'lum xato");
+}
+/* Qayta urinsa o'tishi mumkin bo'lgan xatolar — natija qurilmada saqlanib, keyin yuboriladi */
+const RETRYABLE = ['unavailable', 'deadline-exceeded', 'permission-denied', 'resource-exhausted', 'aborted', 'failed-precondition', 'internal', 'unknown', 'unauthenticated'];
+const isRetryable = (e) => navigator.onLine === false || RETRYABLE.includes(e && e.code);
+
 export async function completeSession(uid, payload) {
-  try {
-    return await runSessionTx(uid, payload);
-  } catch (e) {
-    const offline = navigator.onLine === false || e.code === 'unavailable' || e.code === 'deadline-exceeded';
-    if (offline) {
-      queuePending(uid, payload);
-      return { pending: true, stars: 0, coins: 0, newlyMastered: 0 };
+  let lastErr;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try { return await runSessionTx(uid, payload); }
+    catch (e) {
+      lastErr = e;
+      console.error('[completeSession]', e && e.code, e);
+      if (!(e && (e.code === 'aborted' || e.code === 'failed-precondition'))) break;
     }
-    throw e;
   }
+  if (isRetryable(lastErr)) {
+    queuePending(uid, payload);
+    return { pending: true, stars: 0, coins: 0, newlyMastered: 0, error: saveErrorText(lastErr), errorCode: (lastErr && lastErr.code) || '' };
+  }
+  throw lastErr;
 }
 function queuePending(uid, payload) {
   try {
     const list = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]');
-    list.push({ uid, payload });
+    list.push({ uid, payload, at: Date.now() });
     localStorage.setItem(PENDING_KEY, JSON.stringify(list.slice(-20)));
   } catch (e) { /* ignore */ }
 }
+export function pendingCount(uid) {
+  try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]').filter(x => x.uid === uid).length; } catch (e) { return 0; }
+}
+let flushing = false;
 export async function flushPending(uid) {
+  if (flushing) return 0;
   let list;
-  try { list = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (e) { return; }
-  if (!list.length || navigator.onLine === false) return;
+  try { list = JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); } catch (e) { return 0; }
+  if (!list.length || navigator.onLine === false) return 0;
+  flushing = true;
   const rest = [];
-  for (const item of list) {
-    if (item.uid !== uid) { rest.push(item); continue; }
-    try { await runSessionTx(uid, item.payload); } catch (e) { if (e.code === 'unavailable') rest.push(item); }
+  let sent = 0;
+  const weekAgo = Date.now() - 7 * 86400e3;
+  try {
+    for (const item of list) {
+      if (item.uid !== uid) { rest.push(item); continue; }
+      try { await runSessionTx(uid, item.payload); sent++; }
+      catch (e) { if (isRetryable(e) && (item.at || Date.now()) > weekAgo) rest.push(item); }
+    }
+  } finally {
+    flushing = false;
+    try { localStorage.setItem(PENDING_KEY, JSON.stringify(rest)); } catch (e) { /* ignore */ }
   }
-  try { localStorage.setItem(PENDING_KEY, JSON.stringify(rest)); } catch (e) { /* ignore */ }
+  return sent;
 }
 
+/* Natija saqlangandan keyin reyting yangilanadi (alohida — reyting xatosi natijani yo'qotmasin) */
 async function runSessionTx(uid, payload) {
+  const res = await sessionTx(uid, payload);
+  if (res && res.user) {
+    setDoc(doc(db, 'leaderboard', uid), leaderboardData(res.user)).catch(e => console.warn('[leaderboard]', e && e.code));
+  }
+  return res;
+}
+
+/* Firestore qoidalari bilan bir xil: son bo'lmagan eski qiymat = 0 */
+const n = (v) => (typeof v === 'number' && isFinite(v) ? v : 0);
+
+async function sessionTx(uid, payload) {
   const { src, words, results, mode = 'study' } = payload;
   const today = payload.dateKey || dateKey();
   const wk = payload.weekKey || weekKey();
@@ -353,32 +405,35 @@ async function runSessionTx(uid, payload) {
     const rewards = computeRewards({ newlyMastered: masterIds.length, perfect: mode === 'study' && cooldownOk ? perfect : 0 });
     const gotReward = rewards.stars > 0 || rewards.coins > 0;
 
-    const st = nextStreak(u, today);
+    /* Kechikib yuborilgan (offline) natija — streak va "bugun" hisobini buzmaydi */
+    const stale = typeof u.lastStudyDate === 'string' && u.lastStudyDate > today;
+    const st = stale
+      ? { streakDays: n(u.streakDays), longestStreak: Math.max(n(u.longestStreak), n(u.streakDays)), usedFreeze: false }
+      : nextStreak(u, today);
     const sameDay = (u.todayDate || u.lastStudyDate) === today;
     const sameWeek = u.weekKey === wk;
     const upd = {
       streakDays: st.streakDays,
       longestStreak: st.longestStreak,
-      lastStudyDate: today,
-      todayDate: today,
-      todayWordsLearned: (sameDay ? Number(u.todayWordsLearned) || 0 : 0) + list.length,
-      totalWordsLearned: (Number(u.totalWordsLearned) || 0) + list.length,
-      totalPerfectWords: (Number(u.totalPerfectWords) || 0) + perfect,
-      studyTimeMinutes: (Number(u.studyTimeMinutes) || 0) + minutes,
-      sessionsCount: (Number(u.sessionsCount) || 0) + 1,
-      weekKey: wk,
-      weeklyStars: (sameWeek ? Number(u.weeklyStars) || 0 : 0) + rewards.stars
+      lastStudyDate: stale ? u.lastStudyDate : today,
+      todayDate: stale ? (u.todayDate || u.lastStudyDate) : today,
+      todayWordsLearned: (n(u.todayWordsLearned)) * (sameDay || stale ? 1 : 0) + (stale ? 0 : list.length),
+      totalWordsLearned: (n(u.totalWordsLearned)) + list.length,
+      totalPerfectWords: (n(u.totalPerfectWords)) + perfect,
+      studyTimeMinutes: (n(u.studyTimeMinutes)) + minutes,
+      sessionsCount: (n(u.sessionsCount)) + 1,
+      weekKey: stale && u.weekKey ? u.weekKey : wk,
+      weeklyStars: (sameWeek || (stale && u.weekKey) ? n(u.weeklyStars) : 0) + rewards.stars
     };
-    if (st.usedFreeze) upd.streakFreezes = (Number(u.streakFreezes) || 0) - 1;
+    if (st.usedFreeze) upd.streakFreezes = (n(u.streakFreezes)) - 1;
     if (gotReward) {
-      upd.stars = (Number(u.stars) || 0) + rewards.stars;
-      upd.coins = (Number(u.coins) || 0) + rewards.coins;
-      upd.wordsMastered = (Number(u.wordsMastered) || 0) + rewards.stars;
+      upd.stars = (n(u.stars)) + rewards.stars;
+      upd.coins = (n(u.coins)) + rewards.coins;
+      upd.wordsMastered = (n(u.wordsMastered)) + rewards.stars;
       upd.lastRewardAt = serverTimestamp();
     }
     tx.update(uRef, upd);
     const after = { ...u, ...upd };
-    tx.set(doc(db, 'leaderboard', uid), leaderboardData(after));
 
     /* So'z statistikasi (takrorlash jadvali) */
     const now = new Date();
@@ -422,7 +477,7 @@ async function runSessionTx(uid, payload) {
 
     return {
       pending: false, stars: rewards.stars, coins: rewards.coins, newlyMastered: masterIds.length,
-      perfect, total: list.length, pct, streak: st.streakDays, streakUp: u.lastStudyDate !== today,
+      perfect, total: list.length, pct, streak: st.streakDays, streakUp: !stale && u.lastStudyDate !== today,
       usedFreeze: st.usedFreeze, cooldown: mode === 'study' && !cooldownOk, user: after
     };
   });

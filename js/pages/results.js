@@ -1,8 +1,8 @@
 import { initPage } from '../core.js';
-import { listAchievements, claimAchievements, listTopics } from '../data.js';
+import { listAchievements, claimAchievements, listTopics, flushPending, pendingCount } from '../data.js';
 import { sourceQuery, achievementReady } from '../game.js';
 import { iconName, starIcon } from '../icons.js';
-import { $, html, raw, ic, setHTML, ring, animateRings, emptyState } from '../ui.js';
+import { $, html, raw, ic, setHTML, ring, animateRings, emptyState, withLoading, toast, toastError } from '../ui.js';
 import { readResult } from '../session.js';
 import { playSound, confetti } from '../fx.js';
 
@@ -38,12 +38,21 @@ function render() {
       ${res.coins ? html`<div class="reward" style="color:var(--coin)">${ic('coins', 22)}<div style="color:var(--text)"><b>+${res.coins}</b><div class="xs muted">tanga</div></div></div>` : ''}
       ${res.streakUp && res.streak ? html`<div class="reward" style="color:var(--streak-light)">${ic('flame', 22)}<div style="color:var(--text)"><b>${res.streak}</b><div class="xs muted">kunlik streak</div></div></div>` : ''}
     </div>
-    ${res.pending ? html`<div class="alert alert-warning mt-4">${ic('wifi-off', 18)}<div>Internet yo'q — natija qurilmada saqlandi va aloqa tiklanganda avtomatik yuboriladi.</div></div>` : ''}
+    ${res.pending ? html`<div class="alert alert-warning mt-4" id="pending-alert">${ic(res.error && res.errorCode !== 'unavailable' ? 'alert-triangle' : 'wifi-off', 18)}<div class="grow" style="text-align:left">
+      ${res.error ? html`<b>Natija serverga yuborilmadi:</b> ${res.error}${res.errorCode ? html` <span class="xs dim">(${res.errorCode})</span>` : ''}<br>` : html`Internet yo'q. `}
+      Natija qurilmada saqlandi va keyinroq avtomatik yuboriladi.
+      <div class="mt-2"><button class="btn btn-sm" id="resend">${ic('refresh', 15)} Hozir qayta yuborish</button></div></div></div>` : ''}
     ${res.cooldown ? html`<div class="alert alert-info mt-4">${ic('clock', 18)}<div>Mukofotlar juda tez-tez berilmaydi — keyingi mashg'ulotda yangi so'zlar uchun XP olasiz.</div></div>` : ''}
     ${mode === 'study' && !res.pending && !res.cooldown && !res.stars && perfect > 0 ? html`<p class="xs dim mt-3">Bu so'zlar uchun mukofot avval berilgan. Yangi so'zlarni o'zlashtirib XP to'plang.</p>` : ''}
     ${res.usedFreeze ? html`<p class="xs mt-3" style="color:var(--info-light)">${ic('snowflake', 13)} Streak muzlatish ishlatildi — streak'ingiz saqlab qolindi.</p>` : ''}
   `);
   animateRings($('#hero'));
+  const rs = $('#resend');
+  if (rs) rs.onclick = () => withLoading(rs, async () => {
+    const sent = await flushPending(ctx.user.uid);
+    if (sent && !pendingCount(ctx.user.uid)) { toast('Natija yuborildi'); $('#pending-alert').remove(); }
+    else toastError("Hali yuborib bo'lmadi. Keyinroq avtomatik urinib ko'riladi.");
+  });
   setTimeout(() => {
     playSound(pct >= 70 ? 'victory' : 'coin');
     if (pct === 100) confetti({ count: 160 });

@@ -218,6 +218,8 @@ export async function adminFlow({ newPage, base, settle, shot }) {
   await page.goto(base + 'admin.html');
   await settle(page);
   await shot(page, 'admin-overview');
+  await page.waitForTimeout(800);
+  if (await page.locator('text=qoidalari eskirgan').count()) throw new Error('admin: false outdated-rules banner');
   // Kitob yaratish
   await page.goto(base + 'admin.html#books');
   await page.waitForSelector('#c-new');
@@ -511,5 +513,39 @@ export async function voice({ newPage, base, settle, shot }) {
   if (seen.length < 3) throw new Error('listen: preload count ' + seen.length);
   const cached = await page.evaluate(async () => (await (await caches.open('az-tts-v1')).keys()).length);
   if (cached < 3) throw new Error('device cache ' + cached);
+  await context.close();
+}
+
+/* Eski hisob: son maydonlari null/matn — mashg'ulot natijasi baribir saqlanadi */
+export async function nullish({ newPage, base, settle, shot, env, signUp }) {
+  const { doc, setDoc, getDoc } = await import('firebase/firestore');
+  const me = await signUp('nullish@test.uz');
+  const uid = me.localId;
+  await env.withSecurityRulesDisabled(async (c) => {
+    await setDoc(doc(c.firestore(), 'users', uid), {
+      uid, email: 'nullish@test.uz', displayName: 'Null Foydalanuvchi', stars: null, coins: '15', weeklyStars: null, weekKey: null,
+      streakDays: null, longestStreak: '2', streakFreezes: null, totalWordsLearned: '30', ownedItems: null, equippedItems: { badge: 'yoq' }
+    });
+  });
+  const { page, context } = await newPage();
+  await page.goto(base + 'index.html');
+  await page.fill('#login-email', 'nullish@test.uz');
+  await page.fill('#login-password', 'secret123');
+  await page.click('#form-login button[type=submit]');
+  await page.waitForURL(/dashboard\.html/);
+  await page.goto(base + 'study.html?book=b1&topic=t2');
+  await settle(page);
+  await playStudy(page);
+  await settle(page);
+  await shot(page, 'nullish-results');
+  if (await page.$('#pending-alert')) throw new Error('nullish: pending alert ' + await page.$eval('#pending-alert', e => e.innerText));
+  let u, lb;
+  await env.withSecurityRulesDisabled(async (c) => {
+    const fdb = c.firestore();
+    u = (await getDoc(doc(fdb, 'users', uid))).data();
+    lb = (await getDoc(doc(fdb, 'leaderboard', uid))).data();
+  });
+  if (u.sessionsCount !== 1 || u.streakDays !== 1 || !(u.stars > 0)) throw new Error('nullish user ' + JSON.stringify({ s: u.sessionsCount, st: u.streakDays, stars: u.stars }));
+  if (!lb || lb.stars !== u.stars) throw new Error('nullish leaderboard ' + JSON.stringify(lb));
   await context.close();
 }

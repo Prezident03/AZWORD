@@ -1,7 +1,7 @@
 /* AzWord · admin uchun ma'lumot amallari */
 import {
   db, collection, doc, getDoc, getDocs, setDoc, updateDoc, addDoc, deleteDoc, query, where, orderBy, limit,
-  serverTimestamp, increment, writeBatch, getCountFromServer, Timestamp
+  serverTimestamp, increment, writeBatch, getCountFromServer, Timestamp, getDocFromServer
 } from './firebase.js';
 import { leaderboardData } from './data.js';
 
@@ -125,6 +125,19 @@ export async function migrateUsers(onProgress) {
     if (onProgress) onProgress(done, users.length);
   }
   return { total: users.length, migrated };
+}
+/* Firebase'dagi qoidalar repodagi firestore.rules bilan mosmi? (yangi qoidalar talab qiladigan o'qishlar) */
+export async function checkRules(uid) {
+  const probes = [
+    ["So'z statistikasi (takrorlash)", doc(db, 'users', uid, 'wordStats', '__probe')],
+    ['Mavzu progressi', doc(db, 'users', uid, 'progress', '__probe')],
+    ['Reyting', doc(db, 'leaderboard', '__probe')]
+  ];
+  const failed = [];
+  for (const [name, ref] of probes) {
+    try { await getDocFromServer(ref); } catch (e) { if (e && e.code === 'permission-denied') failed.push(name); }
+  }
+  return failed;
 }
 export async function leaderboardCount() {
   return getCountFromServer(collection(db, 'leaderboard')).then(s => s.data().count).catch(() => null);
