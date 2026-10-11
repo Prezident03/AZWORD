@@ -95,6 +95,7 @@ function renderHead({ topics = null, prog = null } = {}) {
       <a class="btn btn-primary${canStudy ? '' : ' is-disabled'}" href="${canStudy ? 'study.html?' + q : '#'}" id="study-btn">${ic('play', 17)} O'rganish</a>
       <a class="btn${canStudy ? '' : ' is-disabled'}" href="${canStudy ? 'flashcards.html?' + q : '#'}">${ic('copy', 17)} Flashcard</a>
       <a class="btn${canStudy ? '' : ' is-disabled'}" href="${canStudy ? 'quick-quiz.html?' + q : '#'}">${ic('zap', 17)} Kviz</a>
+      <a class="btn${canStudy ? '' : ' is-disabled'}" href="${canStudy ? 'dictation.html?' + q : '#'}">${ic('pen-line', 17)} Diktant</a>
       ${canEdit ? html`<span class="grow"></span>
         <button class="btn" id="add-word">${ic('plus', 17)} So'z qo'shish</button>
         <a class="btn" href="upload.html?id=${encodeURIComponent(folderId)}">${ic('upload', 17)} Fayldan</a>

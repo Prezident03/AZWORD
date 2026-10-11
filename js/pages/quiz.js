@@ -27,6 +27,7 @@ function renderModes() {
     { href: last ? `flashcards.html?${q}` : null, icon: 'copy', tone: 'tone-cyan', name: 'Flashcard', desc: 'Kartalar bilan tezkor takrorlash' },
     { href: last ? `quick-quiz.html?${q}` : null, icon: 'zap', tone: 'tone-emerald', name: 'Tezkor kviz', desc: '10 ta savol — tarjimani toping' },
     { href: last ? `quick-quiz.html?${q}&mode=listen` : null, icon: 'headphones', tone: 'tone-pink', name: 'Tinglab tushunish', desc: "So'zni eshiting va ma'nosini toping" },
+    { href: last ? `dictation.html?${q}` : null, icon: 'pen-line', tone: 'tone-rose', name: 'Diktant', desc: "So'z va gapni eshitib, harfma-harf yozing", isNew: true },
     { href: 'vocabulary.html', icon: 'book-marked', tone: 'tone-amber', name: "Lug'atim", desc: "O'rgangan barcha so'zlaringiz", always: true },
     { href: 'ai.html', icon: 'sparkles', tone: 'tone-orange', name: 'AI yordamchi', desc: 'Savol bering, tushuntirish oling', always: true }
   ];
@@ -34,7 +35,7 @@ function renderModes() {
     const disabled = !m.href;
     return `<${disabled ? 'button' : 'a'} class="card card-link row" ${disabled ? 'data-need-source' : `href="${m.href}"`} style="text-align:left;width:100%;${disabled ? 'opacity:.75' : ''}">
       <span class="tile-icon ${m.tone}">${icon(m.icon, 22)}</span>
-      <div class="grow"><div class="card-title">${m.name}</div><div class="small muted">${disabled ? 'Avval mavzu tanlang' : m.desc}</div></div>
+      <div class="grow"><div class="card-title">${m.name}${m.isNew ? ' <span class="badge badge-success">Yangi</span>' : ''}</div><div class="small muted">${disabled ? 'Avval mavzu tanlang' : m.desc}</div></div>
       ${m.badge ? `<span class="badge badge-primary">${m.badge}</span>` : ''}${icon('chevron-right', 18)}
     </${disabled ? 'button' : 'a'}>`;
   }).join('')));

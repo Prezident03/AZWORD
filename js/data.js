@@ -286,7 +286,7 @@ export async function allWordStats(uid) {
      src: { kind, containerId, topicId, title },
      words: [{ id, en, uz, example }],
      results: { [wordId]: { mistakes: [stage...] } },   // bo'sh massiv = xatosiz
-     minutes, mode: 'study' | 'quiz' | 'flashcards' | 'review' | 'listening',
+     minutes, mode: 'study' | 'quiz' | 'flashcards' | 'review' | 'listening' | 'dictation',
      dateKey, weekKey
    }
    Faqat 'study' rejimi so'zni "o'zlashtirilgan" deb belgilaydi va yulduz/tanga beradi.

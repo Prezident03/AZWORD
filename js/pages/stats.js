@@ -57,7 +57,7 @@ async function load() {
   if (last.length) bars('accuracy', last.map(l => l.accuracy || 0), last.map((l, i) => `#${i + 1}`), { suffix: '%', max: 100 });
   else setHTML('accuracy', emptyState({ iconName: 'target', title: "Hali ma'lumot yo'q" }));
 
-  const MODES = { study: ["O'rganish", 'layers', 'tone-violet'], review: ['Takrorlash', 'repeat', 'tone-blue'], flashcards: ['Flashcard', 'copy', 'tone-cyan'], quiz: ['Kviz', 'zap', 'tone-emerald'], listening: ['Tinglash', 'headphones', 'tone-pink'] };
+  const MODES = { study: ["O'rganish", 'layers', 'tone-violet'], review: ['Takrorlash', 'repeat', 'tone-blue'], flashcards: ['Flashcard', 'copy', 'tone-cyan'], quiz: ['Kviz', 'zap', 'tone-emerald'], listening: ['Tinglash', 'headphones', 'tone-pink'], dictation: ['Diktant', 'pen-line', 'tone-rose'] };
   const counts = {};
   recent.forEach(l => { counts[l.mode || 'study'] = (counts[l.mode || 'study'] || 0) + 1; });
   const totalM = recent.length || 1;

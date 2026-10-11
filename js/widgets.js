@@ -181,6 +181,7 @@ export function topicCard(src, t, prog, index) {
       <a class="btn btn-primary btn-sm grow" href="study.html?${raw(q)}" data-start="${t.id}">${ic('play', 15)} ${prog ? 'Davom etish' : 'Boshlash'}</a>
       <a class="btn btn-sm btn-icon" href="flashcards.html?${raw(q)}" title="Flashcard" aria-label="Flashcard">${ic('copy', 16)}</a>
       <a class="btn btn-sm btn-icon" href="quick-quiz.html?${raw(q)}" title="Tezkor kviz" aria-label="Tezkor kviz">${ic('zap', 16)}</a>
+      <a class="btn btn-sm btn-icon" href="dictation.html?${raw(q)}" title="Diktant" aria-label="Diktant">${ic('pen-line', 16)}</a>
     </div>
   </div>`;
 }

@@ -483,6 +483,7 @@ kbd { display: inline-flex; align-items: center; justify-content: center; min-wi
 .tone-emerald { background: linear-gradient(150deg, #10b981, #047857); }
 .tone-blue { background: linear-gradient(150deg, #3b82f6, #1d4ed8); }
 .tone-pink { background: linear-gradient(150deg, #ec4899, #9d174d); }
+.tone-rose { background: linear-gradient(150deg, #f43f5e, #9f1239); }
 .tone-cyan { background: linear-gradient(150deg, #06b6d4, #0e7490); }
 .tone-orange { background: linear-gradient(150deg, #f97316, #c2410c); }
 .tone-soft { background: var(--primary-soft); color: var(--primary-light); }
@@ -723,6 +724,44 @@ mark { background: rgba(167, 139, 250, 0.28); color: inherit; border-radius: 3px
 .speak-big:active { transform: scale(0.94); }
 .speak-big svg { width: 40px; height: 40px; }
 @keyframes pulse { 50% { opacity: 0.4; } }
+
+/* Diktant */
+.dict-head { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.dict-hint { font-size: 0.95rem; max-width: 520px; }
+.dict-listen { display: flex; align-items: center; gap: 12px; }
+.speak-big.dict-play { width: 72px; height: 72px; }
+.speak-big.dict-play svg { width: 32px; height: 32px; }
+.speak-big.pulse { animation: dictPulse 600ms var(--ease-out); }
+@keyframes dictPulse { 0% { box-shadow: 0 0 0 0 var(--primary-soft); } 100% { box-shadow: 0 0 0 18px transparent; } }
+.dict-slots { position: relative; width: 100%; max-width: 680px; padding: 8px 4px; cursor: text; border-radius: var(--r-md); }
+.dict-slots:focus-within { background: var(--surface-2); }
+.dict-slot-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 16px; }
+.dict-word { display: inline-flex; gap: 5px; }
+.dict-slot { width: 40px; height: 52px; display: grid; place-items: center; border-radius: 8px 8px 4px 4px; background: var(--surface-2); border-bottom: 3px solid var(--border-strong); font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; line-height: 1; transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast); }
+.dict-slots:focus-within .dict-slot:not(.fixed) { background: var(--bg-elev); }
+.dict-slots.sm .dict-word { gap: 3px; }
+.dict-slots.sm .dict-slot { width: 23px; height: 36px; font-size: 1.12rem; border-bottom-width: 2px; border-radius: 5px 5px 3px 3px; }
+.dict-slot.fixed { width: auto; min-width: 8px; background: none !important; border-color: transparent; color: var(--text-2); }
+.dict-slot.cur { border-color: var(--primary); box-shadow: 0 3px 0 -1px var(--primary); }
+.dict-slots:focus-within .dict-slot.cur { animation: caret 1s steps(1) infinite; }
+@keyframes caret { 50% { border-color: transparent; box-shadow: none; } }
+.dict-slot.ok { color: var(--success-light); border-color: var(--success); }
+.dict-slot.help { color: var(--warning-light); border-color: var(--warning); }
+.dict-slot.bad { color: var(--danger-light); border-color: var(--danger); background: var(--danger-soft) !important; animation: shake 300ms; }
+.dict-slot .ph { color: var(--text-3); opacity: 0.55; }
+.dict-slots.done .dict-slot.cur { animation: none; }
+.dict-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; padding: 0; background: transparent; color: transparent; caret-color: transparent; font-size: 16px; cursor: text; }
+.dict-after { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; max-width: 640px; }
+.gloss { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 14px; }
+.gloss-w { display: flex; flex-direction: column; align-items: center; line-height: 1.25; }
+.gloss-w b { font-family: var(--font-display); font-size: 1.05rem; }
+.gloss-w span { font-size: 0.74rem; color: var(--text-3); max-width: 110px; text-align: center; }
+@media (max-width: 480px) {
+  .dict-slot { width: 32px; height: 44px; font-size: 1.3rem; }
+  .dict-slots.sm .dict-slot { width: 19px; height: 30px; font-size: 0.98rem; }
+  .dict-slot-list { gap: 10px 12px; }
+  .hide-xs { display: none; }
+}
 
 /* Results */
 .result-hero { text-align: center; padding: 32px 20px; }

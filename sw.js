@@ -4,10 +4,10 @@
    - Firebase SDK va shriftlar (versiyali URL): kesh birinchi
    - /api/* va Firestore so'rovlari keshlanmaydi
    Yangi versiya chiqarganda VERSION ni oshiring. */
-const VERSION = 'azword-v7';
+const VERSION = 'azword-v8';
 const SHELL = [
   'index.html', 'dashboard.html', 'folders.html', 'folder.html', 'book.html', 'study.html', 'results.html',
-  'flashcards.html', 'quick-quiz.html', 'quiz.html', 'review.html', 'vocabulary.html', 'stats.html', 'streak.html',
+  'flashcards.html', 'quick-quiz.html', 'dictation.html', 'quiz.html', 'review.html', 'vocabulary.html', 'stats.html', 'streak.html',
   'achievements.html', 'leaderboard.html', 'shop.html', 'profile.html', 'settings.html', 'ai.html', '404.html',
   'css/app.css', 'favicon.svg', 'manifest.json', 'icon-192.png',
   'js/firebase.js', 'js/core.js', 'js/ui.js', 'js/data.js', 'js/game.js', 'js/icons.js', 'js/icon-paths.js',

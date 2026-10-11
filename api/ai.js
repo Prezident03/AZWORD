@@ -1,6 +1,6 @@
 /* AzWord · AI API (Vercel serverless funksiya)
    POST /api/ai   Authorization: Bearer <Firebase ID token>
-   Body: { task: 'example' | 'translate' | 'words' | 'chat', ... }
+   Body: { task: 'example' | 'translate' | 'gloss' | 'words' | 'chat', ... }
 
    Xavfsizlik:
    - Har bir so'rov Firebase ID token bilan tekshiriladi (Google sertifikatlari, RS256).
@@ -27,7 +27,7 @@ const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1')
 const FS_HOST = process.env.FIRESTORE_EMULATOR_HOST ? `http://${process.env.FIRESTORE_EMULATOR_HOST}` : 'https://firestore.googleapis.com';
 const FS_BASE = `${FS_HOST}/v1/projects/${PROJECT}/databases/(default)/documents`;
 
-const LIMITS = { example: 30, translate: 30, words: 6, chat: 20 }; // daqiqasiga
+const LIMITS = { example: 30, translate: 30, gloss: 30, words: 6, chat: 20 }; // daqiqasiga
 const hits = new Map();
 
 class HttpError extends Error {
@@ -190,6 +190,28 @@ const TASKS = {
       { role: 'user', content: text }
     ], { maxTokens: 300, temperature: 0.2 });
     return { text: unquote(out).slice(0, 800) };
+  },
+
+  /* Diktant uchun: gap tarjimasi va har bir so'zning kontekstdagi ma'nosi */
+  async gloss(body) {
+    const text = str(body.text, 300);
+    if (!text) throw new HttpError(400, 'Matn kiritilmagan');
+    const raw = await groq([
+      { role: 'system', content: 'You help Uzbek learners understand English sentences. Always reply with valid JSON only.' },
+      { role: 'user', content: `Sentence: "${text}"\nReturn JSON: {"translation":"natural Uzbek translation (Latin script)","words":[{"en":"each English word of the sentence in order, without punctuation","uz":"its short Uzbek meaning in this sentence (1-3 words, Latin script)"}]}` }
+    ], { maxTokens: 900, temperature: 0.2, json: true });
+    let parsed = null;
+    try { parsed = JSON.parse(raw); } catch (e) {
+      const m = raw.match(/\{[\s\S]*\}/);
+      try { parsed = m ? JSON.parse(m[0]) : null; } catch (e2) { parsed = null; }
+    }
+    const translation = unquote(str(parsed && parsed.translation, 800));
+    if (!translation) throw new HttpError(502, "AI gapni tarjima qila olmadi", 'empty');
+    const words = (parsed && Array.isArray(parsed.words) ? parsed.words : [])
+      .map(w => ({ en: str(w && w.en, 60), uz: str(w && w.uz, 80) }))
+      .filter(w => w.en)
+      .slice(0, 60);
+    return { text: translation, words };
   },
 
   async words(body, user) {

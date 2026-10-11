@@ -22,7 +22,10 @@ before(async () => {
     req.on('end', () => {
       lastGroqBody = JSON.parse(b);
       const json = !!lastGroqBody.response_format;
-      const content = json
+      const isGloss = json && /Sentence:/.test(JSON.stringify(lastGroqBody.messages));
+      const content = isGloss
+        ? JSON.stringify({ translation: 'Mushuk divanda uxlaydi.', words: [{ en: 'The', uz: '' }, { en: 'cat', uz: 'mushuk' }, { en: 'sleeps', uz: 'uxlaydi' }] })
+        : json
         ? JSON.stringify({ words: [{ en: 'airport', uz: 'aeroport', example: 'We met at the airport.' }, { en: 'ticket', uz: 'chipta', example: 'I bought a ticket.' }] })
         : '"The cat sleeps on the sofa."';
       res.setHeader('Content-Type', 'application/json');
@@ -73,6 +76,13 @@ test('misol gap', async () => {
   const r = await call({ task: 'example', en: 'cat', uz: 'mushuk' }, u.token);
   assert.equal(r.status, 200);
   assert.equal(r.data.text, 'The cat sleeps on the sofa.');
+});
+test('gap tarjimasi (diktant)', async () => {
+  const u = await signUp('t9@x.com');
+  const r = await call({ task: 'gloss', text: 'The cat sleeps.' }, u.token);
+  assert.equal(r.status, 200);
+  assert.equal(r.data.text, 'Mushuk divanda uxlaydi.');
+  assert.equal(r.data.words[1].uz, 'mushuk');
 });
 test('so\'z generatori: urinish yo\'q bo\'lsa 402', async () => {
   const u = await signUp('t3@x.com');

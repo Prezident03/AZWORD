@@ -8,12 +8,12 @@ Ingliz tilidagi so'zlarni o'zbek tilida o'rganish uchun veb-ilova (PWA): kitobla
 |---|---|
 | **O'rganish** | Kitoblar → mavzular → so'zlar; umumiy (admin) va shaxsiy bo'limlar |
 | **5 bosqichli mashq** | Tanishish → Variantlar → Bo'laklash → Moslashtirish → Yozish, oxirida xatolarni mustahkamlash |
-| **Mashq turlari** | Flashcard (suring/bosing), tezkor kviz, tinglab tushunish |
+| **Mashq turlari** | Flashcard (suring/bosing), tezkor kviz, tinglab tushunish, diktant (so'z va misol gapni eshitib harfma-harf yozish, AI so'zma-so'z tarjima) |
 | **Takrorlash** | Leitner tizimi: to'g'ri eslangan so'z 1, 2, 4, 7, 15, 30, 60 kundan keyin qaytadi |
 | **Lug'atim** | Mashq qilingan barcha so'zlar: o'zlashtirilgan / qiyin / takrorlash kerak |
 | **O'yinlashtirish** | XP va darajalar, tanga, kunlik maqsad, streak (+ streak muzlatish), yutuqlar, haftalik reyting |
 | **Do'kon** | AI so'z generatori, streak muzlatish, nishon, avatar ramkasi, ilova rangi |
-| **AI** | Misol gap yozish, tarjima, mavzu bo'yicha so'z generatsiyasi, AI yordamchi (chat) |
+| **AI** | Misol gap yozish, tarjima, diktant gaplarining so'zma-so'z tarjimasi, mavzu bo'yicha so'z generatsiyasi, AI yordamchi (chat) |
 | **Admin panel** | Foydalanuvchilar (balans, bloklash), kitob/mavzu/so'z CRUD, Excel/Word import, AI generatsiya, e'lonlar, do'kon, yutuqlar, texnik ishlar rejimi, adminlar ro'yxati |
 | **PWA** | O'rnatish, oflayn ishlash (oxirgi ma'lumotlar keshda), oflayn natijalar keyin yuboriladi |
 
