@@ -8,7 +8,9 @@ const DEFAULTS = {
   autoSpeak: true,      // so'z ko'rsatilganda avtomatik talaffuz
   voiceRate: 0.9,
   sessionSize: 12,     // bitta mashg'ulotdagi so'zlar soni
-  accent: 'en-GB',      // 'en-GB' | 'en-US'
+  accent: 'en-GB',      // brauzer ovozi uchun: 'en-GB' | 'en-US'
+  voiceEngine: 'ai',    // 'ai' (tabiiy ovoz) | 'browser'
+  voice: 'troy',        // AI ovoz nomi
   reminder: false,
   reminderTime: '19:00'
 };

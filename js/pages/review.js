@@ -4,7 +4,7 @@ import { initPage } from '../core.js';
 import { db, collection, query, orderBy, limit, getDocs } from '../firebase.js';
 import { SRS_DAYS } from '../game.js';
 import { $, html, ic, setHTML, emptyState, errorState, loadingBlock, fmtDate, fmtNum } from '../ui.js';
-import { playSound, speak, canSpeak } from '../fx.js';
+import { playSound, speak, canSpeak, preloadSpeech } from '../fx.js';
 import { getPrefs } from '../prefs.js';
 import { loadReview, saveGrouped, storeResult } from '../session.js';
 
@@ -16,7 +16,7 @@ let startedAt = 0;
 
 async function load() {
   setHTML('content', loadingBlock());
-  try { items = await loadReview(user.uid, 30); }
+  try { items = await loadReview(user.uid, 30); preloadSpeech(items.map(w => w.en)); }
   catch (e) { errorState('content', load); return; }
   if (!items.length) return renderEmpty();
   renderIntro();

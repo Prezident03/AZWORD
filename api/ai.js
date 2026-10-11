@@ -1,6 +1,7 @@
 /* AzWord · AI API (Vercel serverless funksiya)
    POST /api/ai   Authorization: Bearer <Firebase ID token>
-   Body: { task: 'example' | 'translate' | 'gloss' | 'words' | 'chat', ... }
+   Body: { task: 'example' | 'translate' | 'gloss' | 'words' | 'chat' | 'tts', ... }
+   'tts' javobi JSON emas, audio/wav (Groq Orpheus — tabiiy ingliz talaffuzi).
 
    Xavfsizlik:
    - Har bir so'rov Firebase ID token bilan tekshiriladi (Google sertifikatlari, RS256).
@@ -13,7 +14,8 @@
    Vercel → Settings → Environment Variables:
      GROQ_API_KEY            (majburiy)
      FIREBASE_PROJECT_ID     (ixtiyoriy, standart — azword-30a2e)
-     AI_MODEL                (ixtiyoriy, standart — llama-3.3-70b-versatile) */
+     AI_MODEL                (ixtiyoriy, standart — llama-3.3-70b-versatile)
+     TTS_MODEL               (ixtiyoriy, standart — canopylabs/orpheus-v1-english) */
 
 import crypto from 'node:crypto';
 import { Buffer } from 'node:buffer';
@@ -23,11 +25,14 @@ const PROJECT = process.env.FIREBASE_PROJECT_ID || 'azword-30a2e';
 /* Birinchi ishlagan model eslab qolinadi; model o'chirilgan bo'lsa keyingisiga o'tiladi */
 const MODELS = [...new Set([process.env.AI_MODEL, 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'llama-3.1-8b-instant'].filter(Boolean))];
 let workingModel = null;
-const GROQ_URL = (process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1') + '/chat/completions';
+const GROQ_BASE = process.env.GROQ_BASE_URL || 'https://api.groq.com/openai/v1';
+const GROQ_URL = GROQ_BASE + '/chat/completions';
+const TTS_MODEL = process.env.TTS_MODEL || 'canopylabs/orpheus-v1-english';
+const TTS_VOICES = ['troy', 'austin', 'daniel', 'hannah', 'autumn', 'diana'];
 const FS_HOST = process.env.FIRESTORE_EMULATOR_HOST ? `http://${process.env.FIRESTORE_EMULATOR_HOST}` : 'https://firestore.googleapis.com';
 const FS_BASE = `${FS_HOST}/v1/projects/${PROJECT}/databases/(default)/documents`;
 
-const LIMITS = { example: 30, translate: 30, gloss: 30, words: 6, chat: 20 }; // daqiqasiga
+const LIMITS = { example: 30, translate: 30, gloss: 30, words: 6, chat: 20, tts: 90 }; // daqiqasiga
 const hits = new Map();
 
 class HttpError extends Error {
@@ -131,6 +136,30 @@ const isModelError = (status, err) => {
   const t = `${err && err.code} ${err && err.type} ${err && err.message}`.toLowerCase();
   return status === 404 || /model_not_found|model_decommissioned|decommissioned|does not exist|not found|no longer supported/.test(t);
 };
+
+const ttsCache = new Map();
+const TTS_CACHE_BYTES = 40 * 1024 * 1024;
+async function groqSpeech(text, voice) {
+  if (!process.env.GROQ_API_KEY) throw new HttpError(500, 'AI xizmati sozlanmagan: Vercel\'da GROQ_API_KEY qo\'shilmagan.', 'not-configured');
+  let r;
+  try {
+    r = await fetch(GROQ_BASE + '/audio/speech', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+      body: JSON.stringify({ model: TTS_MODEL, voice, input: text, response_format: 'wav' })
+    });
+  } catch (e) {
+    throw new HttpError(502, "Ovoz xizmatiga ulanib bo'lmadi.", 'upstream', String(e.message || e));
+  }
+  if (r.ok) return Buffer.from(await r.arrayBuffer());
+  const data = await r.json().catch(() => ({}));
+  const err = data && data.error;
+  console.error('[api/ai] tts', r.status, JSON.stringify(err || data).slice(0, 400));
+  if (/terms/i.test(`${err && err.code} ${err && err.message}`)) {
+    throw new HttpError(502, `Ovoz modeli yoqilmagan: Groq hisobida ${TTS_MODEL} shartlarini qabul qiling (console.groq.com/playground).`, 'tts-terms', String(err && err.message || '').slice(0, 300));
+  }
+  throw upstreamError(r.status, err);
+}
 
 async function groq(messages, { maxTokens = 400, temperature = 0.6, json = false } = {}) {
   if (!process.env.GROQ_API_KEY) throw new HttpError(500, 'AI xizmati sozlanmagan: Vercel\'da GROQ_API_KEY qo\'shilmagan.', 'not-configured');
@@ -243,12 +272,32 @@ const TASKS = {
     return { words, usesLeft, unlimited: !credit };
   },
 
+  /* Tabiiy ovoz: matn → audio/wav. Bir xil matn+ovoz server xotirasida keshlanadi. */
+  async tts(body) {
+    const voice = TTS_VOICES.includes(body.voice) ? body.voice : TTS_VOICES[0];
+    /* Kvadrat qavslar Orpheus'da "ovoz yo'nalishi" — foydalanuvchi matnida ruxsat bermaymiz */
+    const text = str(body.text, 200).replace(/[[\]<>]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!text || !/[\p{L}\p{N}]/u.test(text)) throw new HttpError(400, 'Matn kiritilmagan');
+    const key = voice + '|' + text;
+    const hit = ttsCache.get(key);
+    if (hit) { ttsCache.delete(key); ttsCache.set(key, hit); return { audio: hit }; }
+    const audio = await groqSpeech(text, voice);
+    ttsCache.set(key, audio);
+    let size = 0;
+    for (const v of ttsCache.values()) size += v.length;
+    for (const k of ttsCache.keys()) { if (size <= TTS_CACHE_BYTES) break; size -= ttsCache.get(k).length; ttsCache.delete(k); }
+    return { audio };
+  },
+
   /* Admin uchun: AI ulanishini tekshirish */
   async ping(body, user) {
     if (!(await isAdmin(user))) throw new HttpError(403, 'Faqat admin uchun', 'forbidden');
     const t0 = Date.now();
     const text = await groq([{ role: 'user', content: 'Reply with the single word: OK' }], { maxTokens: 5, temperature: 0 });
-    return { ok: true, model: workingModel, reply: text, ms: Date.now() - t0 };
+    const ms = Date.now() - t0;
+    let tts = { ok: true, model: TTS_MODEL };
+    try { await groqSpeech('OK', TTS_VOICES[0]); } catch (e) { tts = { ok: false, model: TTS_MODEL, error: e.message, code: e.code, detail: e.detail }; }
+    return { ok: true, model: workingModel, reply: text, ms, tts };
   },
 
   async chat(body) {
@@ -281,6 +330,12 @@ export default async function handler(req, res) {
     reqUser = user;
     rateLimit(user.uid, task);
     const result = await TASKS[task](body, user);
+    if (result && result.audio) {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'audio/wav');
+      res.setHeader('Content-Length', String(result.audio.length));
+      return res.end(result.audio);
+    }
     return res.status(200).json(result);
   } catch (e) {
     const status = e instanceof HttpError ? e.status : 500;

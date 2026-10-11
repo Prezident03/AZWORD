@@ -33,12 +33,27 @@ function fakeAI(body) {
   return { error: 'bad' };
 }
 
+/* 0.15 soniyalik jimjitlik — soxta "tabiiy ovoz" */
+function silentWav(ms = 150, rate = 8000) {
+  const n = Math.round(rate * ms / 1000);
+  const b = Buffer.alloc(44 + n, 128);
+  b.write('RIFF', 0); b.writeUInt32LE(36 + n, 4); b.write('WAVE', 8); b.write('fmt ', 12);
+  b.writeUInt32LE(16, 16); b.writeUInt16LE(1, 20); b.writeUInt16LE(1, 22); b.writeUInt32LE(rate, 24);
+  b.writeUInt32LE(rate, 28); b.writeUInt16LE(1, 32); b.writeUInt16LE(8, 34); b.write('data', 36); b.writeUInt32LE(n, 40);
+  return b;
+}
+const ttsLog = [];
+
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
   if (url.pathname === '/api/ai') {
     let b = '';
     req.on('data', c => (b += c));
-    req.on('end', () => { res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(fakeAI(JSON.parse(b || '{}')))); });
+    req.on('end', () => {
+      const body = JSON.parse(b || '{}');
+      if (body.task === 'tts') { ttsLog.push(body); res.setHeader('Content-Type', 'audio/wav'); return res.end(silentWav()); }
+      res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify(fakeAI(body)));
+    });
     return;
   }
   let p = decodeURIComponent(url.pathname);

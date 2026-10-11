@@ -4,7 +4,7 @@ import { completeSession } from '../data.js';
 import { sourceFromParams, sourceHome } from '../game.js';
 import { icon } from '../icons.js';
 import { $, html, raw, ic, setHTML, params, shuffle, confirmDialog, errorState, emptyState } from '../ui.js';
-import { playSound, speak, canSpeak, vibrate } from '../fx.js';
+import { playSound, speak, canSpeak, vibrate, preloadSpeech } from '../fx.js';
 import { getPrefs } from '../prefs.js';
 import { resolveSource, loadSession, finishPayload, storeResult } from '../session.js';
 
@@ -23,6 +23,7 @@ async function start() {
   home = sourceHome(session.src);
   $('#meta-title').textContent = session.title || 'Flashcard';
   deck = shuffle(session.words);
+  preloadSpeech(deck.map(w => w.en));
   if (!deck.length) {
     setHTML('stage', html`<div class="card">${emptyState({ iconName: 'copy', title: "So'zlar yo'q", action: html`<a class="btn" href="${home}">Orqaga</a>` })}</div>`);
     $('#fc-help').hidden = true;

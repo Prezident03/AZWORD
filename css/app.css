@@ -417,6 +417,8 @@ html.no-motion *, html.no-motion *::before, html.no-motion *::after { animation-
 .setting-row:last-child { border-bottom: 0; padding-bottom: 0; }
 .setting-row:first-child { padding-top: 0; }
 .setting-info { min-width: 0; }
+.setting-row > .tabs, .setting-row > .select, .setting-row > .btn, .setting-row > .switch { flex-shrink: 0; }
+@media (max-width: 560px) { .setting-row:has(> .tabs) { flex-wrap: wrap; } }
 .setting-name { font-weight: 600; }
 .setting-desc { font-size: 0.82rem; color: var(--text-3); margin-top: 2px; }
 

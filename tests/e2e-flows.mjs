@@ -331,7 +331,8 @@ export async function dictation({ newPage, base, settle, shot }) {
     await settle(page);
     let n = 0, wrongDone = false, revealDone = false;
     for (let guard = 0; guard < 30 && !/results\.html/.test(page.url()); guard++) {
-      await page.waitForSelector('#ti', { timeout: 8000 });
+      await Promise.race([page.waitForSelector('#ti', { timeout: 10000 }), page.waitForURL(/results\.html/, { timeout: 10000 })]);
+      if (/results\.html/.test(page.url())) break;
       const sentence = await page.$eval('#slots', el => el.classList.contains('sm'));
       let en;
       if (sentence) en = await page.$eval('.dict-hint b', el => el.textContent.trim());
@@ -476,4 +477,39 @@ export async function legacyAdmin({ newPage, base, settle, shot, env }) {
   const list = await p.textContent('#list');
   if (!/mushukcha/.test(list)) throw new Error('legacy word edit failed');
   await s.context.close();
+}
+
+/* Tabiiy ovoz: sozlamalarda ovoz tanlash va so'zlar AI ovoz orqali o'qilishi */
+export async function voice({ newPage, base, settle, shot }) {
+  const { page, context } = await newPage();
+  await page.goto(base + 'index.html');
+  await page.fill('#login-email', 'student@test.uz');
+  await page.fill('#login-password', 'secret123');
+  await page.click('#form-login button[type=submit]');
+  await page.waitForURL(/dashboard\.html/);
+  await page.goto(base + 'settings.html');
+  await settle(page);
+  const seen = [];
+  page.on('request', r => { if (r.url().endsWith('/api/ai')) { try { const b = JSON.parse(r.postData() || '{}'); if (b.task === 'tts') seen.push(b); } catch (e) { /* ignore */ } } });
+  await page.selectOption('#voice', 'hannah');
+  await page.waitForTimeout(600);
+  await shot(page, 'settings-voice');
+  if (!seen.some(b => b.voice === 'hannah')) throw new Error('settings: no tts request with hannah ' + JSON.stringify(seen));
+  /* Brauzer ovoziga o'tilsa — AI so'rovi bo'lmaydi va UK/US tanlovi chiqadi */
+  await page.click('#engine [data-v="browser"]');
+  if (await page.isHidden('#accent-row')) throw new Error('accent row hidden');
+  const n = seen.length;
+  await page.click('#test-voice');
+  await page.waitForTimeout(400);
+  if (seen.length !== n) throw new Error('browser engine still calls tts');
+  await page.click('#engine [data-v="ai"]');
+  /* Mashqda so'zlar oldindan yuklanadi va AI ovoz bilan o'qiladi */
+  seen.length = 0;
+  await page.goto(base + 'quick-quiz.html?book=b1&topic=t1&mode=listen');
+  await settle(page);
+  await page.waitForTimeout(800);
+  if (seen.length < 3) throw new Error('listen: preload count ' + seen.length);
+  const cached = await page.evaluate(async () => (await (await caches.open('az-tts-v1')).keys()).length);
+  if (cached < 3) throw new Error('device cache ' + cached);
+  await context.close();
 }

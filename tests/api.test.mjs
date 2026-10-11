@@ -14,13 +14,23 @@ process.env.FIREBASE_PROJECT_ID = PROJECT;
 process.env.FIREBASE_API_KEY = 'fake-key';
 process.env.GROQ_API_KEY = 'test';
 
-let groqServer, env, handler, lastGroqBody;
+let groqServer, env, handler, lastGroqBody, ttsCalls = 0;
 before(async () => {
   groqServer = http.createServer((req, res) => {
     let b = '';
     req.on('data', c => (b += c));
     req.on('end', () => {
       lastGroqBody = JSON.parse(b);
+      if (req.url.endsWith('/audio/speech')) {
+        ttsCalls++;
+        if (lastGroqBody.input === 'terms please') {
+          res.statusCode = 400;
+          res.setHeader('Content-Type', 'application/json');
+          return res.end(JSON.stringify({ error: { message: 'The model requires terms acceptance', code: 'model_terms_required' } }));
+        }
+        res.setHeader('Content-Type', 'audio/wav');
+        return res.end(Buffer.from('RIFF0000WAVEfake-audio'));
+      }
       const json = !!lastGroqBody.response_format;
       const isGloss = json && /Sentence:/.test(JSON.stringify(lastGroqBody.messages));
       const content = isGloss
@@ -56,7 +66,8 @@ function call(body, token) {
       code: 200, headers: {},
       setHeader(k, v) { this.headers[k] = v; },
       status(c) { this.code = c; return this; },
-      json(d) { resolve({ status: this.code, data: d }); }
+      json(d) { resolve({ status: this.code, data: d }); },
+      end(buf) { resolve({ status: this.statusCode || this.code, audio: buf, headers: this.headers }); }
     };
     handler(req, res);
   });
@@ -76,6 +87,26 @@ test('misol gap', async () => {
   const r = await call({ task: 'example', en: 'cat', uz: 'mushuk' }, u.token);
   assert.equal(r.status, 200);
   assert.equal(r.data.text, 'The cat sleeps on the sofa.');
+});
+test('tabiiy ovoz (tts): audio qaytaradi, keshlaydi, qavslarni olib tashlaydi', async () => {
+  const u = await signUp('t10@x.com');
+  const before = ttsCalls;
+  const r = await call({ task: 'tts', text: 'Hello [whisper] world', voice: 'hannah' }, u.token);
+  assert.equal(r.status, 200);
+  assert.equal(r.headers['Content-Type'], 'audio/wav');
+  assert.equal(r.audio.toString(), 'RIFF0000WAVEfake-audio');
+  assert.equal(lastGroqBody.model, 'canopylabs/orpheus-v1-english');
+  assert.equal(lastGroqBody.voice, 'hannah');
+  assert.equal(lastGroqBody.input, 'Hello whisper world');
+  const r2 = await call({ task: 'tts', text: 'Hello [whisper] world', voice: 'hannah' }, u.token);
+  assert.equal(r2.status, 200);
+  assert.equal(ttsCalls, before + 1);
+  const bad = await call({ task: 'tts', text: 'Hi', voice: 'evil' }, u.token);
+  assert.equal(lastGroqBody.voice, 'troy');
+  assert.equal(bad.status, 200);
+  const terms = await call({ task: 'tts', text: 'terms please' }, u.token);
+  assert.equal(terms.status, 502);
+  assert.equal(terms.data.code, 'tts-terms');
 });
 test('gap tarjimasi (diktant)', async () => {
   const u = await signUp('t9@x.com');

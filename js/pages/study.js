@@ -7,7 +7,7 @@ import { completeSession } from '../data.js';
 import { sourceFromParams, sourceHome, normalizeAnswer } from '../game.js';
 import { icon } from '../icons.js';
 import { $, html, raw, ic, setHTML, esc, params, shuffle, confirmDialog, toastError, withLoading, errorState, emptyState } from '../ui.js';
-import { playSound, confetti, speak, canSpeak, vibrate } from '../fx.js';
+import { playSound, confetti, speak, canSpeak, vibrate, preloadSpeech } from '../fx.js';
 import { getPrefs } from '../prefs.js';
 import { aiTranslate } from '../ai.js';
 import { resolveSource, loadSession, finishPayload, storeResult } from '../session.js';
@@ -45,6 +45,8 @@ async function start() {
   src = session.src;
   home = sourceHome(src);
   words = session.words;
+  preloadSpeech(words.map(w => w.en));
+  preloadSpeech(words.map(w => w.example).filter(Boolean));
   $('#meta-title').textContent = session.title || "O'rganish";
   document.title = `${session.title || "O'rganish"} · AzWord`;
   if (words.length < 2) {

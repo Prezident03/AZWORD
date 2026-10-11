@@ -578,7 +578,10 @@ async function settings() {
     const out = $('#st-ai-out');
     try {
       const r = await aiPing();
-      setHTML(out, html`<div class="alert alert-success">${ic('circle-check', 18)}<div>AI ishlayapti. Model: <b>${r.model}</b> · ${r.ms} ms</div></div>`);
+      const t = r.tts || {};
+      setHTML(out, html`<div class="alert alert-success">${ic('circle-check', 18)}<div>AI ishlayapti. Model: <b>${r.model}</b> · ${r.ms} ms</div></div>
+        ${t.ok ? html`<div class="alert alert-success mt-2">${ic('volume', 18)}<div>Tabiiy ovoz ishlayapti (${t.model})</div></div>`
+          : html`<div class="alert alert-warning mt-2">${ic('volume', 18)}<div style="word-break:break-word">Tabiiy ovoz ishlamayapti — foydalanuvchilar brauzer ovozini eshitadi.<br>${t.error || ''}${t.detail ? html` <span class="xs dim">(${t.detail})</span>` : ''}</div></div>`}`);
     } catch (err) {
       setHTML(out, html`<div class="alert alert-danger">${ic('alert-triangle', 18)}<div style="word-break:break-word">${err.message}</div></div>`);
     }
